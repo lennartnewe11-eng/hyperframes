@@ -3,7 +3,7 @@ audio/
 *.mp3
 *.mp4
 *.wav
-frames/
+frames*/
 ref/
 node_modules/
 .hyperframes/
