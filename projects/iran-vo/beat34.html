@@ -61,7 +61,12 @@
       #amnestySub { position: absolute; left: 0; right: 0; top: 50%; margin-top: 40px; text-align: center; font-size: 18px; }
 
       /* 4b/4c — satellite analysis */
-      #sat { left: 50%; margin-left: -590px; top: 50%; margin-top: -350px; width: 1180px; height: 700px; }
+      #sat { left: 50%; margin-left: -500px; top: 50%; margin-top: -360px; width: 1000px; height: 750px; }
+      .satlbl { position: absolute; font-family: "IBM Plex Mono", monospace; text-transform: uppercase;
+        letter-spacing: 0.12em; font-size: 14px; color: var(--highlight); top: 4%; left: 12%; }
+      .dmg { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px;
+        border: 1.5px solid var(--highlight); }
+      #adjNote { position: absolute; left: 50%; top: 190px; transform: translateX(-50%); font-size: 13px; }
       .scanline { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,214,10,0.8), transparent); top: 0; }
       .zone { position: absolute; border: 1.5px solid var(--highlight); }
       .zone .z-lbl { position: absolute; top: -28px; left: 0; font-family: "IBM Plex Mono", monospace;
@@ -108,7 +113,7 @@
 
       <!-- 3b trump quote -->
       <div class="scene" id="s3b">
-        <div class="photo hid" id="trump"><div class="ph-lbl mono">Foto: D. Trump — Platzhalter</div></div>
+        <div class="photo hid" id="trump" style="background:#05080f url('assets/trump.jpg') center/cover;"></div>
         <div id="quoteWrap" class="hid">
           <div id="qmark">“</div>
           <div id="quote">Amerika greift keine Zivilisten an.</div>
@@ -133,16 +138,15 @@
       <!-- 4b/4c satellite analysis -->
       <div class="scene" id="s4b">
         <div class="mono hid" id="anaTag">Satellitenanalyse · Quelle: Amnesty International</div>
-        <div class="photo hid" id="sat">
-          <div class="ph-lbl mono">Satellit: Gelände — Platzhalter</div>
+        <div class="photo hid" id="sat" style="background:#05080f url('assets/schule-teaser.jpg') center/cover;">
           <div class="scanline hid" id="scan"></div>
-          <div class="zone hid" id="zSchule"><div class="z-lbl">Schule</div></div>
-          <div class="zone hid" id="zRG"><div class="z-lbl">Compound · Revolutionsgarden</div></div>
-          <div class="hid" id="distBracket"></div>
-          <div id="irWash" class="hid"></div>
-          <div id="geoCross" class="hid"></div>
+          <div class="satlbl hid" id="satLbl">Mädchenschule · Minab</div>
+          <div class="dmg hid" id="dmg1" style="left:37%; top:45%;"></div>
+          <div class="dmg hid" id="dmg2" style="left:27%; top:30%;"></div>
+          <div class="dmg hid" id="dmg3" style="left:70%; top:22%;"></div>
+          <div id="geoCross" class="hid" style="left:40%; top:46%;"></div>
         </div>
-        <div class="mono hid" id="distLabel">Unmittelbar benachbart</div>
+        <div class="mono hid" id="adjNote">Compound der Revolutionsgarden · unmittelbar benachbart</div>
         <div class="hid" id="geoLabel">Einschlaggeometrie</div>
       </div>
 
@@ -199,15 +203,15 @@
         tl.set("#scan", { opacity: 1 }, 22.6);
         tl.fromTo("#scan", { top: "0%" }, { top: "100%", duration: 1.0, ease: "power1.inOut" }, 22.6);
         tl.to("#scan", { opacity: 0, duration: 0.2 }, 23.6);
-        // zones
-        tl.fromTo("#zSchule", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out", transformOrigin: "center" }, 23.8);
-        tl.fromTo("#zRG", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out", transformOrigin: "center" }, 25.0);
-        tl.fromTo(["#distBracket", "#distLabel"], { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.1 }, 26.2);
+        // labels: school + adjacent compound
+        tl.fromTo("#satLbl", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 23.8);
+        tl.fromTo("#adjNote", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 24.8);
+        // damage markers on destroyed buildings
+        tl.fromTo(".dmg", { opacity: 0, scale: 1.7 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.2, ease: "power3.out", immediateRender: false }, 25.6);
 
-        // ===== 4c infrared + geometry (28.4–34.7) =====
-        tl.fromTo("#irWash", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.inOut" }, 28.4);
-        tl.fromTo("#geoCross", { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 30.0);
-        tl.fromTo("#geoLabel", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 30.4);
+        // ===== 4c geometry (28.4–34.7) =====
+        tl.fromTo("#geoCross", { opacity: 0, scale: 1.7 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out", immediateRender: false }, 28.4);
+        tl.fromTo("#geoLabel", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 28.8);
 
         window.__timelines["main"] = tl;
       </script>
