@@ -49,7 +49,8 @@
       .idot { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px;
         border-radius: 50%; background: var(--highlight); box-shadow: 0 0 24px 4px rgba(255,214,10,0.5); }
       #t1 { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-        text-align: center; font-weight: 700; font-size: 132px; letter-spacing: -0.01em; }
+        text-align: center; font-family: "Inter", system-ui, sans-serif; font-weight: 800;
+        font-size: 138px; letter-spacing: -0.03em; }
 
       /* ① timeline */
       .tl-wrap { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 1080px; height: 220px; }
@@ -109,7 +110,7 @@
         <div class="scene" id="s1a">
           <div class="ring hid" id="r1"></div>
           <div class="idot hid" id="idot"></div>
-          <div class="serif hid" id="t1">Der erste Schlag</div>
+          <div class="hid" id="t1">Der erste Schlag</div>
         </div>
 
         <!-- ① timeline -->
@@ -192,7 +193,7 @@
           { opacity: 0.8, duration: 0.06, ease: "power2.in" },
           { opacity: 0, duration: 0.32, ease: "power2.out" },
         ] }, 1.6);
-        tl.fromTo("#r1", { scale: 0.2, opacity: 0.9 }, { scale: 9, opacity: 0, duration: 1.1, ease: "power2.out" }, 1.6);
+        tl.fromTo("#r1", { scale: 0.2, opacity: 0.9 }, { scale: 9, opacity: 0, duration: 1.1, ease: "power2.out", immediateRender: false }, 1.6);
         tl.fromTo("#idot", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "power3.out" }, 1.62);
         tl.fromTo("#t1", { scale: 1.12, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.34, ease: "power3.out" }, 1.62);
         // screen shake
@@ -218,7 +219,7 @@
         tl.from("#t40", { opacity: 0, y: -10, duration: 0.4, ease: "power2.out" }, 9.4);
         tl.fromTo("#mB", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2)" }, 9.5);
         tl.from("#lblB", { opacity: 0, y: 8, duration: 0.5 }, 9.6);
-        tl.fromTo(["#s2a-r1", "#s2a-r2", "#s2a-r3"], { scale: 0.2, opacity: 0.9 }, { scale: 6, opacity: 0, duration: 1.1, ease: "power2.out", stagger: 0.18 }, 9.5);
+        tl.fromTo(["#s2a-r1", "#s2a-r2", "#s2a-r3"], { scale: 0.2, opacity: 0.9 }, { scale: 6, opacity: 0, duration: 1.1, ease: "power2.out", stagger: 0.18, immediateRender: false }, 9.5);
         tl.to("#playhead", { opacity: 0, duration: 0.3 }, 9.8);
         // exit timeline (slide up)
         tl.to("#s1b", { y: -50, opacity: 0, duration: 0.4, ease: "power2.in" }, 12.0);
@@ -228,14 +229,14 @@
         tl.fromTo("#dtSub", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 12.9);
         tl.fromTo("#bldg", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "power3.out" }, 13.3);
         // strike 1 on building
-        tl.fromTo("#strike1", { scale: 0.2, opacity: 1 }, { scale: 4, opacity: 0, duration: 0.8, ease: "power2.out" }, 14.6);
+        tl.fromTo("#strike1", { scale: 0.2, opacity: 1 }, { scale: 4, opacity: 0, duration: 0.8, ease: "power2.out", immediateRender: false }, 14.6);
         // helpers converge
         for (let i = 0; i < HPOS_vals.length; i++) {
           const [x, y] = HPOS_vals[i];
           tl.fromTo(`#h${i}`, { x, y, opacity: 0 }, { x: x * 0.16, y: y * 0.16, opacity: 1, duration: 1.0, ease: "power2.inOut" }, 15.2 + i * 0.03);
         }
         // strike 2 on responders, scatter
-        tl.fromTo("#strike2", { scale: 0.2, opacity: 1 }, { scale: 4.4, opacity: 0, duration: 0.8, ease: "power2.out" }, 16.9);
+        tl.fromTo("#strike2", { scale: 0.2, opacity: 1 }, { scale: 4.4, opacity: 0, duration: 0.8, ease: "power2.out", immediateRender: false }, 16.9);
         for (let i = 0; i < HPOS_vals.length; i++) {
           const [x, y] = HPOS_vals[i];
           tl.to(`#h${i}`, { x: x * 0.4, y: y * 0.4, opacity: 0, duration: 0.5, ease: "power2.in" }, 17.0 + i * 0.015);

@@ -46,11 +46,11 @@ full-screen linear gradient.
 
 ## Typography
 
-- **Hero keywords (serif):** `Playfair Display`, weight 700–800. High-contrast Didone —
-  the headline word of each beat. Big (120px+ landscape), centered, often sliding
-  horizontally through frame. This is the primary "spoken word" treatment.
-- **Display / secondary (sans):** `Inter`, weight 800. Tight tracking (`-0.02em`).
-  Used inside band-wipe panels and for non-headline words.
+- **Hero keywords (grotesque):** `Inter`, weight 800, Helvetica-like. Tight tracking
+  (`-0.03em`). The headline word of each beat — big (130px+ landscape), centered, often
+  sliding horizontally through frame. This is the primary "spoken word" treatment.
+- **Serif (optional accent):** `Playfair Display` may be used for a special editorial
+  pull-quote moment, but the default hero is grotesque (Inter).
 - **Micro-labels / data:** `IBM Plex Mono`, 12–14px, uppercase, `letter-spacing: .14em`,
   color `--muted`. Corner chrome, timecodes, units, captions.
 - **Data values:** `Inter` 700 with `font-variant-numeric: tabular-nums` (counters
