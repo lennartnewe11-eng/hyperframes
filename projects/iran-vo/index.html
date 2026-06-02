@@ -95,7 +95,7 @@
     </style>
   </head>
   <body>
-    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="25.6">
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="27.1">
       <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
 
       <div class="chrome">
@@ -190,8 +190,9 @@
 
         // ===== ① "Der erste Schlag" — impact ~1.6s =====
         tl.fromTo("#flash", { opacity: 0 }, { keyframes: [
-          { opacity: 0.8, duration: 0.06, ease: "power2.in" },
-          { opacity: 0, duration: 0.32, ease: "power2.out" },
+          { opacity: 0.95, duration: 0.05, ease: "power2.in" },
+          { opacity: 0.95, duration: 0.20 },
+          { opacity: 0, duration: 0.55, ease: "power2.out" },
         ] }, 1.6);
         tl.fromTo("#r1", { scale: 0.2, opacity: 0.9 }, { scale: 9, opacity: 0, duration: 1.1, ease: "power2.out", immediateRender: false }, 1.6);
         tl.fromTo("#idot", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "power3.out" }, 1.62);
@@ -252,15 +253,15 @@
         } }, 18.5);
         tl.fromTo("#lblTote", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 19.4);
         tl.fromTo("#rhSource", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 19.7);
-        // exit number up to make room for grid
-        tl.to(["#num168", "#lblTote", "#rhSource"], { y: -260, opacity: 0, duration: 0.5, ease: "power2.inOut" }, 21.2);
+        // hold 168 longer, then exit number up to make room for grid
+        tl.to(["#num168", "#lblTote", "#rhSource"], { y: -260, opacity: 0, duration: 0.5, ease: "power2.inOut" }, 21.9);
 
-        // ===== ② grid + 100+ Kinder (21.4–25.6) =====
-        tl.set("#grid", { opacity: 1 }, 21.4);
-        tl.fromTo(".gdot", { opacity: 0, scale: 0.4 }, { opacity: 0.42, scale: 1, duration: 0.5, stagger: 0.004, ease: "power1.out" }, 21.4);
+        // ===== ② grid + 100+ Kinder (22.1 → held to 27.1 in silence) =====
+        tl.set("#grid", { opacity: 1 }, 22.1);
+        tl.fromTo(".gdot", { opacity: 0, scale: 0.4 }, { opacity: 0.42, scale: 1, duration: 0.5, stagger: 0.004, ease: "power1.out" }, 22.1);
         // highlight children
-        tl.to(".gdot.child", { opacity: 1, duration: 0.6, stagger: 0.006, ease: "power2.out" }, 23.0);
-        tl.fromTo("#kLabel", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 23.4);
+        tl.to(".gdot.child", { opacity: 1, duration: 0.6, stagger: 0.006, ease: "power2.out" }, 23.3);
+        tl.fromTo("#kLabel", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 23.7);
 
         window.__timelines["main"] = tl;
 
