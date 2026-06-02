@@ -69,7 +69,8 @@ sheet. Hairline registration marks optional. Constant, quiet, `--muted`.
 - **Map overlays ("Karten-Einblendungen") — primary data element:** a dark map
   (stylized, desaturated, on-palette) with: a **glowing marker dot** (pulsing rings,
   finite repeats), an **animated dashed route line** (amber `--route`) that draws on
-  via `stroke-dashoffset` then flows with marching-ant dashes, faint **place labels**
+  via `stroke-dashoffset` then flows with marching-ant dashes (intense yellow `--highlight`),
+  faint **place labels**
   (`IBM Plex Mono`, `--muted`), a hairline lat/long **graticule**, and a **count-up
   data callout** (distance/coords, tabular-nums). Everything draws/eases on smoothly —
   no hard pop-in. This is the signature "Einblendung". See reference.
