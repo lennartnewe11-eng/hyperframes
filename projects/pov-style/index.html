@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --bg-0: #070c16;
+        --bg-1: #0b1424;
+        --steel: #3e5c8a;
+        --fog: #5b7396;
+        --horizon: #a8bfd8;
+        --accent: #6e9bd8;
+        --highlight: #ffd60a;
+        --route: #ffd60a;
+        --ink: #f4f7fb;
+        --muted: #8492a8;
+        --line: rgba(255, 255, 255, 0.22);
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--bg-0);
+        font-family: "Inter", system-ui, sans-serif;
+        color: var(--ink);
+      }
+      .mono {
+        font-family: "IBM Plex Mono", monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+      }
+
+      /* ---------- Atmospheric background ---------- */
+      .bg {
+        position: absolute;
+        inset: 0;
+      }
+      .bg-base {
+        background: var(--bg-1);
+      }
+      /* portal / tunnel — radial glow on edges, dark center (image 2) */
+      .bg-portal {
+        background:
+          radial-gradient(120% 95% at 50% 18%, rgba(62, 92, 138, 0.55), rgba(11, 20, 36, 0) 55%),
+          radial-gradient(80% 70% at 50% 120%, rgba(11, 20, 36, 0.9), rgba(11, 20, 36, 0) 60%);
+      }
+      /* fog — soft drifting steel-blue haze (image 3) */
+      .bg-fog {
+        opacity: 0.7;
+      }
+      .fog-blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+      }
+      .fog-1 {
+        width: 1100px;
+        height: 700px;
+        left: -200px;
+        top: 120px;
+        background: radial-gradient(circle, rgba(91, 115, 150, 0.35), rgba(91, 115, 150, 0) 70%);
+      }
+      .fog-2 {
+        width: 1300px;
+        height: 800px;
+        right: -300px;
+        top: 260px;
+        background: radial-gradient(circle, rgba(62, 92, 138, 0.3), rgba(62, 92, 138, 0) 70%);
+      }
+      /* sea horizon — bright thin line mid-frame + reflection (image 4) */
+      .bg-horizon {
+        opacity: 0;
+      }
+      .horizon-sky {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 58%;
+        background: radial-gradient(
+          140% 120% at 50% 100%,
+          rgba(168, 191, 216, 0.5),
+          rgba(11, 20, 36, 0) 60%
+        );
+      }
+      .horizon-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 58%;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          rgba(168, 191, 216, 0) 0%,
+          rgba(220, 232, 244, 0.95) 50%,
+          rgba(168, 191, 216, 0) 100%
+        );
+        box-shadow: 0 0 40px 6px rgba(168, 191, 216, 0.4);
+        transform: scaleX(0.9);
+      }
+      .horizon-sea {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 58%;
+        bottom: 0;
+        background: linear-gradient(180deg, rgba(46, 64, 94, 0.7) 0%, rgba(8, 14, 24, 1) 90%);
+      }
+      /* film grain to break H.264 banding on the blue gradients */
+      .grain {
+        position: absolute;
+        inset: 0;
+        opacity: 0.05;
+        mix-blend-mode: overlay;
+        pointer-events: none;
+      }
+
+      /* ---------- Editorial frame chrome ---------- */
+      .chrome {
+        position: absolute;
+        inset: 0;
+        font-size: 14px;
+      }
+      .chrome > div {
+        position: absolute;
+      }
+      .c-tl {
+        top: 42px;
+        left: 56px;
+      }
+      .c-tr {
+        top: 42px;
+        right: 56px;
+        text-align: right;
+      }
+      .c-bl {
+        bottom: 42px;
+        left: 56px;
+      }
+      .c-br {
+        bottom: 42px;
+        right: 56px;
+        text-align: right;
+      }
+
+      /* ---------- Scenes ---------- */
+      .scene {
+        position: absolute;
+        inset: 0;
+      }
+      #sc2,
+      #sc3 {
+        opacity: 0;
+      }
+
+      /* Scene 1 — Point of View */
+      .horn {
+        position: absolute;
+        inset: 0;
+      }
+      .horn path {
+        fill: none;
+        stroke: var(--line);
+        stroke-width: 1.5;
+      }
+      .title {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: 800;
+        font-size: 116px;
+        letter-spacing: -0.02em;
+        line-height: 0.95;
+      }
+      .title-l {
+        left: 56px;
+      }
+      .title-r {
+        right: 150px;
+      }
+
+      /* Scene 2 — map overlay */
+      .map {
+        position: absolute;
+        inset: 0;
+      }
+      .map svg {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+      }
+      .graticule {
+        stroke: rgba(255, 255, 255, 0.06);
+        stroke-width: 1;
+        fill: none;
+      }
+      .landmass {
+        fill: rgba(132, 146, 168, 0.06);
+        stroke: rgba(255, 255, 255, 0.12);
+        stroke-width: 1;
+      }
+      .place {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        fill: var(--muted);
+      }
+      .place-dot {
+        fill: rgba(180, 196, 218, 0.5);
+      }
+      .route {
+        fill: none;
+        stroke: var(--route);
+        stroke-width: 2.5;
+        stroke-linecap: round;
+      }
+      .marker-core {
+        fill: #ffffff;
+      }
+      .marker-ring {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.6);
+        stroke-width: 1.5;
+      }
+      .callout {
+        position: absolute;
+      }
+      .callout .lbl {
+        font-size: 13px;
+      }
+      .callout .val {
+        font-weight: 700;
+        font-size: 56px;
+        letter-spacing: -0.01em;
+        font-variant-numeric: tabular-nums;
+        color: var(--highlight);
+      }
+      .callout .unit {
+        color: var(--muted);
+        font-size: 22px;
+        font-weight: 500;
+        margin-left: 8px;
+      }
+
+      /* Scene 3 — outro */
+      .outro {
+        position: absolute;
+        left: 56px;
+        bottom: 140px;
+      }
+      .outro .mark {
+        font-weight: 800;
+        font-size: 92px;
+        letter-spacing: -0.02em;
+      }
+      .outro .tag {
+        font-size: 15px;
+        margin-top: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      data-composition-id="main"
+      data-width="1920"
+      data-height="1080"
+      data-start="0"
+      data-duration="14"
+    >
+      <!-- Background -->
+      <div class="bg bg-base"></div>
+      <div class="bg bg-portal" id="bgPortal"></div>
+      <div class="bg bg-fog" id="bgFog">
+        <div class="fog-blob fog-1"></div>
+        <div class="fog-blob fog-2"></div>
+      </div>
+      <div class="bg bg-horizon" id="bgHorizon">
+        <div class="horizon-sky"></div>
+        <div class="horizon-sea"></div>
+        <div class="horizon-line" id="hLine"></div>
+      </div>
+      <svg class="grain">
+        <filter id="gr">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#gr)" />
+      </svg>
+
+      <!-- Chrome -->
+      <div class="chrome" id="chrome">
+        <div class="c-tl mono">Introduction</div>
+        <div class="c-tr mono">About / Point of View</div>
+        <div class="c-bl mono">A point of view</div>
+        <div class="c-br mono" id="idx">001</div>
+      </div>
+
+      <!-- Scene 1 -->
+      <div class="scene" id="sc1">
+        <svg class="horn" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+          <path
+            id="hornPath"
+            d="M 150 540 L 1545 80 M 150 540 L 1545 1000 M 1545 80 Q 1640 540 1545 1000"
+          />
+        </svg>
+        <div class="title title-l" id="t1">Point</div>
+        <div class="title title-r" id="t2">of View</div>
+      </div>
+
+      <!-- Scene 2 — map overlay -->
+      <div class="scene" id="sc2">
+        <div class="map">
+          <svg viewBox="0 0 1920 1080" preserveAspectRatio="none">
+            <g id="grat" class="graticule"></g>
+            <path
+              class="landmass"
+              id="land"
+              d="M 360 300 C 520 250 760 240 980 290 C 1240 350 1480 330 1620 430 C 1700 500 1640 640 1500 700 C 1300 790 1020 800 800 760 C 560 715 380 640 330 520 C 300 440 300 350 360 300 Z"
+            />
+            <g id="places"></g>
+            <path class="route" id="routePath" d="M 700 560 C 850 520 1060 470 1230 430" />
+            <g id="marker" transform="translate(700 560)">
+              <circle class="marker-ring" id="ring1" r="14" />
+              <circle class="marker-ring" id="ring2" r="14" />
+              <circle class="marker-core" r="7" />
+            </g>
+          </svg>
+          <div class="callout" id="callout" style="left: 1180px; top: 300px">
+            <div class="lbl mono">Origin · 32.4°N 90.1°W</div>
+            <div><span class="val" id="dist">0</span><span class="unit">km</span></div>
+            <div class="lbl mono" style="margin-top: 6px">Vector to destination</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 3 — outro -->
+      <div class="scene" id="sc3">
+        <div class="outro">
+          <div class="mark" id="o1">Point of View</div>
+          <div class="tag mono" id="o2">Data · Atmosphere · Motion</div>
+        </div>
+      </div>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+
+        // graticule (lat/long grid) — deterministic
+        const grat = document.getElementById("grat");
+        let gg = "";
+        for (let x = 160; x <= 1760; x += 160)
+          gg += `<line x1="${x}" y1="120" x2="${x}" y2="960"/>`;
+        for (let y = 160; y <= 960; y += 160)
+          gg += `<line x1="160" y1="${y}" x2="1760" y2="${y}"/>`;
+        grat.innerHTML = gg;
+
+        // place nodes
+        const PLACES = [
+          { x: 520, y: 360, t: "Nashville" },
+          { x: 1180, y: 340, t: "Atlanta" },
+          { x: 1480, y: 500, t: "Savannah" },
+          { x: 640, y: 720, t: "New Orleans" },
+          { x: 1380, y: 720, t: "Tampa" },
+        ];
+        document.getElementById("places").innerHTML = PLACES.map(
+          (p) =>
+            `<circle class="place-dot" cx="${p.x}" cy="${p.y}" r="3"/>` +
+            `<text class="place" x="${p.x + 14}" y="${p.y + 5}">${p.t}</text>`,
+        ).join("");
+
+        // route draw-on setup
+        const route = document.getElementById("routePath");
+        const L = route.getTotalLength();
+        route.style.strokeDasharray = L;
+        route.style.strokeDashoffset = L;
+
+        const tl = gsap.timeline({ paused: true });
+
+        // background life — slow drift + mood shift to horizon
+        tl.fromTo("#bgPortal", { scale: 1.06 }, { scale: 1, duration: 14, ease: "sine.inOut" }, 0);
+        tl.fromTo(
+          ".fog-1",
+          { x: -40, y: 10 },
+          { x: 40, y: -10, duration: 14, ease: "sine.inOut" },
+          0,
+        );
+        tl.fromTo(".fog-2", { x: 30 }, { x: -40, duration: 14, ease: "sine.inOut" }, 0);
+        tl.fromTo(".grain", { opacity: 0 }, { opacity: 0.05, duration: 1.2 }, 0);
+
+        // chrome
+        tl.from(
+          "#chrome > div",
+          { opacity: 0, y: 8, duration: 0.8, stagger: 0.08, ease: "power2.out" },
+          0.3,
+        );
+
+        // ---------------- SCENE 1 ----------------
+        tl.fromTo(
+          "#hornPath",
+          { strokeDashoffset: 4200, strokeDasharray: 4200 },
+          { strokeDashoffset: 0, duration: 1.6, ease: "power2.inOut" },
+          0.4,
+        );
+        tl.from("#t1", { x: -60, opacity: 0, duration: 0.9, ease: "expo.out" }, 0.7);
+        tl.from("#t2", { x: 60, opacity: 0, duration: 0.9, ease: "expo.out" }, 0.9);
+        tl.to("#sc1", { opacity: 0, duration: 0.8, ease: "power2.inOut" }, 4.2);
+
+        // ---------------- SCENE 2 (map) ----------------
+        tl.set("#idx", { textContent: "002" }, 4.6);
+        tl.to("#sc2", { opacity: 1, duration: 0.8, ease: "power2.inOut" }, 4.6);
+        tl.from("#land", { opacity: 0, duration: 1.0, ease: "power2.out" }, 4.8);
+        tl.from(
+          "#grat line",
+          { opacity: 0, duration: 0.6, stagger: 0.01, ease: "power1.out" },
+          4.8,
+        );
+        tl.from(
+          "#places circle, #places text",
+          { opacity: 0, y: 6, duration: 0.6, stagger: 0.06, ease: "power2.out" },
+          5.1,
+        );
+        tl.from("#marker", { y: -24, opacity: 0, duration: 0.6, ease: "power3.out" }, 5.7);
+        tl.fromTo(
+          ["#ring1", "#ring2"],
+          { attr: { r: 7 }, opacity: 0.7 },
+          { attr: { r: 46 }, opacity: 0, duration: 1.6, ease: "sine.out", stagger: 0.8, repeat: 4 },
+          5.9,
+        );
+        tl.to("#routePath", { strokeDashoffset: 0, duration: 1.0, ease: "power2.inOut" }, 6.1);
+        tl.set("#routePath", { strokeDasharray: "14 12" }, 7.1);
+        tl.fromTo(
+          "#routePath",
+          { strokeDashoffset: 0 },
+          { strokeDashoffset: -52, duration: 0.7, ease: "none", repeat: 4 },
+          7.1,
+        );
+        tl.from("#callout", { x: 24, opacity: 0, duration: 0.7, ease: "power3.out" }, 6.3);
+        tl.to(
+          { v: 0 },
+          {
+            v: 642,
+            duration: 1.4,
+            ease: "power1.out",
+            onUpdate: function () {
+              document.getElementById("dist").textContent = Math.round(this.targets()[0].v);
+            },
+          },
+          6.4,
+        );
+        tl.to("#sc2", { opacity: 0, duration: 0.8, ease: "power2.inOut" }, 9.6);
+
+        // ---------------- SCENE 3 (horizon outro) ----------------
+        tl.set("#idx", { textContent: "003" }, 9.8);
+        tl.to("#bgHorizon", { opacity: 1, duration: 1.6, ease: "power2.inOut" }, 9.6);
+        tl.to("#bgPortal", { opacity: 0.4, duration: 1.6, ease: "power2.inOut" }, 9.6);
+        tl.fromTo(
+          "#hLine",
+          { scaleX: 0.2, opacity: 0 },
+          { scaleX: 0.9, opacity: 1, duration: 1.4, ease: "expo.out" },
+          9.9,
+        );
+        tl.to("#sc3", { opacity: 1, duration: 0.8, ease: "power2.inOut" }, 10.2);
+        tl.from("#o1", { y: 40, opacity: 0, duration: 1.0, ease: "expo.out" }, 10.4);
+        tl.from("#o2", { y: 20, opacity: 0, duration: 0.8, ease: "power2.out" }, 10.7);
+        tl.to("#chrome", { opacity: 0.6, duration: 1.0 }, 12.5);
+
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>
