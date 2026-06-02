@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root {
+        --bg-0: #070c16;
+        --ink: #f4f7fb;
+        --muted: #8492a8;
+        --highlight: #ffd60a;
+        --line: rgba(255, 255, 255, 0.22);
+        --danger: #d24b4b;
+      }
+      html, body {
+        width: 1920px; height: 1080px; overflow: hidden;
+        background: var(--bg-0);
+        font-family: "Inter", system-ui, sans-serif;
+        color: var(--ink);
+      }
+      .serif { font-family: "Playfair Display", serif; }
+      .mono {
+        font-family: "IBM Plex Mono", monospace;
+        text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted);
+      }
+      .hid { opacity: 0; }
+
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; }
+      .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 50; }
+
+      /* editorial chrome */
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; }
+      .c-tr { top: 46px; right: 64px; text-align: right; }
+      .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 96px; left: 50%; transform: translateX(-50%);
+        width: 360px; height: 1px; background: var(--line); transform-origin: center; }
+
+      .stage { position: absolute; inset: 0; }
+      .scene { position: absolute; inset: 0; }
+
+      /* ① impact */
+      .center { position: absolute; left: 50%; top: 50%; }
+      .ring { position: absolute; left: 50%; top: 50%; width: 40px; height: 40px; margin: -20px 0 0 -20px;
+        border: 2px solid rgba(255,255,255,0.85); border-radius: 50%; }
+      .idot { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px;
+        border-radius: 50%; background: var(--highlight); box-shadow: 0 0 24px 4px rgba(255,214,10,0.5); }
+      #t1 { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        text-align: center; font-weight: 700; font-size: 132px; letter-spacing: -0.01em; }
+
+      /* ① timeline */
+      .tl-wrap { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 1080px; height: 220px; }
+      .axis { position: absolute; left: 0; top: 110px; width: 100%; height: 1px; background: var(--line); transform-origin: left center; }
+      .tick { position: absolute; top: 102px; width: 1px; height: 18px; background: var(--line); }
+      .mk { position: absolute; top: 110px; width: 11px; height: 11px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--ink); }
+      .mk-lbl { position: absolute; font-size: 13px; width: 240px; }
+      .playhead { position: absolute; top: 84px; width: 1px; height: 52px; background: var(--highlight); }
+      .t40 { position: absolute; top: 36px; font-family: "IBM Plex Mono", monospace; font-weight: 600;
+        letter-spacing: 0.08em; font-size: 30px; color: var(--highlight); }
+      .sring { position: absolute; top: 110px; width: 30px; height: 30px; margin: -15px 0 0 -15px;
+        border: 1.5px solid rgba(255,214,10,0.8); border-radius: 50%; }
+      #reuters { position: absolute; left: 50%; bottom: 150px; transform: translateX(-50%); font-size: 13px; }
+
+      /* ② double tap */
+      #dtLabel { position: absolute; left: 0; right: 0; top: 300px; text-align: center;
+        font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.22em;
+        font-size: 40px; font-weight: 600; color: var(--highlight); }
+      #dtSub { position: absolute; left: 0; right: 0; top: 372px; text-align: center; font-size: 22px; color: var(--muted); }
+      .bldg { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+        width: 150px; height: 96px; border: 1.5px solid var(--line); background: rgba(255,255,255,0.04); }
+      .hdot { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px;
+        border-radius: 50%; background: var(--ink); }
+      .strike { position: absolute; left: 50%; top: 50%; width: 40px; height: 40px; margin: -20px 0 0 -20px;
+        border: 2px solid var(--danger); border-radius: 50%; }
+
+      /* ② counts */
+      #num168 { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+        text-align: center; font-weight: 800; font-size: 240px; letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums; }
+      #lblTote { position: absolute; left: 0; right: 0; top: 50%; margin-top: 150px; text-align: center;
+        font-size: 16px; }
+      #rhSource { position: absolute; left: 0; right: 0; top: 50%; margin-top: 188px; text-align: center; font-size: 12px; }
+
+      /* ② grid */
+      .grid { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+        display: grid; grid-template-columns: repeat(24, 1fr); gap: 16px 18px; }
+      .gdot { width: 13px; height: 13px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.35); background: transparent; }
+      .gdot.child { background: var(--ink); border-color: var(--ink); }
+      #kLabel { position: absolute; left: 0; right: 0; top: 50%; margin-top: 200px; text-align: center; font-size: 18px; }
+      #kLabel b { font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="25.6">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+
+      <div class="chrome">
+        <div class="c-tl mono">Minab · Iran</div>
+        <div class="c-tr mono">28. Februar 2026</div>
+        <div class="c-br mono" id="tc">00:50</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <div class="stage" id="stage">
+        <!-- ① impact -->
+        <div class="scene" id="s1a">
+          <div class="ring hid" id="r1"></div>
+          <div class="idot hid" id="idot"></div>
+          <div class="serif hid" id="t1">Der erste Schlag</div>
+        </div>
+
+        <!-- ① timeline -->
+        <div class="scene hid" id="s1b">
+          <div class="tl-wrap">
+            <div class="axis" id="axis"></div>
+            <div class="tick" id="tickA" style="left: 0;"></div>
+            <div class="tick" id="tickB" style="left: 100%;"></div>
+            <div class="mk" id="mA" style="left: 0;"></div>
+            <div class="mk-lbl mono" id="lblA" style="left: -10px; top: 134px;">00:00 · Erster Einschlag</div>
+            <div class="playhead" id="playhead" style="left: 0;"></div>
+            <div class="t40" id="t40" style="right: 0;">+40 MIN</div>
+            <div class="mk" id="mB" style="left: 100%;"></div>
+            <div class="mk-lbl mono" id="lblB" style="right: -10px; top: 134px; text-align: right;">Weitere Einschläge</div>
+            <div class="sring" id="s2a-r1" style="left: 100%;"></div>
+            <div class="sring" id="s2a-r2" style="left: 100%;"></div>
+            <div class="sring" id="s2a-r3" style="left: 100%;"></div>
+          </div>
+          <div class="mono" id="reuters">Quelle: Reuters</div>
+        </div>
+
+        <!-- ② double tap schematic -->
+        <div class="scene" id="s2a">
+          <div class="hid" id="dtLabel">Double Tap</div>
+          <div class="hid" id="dtSub">Erst das Gebäude — dann die Ersthelfer</div>
+          <div class="bldg hid" id="bldg"></div>
+          <div class="strike hid" id="strike1"></div>
+          <div class="strike hid" id="strike2"></div>
+          <div id="helpers"></div>
+        </div>
+
+        <!-- ② counts -->
+        <div class="scene" id="s2b">
+          <div class="hid" id="num168">0</div>
+          <div class="mono hid" id="lblTote">Tote</div>
+          <div class="mono hid" id="rhSource">Iranischer Roter Halbmond</div>
+        </div>
+
+        <!-- ② grid -->
+        <div class="scene" id="s2c">
+          <div class="grid hid" id="grid"></div>
+          <div class="hid" id="kLabel"><b>Über 100</b> davon Kinder</div>
+        </div>
+      </div>
+
+      <div class="flash" id="flash"></div>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+
+        // helper dots (Ersthelfer) — deterministic positions around building
+        const HPOS_vals = [
+          [-230,-70],[-280,40],[-180,120],[250,-90],[300,30],[210,130],
+          [-60,-180],[80,-200],[20,200],[-130,-150],[150,180],[-300,-20],
+        ];
+        document.getElementById("helpers").innerHTML =
+          HPOS_vals.map((_, i) => `<div class="hdot" id="h${i}"></div>`).join("");
+
+        // 168 grid, first 100 marked as children
+        const grid = document.getElementById("grid");
+        let gh = "";
+        for (let i = 0; i < 168; i++) gh += `<div class="gdot${i < 100 ? " child" : ""}" data-i="${i}"></div>`;
+        grid.innerHTML = gh;
+
+        const tl = gsap.timeline({ paused: true });
+
+        // running timecode 00:50 -> 01:16 (50.6 + local)
+        tl.to({ p: 0 }, { p: 1, duration: 25.6, ease: "none", onUpdate: function () {
+          const t = 50.6 + 25.6 * this.targets()[0].p;
+          const m = Math.floor(t / 60), s = Math.floor(t % 60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+
+        // baseline draw-in
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.3);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.3);
+
+        // ===== ① "Der erste Schlag" — impact ~1.6s =====
+        tl.fromTo("#flash", { opacity: 0 }, { keyframes: [
+          { opacity: 0.8, duration: 0.06, ease: "power2.in" },
+          { opacity: 0, duration: 0.32, ease: "power2.out" },
+        ] }, 1.6);
+        tl.fromTo("#r1", { scale: 0.2, opacity: 0.9 }, { scale: 9, opacity: 0, duration: 1.1, ease: "power2.out" }, 1.6);
+        tl.fromTo("#idot", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "power3.out" }, 1.62);
+        tl.fromTo("#t1", { scale: 1.12, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.34, ease: "power3.out" }, 1.62);
+        // screen shake
+        tl.fromTo("#stage", { x: 0, y: 0 }, { keyframes: [
+          { x: 14, y: -8, duration: 0.04 }, { x: -12, y: 9, duration: 0.04 },
+          { x: 8, y: 5, duration: 0.04 }, { x: -5, y: -3, duration: 0.04 }, { x: 0, y: 0, duration: 0.05 },
+        ] }, 1.6);
+        // hold, then exit title up (quick)
+        tl.to("#idot", { opacity: 0, duration: 0.3 }, 2.0);
+        tl.to("#t1", { y: -70, opacity: 0, duration: 0.34, ease: "power2.in" }, 4.3);
+
+        // ===== ① timeline (4.7–12.4) =====
+        tl.set("#s1b", { opacity: 1 }, 4.6);
+        tl.fromTo("#axis", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power2.inOut" }, 4.7);
+        tl.from(["#tickA", "#tickB"], { opacity: 0, duration: 0.4, stagger: 0.1 }, 5.0);
+        tl.fromTo("#mA", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2)" }, 5.1);
+        tl.from("#lblA", { opacity: 0, y: 8, duration: 0.5 }, 5.2);
+        tl.from("#reuters", { opacity: 0, duration: 0.5 }, 5.3);
+        // playhead sweep to +40
+        tl.fromTo("#playhead", { left: "0%", opacity: 0 }, { opacity: 1, duration: 0.3 }, 6.2);
+        tl.to("#playhead", { left: "100%", duration: 3.0, ease: "power1.inOut" }, 6.5);
+        // arrive +40: label, marker B, second strikes
+        tl.from("#t40", { opacity: 0, y: -10, duration: 0.4, ease: "power2.out" }, 9.4);
+        tl.fromTo("#mB", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2)" }, 9.5);
+        tl.from("#lblB", { opacity: 0, y: 8, duration: 0.5 }, 9.6);
+        tl.fromTo(["#s2a-r1", "#s2a-r2", "#s2a-r3"], { scale: 0.2, opacity: 0.9 }, { scale: 6, opacity: 0, duration: 1.1, ease: "power2.out", stagger: 0.18 }, 9.5);
+        tl.to("#playhead", { opacity: 0, duration: 0.3 }, 9.8);
+        // exit timeline (slide up)
+        tl.to("#s1b", { y: -50, opacity: 0, duration: 0.4, ease: "power2.in" }, 12.0);
+
+        // ===== ② Double Tap schematic (12.4–18) =====
+        tl.fromTo("#dtLabel", { opacity: 0, letterSpacing: "0.5em" }, { opacity: 1, letterSpacing: "0.22em", duration: 0.6, ease: "power3.out" }, 12.5);
+        tl.fromTo("#dtSub", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 12.9);
+        tl.fromTo("#bldg", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "power3.out" }, 13.3);
+        // strike 1 on building
+        tl.fromTo("#strike1", { scale: 0.2, opacity: 1 }, { scale: 4, opacity: 0, duration: 0.8, ease: "power2.out" }, 14.6);
+        // helpers converge
+        for (let i = 0; i < HPOS_vals.length; i++) {
+          const [x, y] = HPOS_vals[i];
+          tl.fromTo(`#h${i}`, { x, y, opacity: 0 }, { x: x * 0.16, y: y * 0.16, opacity: 1, duration: 1.0, ease: "power2.inOut" }, 15.2 + i * 0.03);
+        }
+        // strike 2 on responders, scatter
+        tl.fromTo("#strike2", { scale: 0.2, opacity: 1 }, { scale: 4.4, opacity: 0, duration: 0.8, ease: "power2.out" }, 16.9);
+        for (let i = 0; i < HPOS_vals.length; i++) {
+          const [x, y] = HPOS_vals[i];
+          tl.to(`#h${i}`, { x: x * 0.4, y: y * 0.4, opacity: 0, duration: 0.5, ease: "power2.in" }, 17.0 + i * 0.015);
+        }
+        // exit schematic
+        tl.to(["#bldg", "#dtLabel", "#dtSub"], { opacity: 0, duration: 0.4 }, 18.0);
+
+        // ===== ② 168 Tote (18.5–21) =====
+        tl.set("#num168", { opacity: 1 }, 18.5);
+        tl.fromTo("#num168", { scale: 1.06 }, { scale: 1, duration: 0.5, ease: "power2.out" }, 18.5);
+        tl.to({ v: 0 }, { v: 168, duration: 1.7, ease: "power1.out", onUpdate: function () {
+          document.getElementById("num168").textContent = Math.round(this.targets()[0].v);
+        } }, 18.5);
+        tl.fromTo("#lblTote", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 19.4);
+        tl.fromTo("#rhSource", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 19.7);
+        // exit number up to make room for grid
+        tl.to(["#num168", "#lblTote", "#rhSource"], { y: -260, opacity: 0, duration: 0.5, ease: "power2.inOut" }, 21.2);
+
+        // ===== ② grid + 100+ Kinder (21.4–25.6) =====
+        tl.set("#grid", { opacity: 1 }, 21.4);
+        tl.fromTo(".gdot", { opacity: 0, scale: 0.4 }, { opacity: 0.42, scale: 1, duration: 0.5, stagger: 0.004, ease: "power1.out" }, 21.4);
+        // highlight children
+        tl.to(".gdot.child", { opacity: 1, duration: 0.6, stagger: 0.006, ease: "power2.out" }, 23.0);
+        tl.fromTo("#kLabel", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 23.4);
+
+        window.__timelines["main"] = tl;
+
+        // audio (synced to VO from 50.6s)
+      </script>
+
+      <audio id="vo" data-start="0" data-duration="25.6" data-media-start="50.6" data-track-index="2" src="audio/voiceover.m4a"></audio>
+    </div>
+  </body>
+</html>
