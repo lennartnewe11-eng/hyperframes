@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root {
+        --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8;
+        --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --danger: #d24b4b;
+      }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0);
+        font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; }
+
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; }
+      .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 96px; left: 50%; transform: translateX(-50%);
+        width: 360px; height: 1px; background: var(--line); transform-origin: center; }
+
+      .scene { position: absolute; inset: 0; }
+
+      /* 3a — question / denial */
+      .big { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        text-align: center; font-weight: 800; letter-spacing: -0.03em; font-size: 116px; }
+      #q1kick { position: absolute; left: 0; right: 0; top: 50%; margin-top: -130px; text-align: center; font-size: 15px; }
+      #usaSub { position: absolute; left: 0; right: 0; top: 50%; margin-top: 90px; text-align: center; font-size: 22px; color: var(--muted); }
+      #usaStrike { position: absolute; left: 50%; margin-left: -180px; top: 50%; margin-top: -2px; width: 360px; height: 4px; background: var(--highlight);
+        transform: scaleX(0); transform-origin: left center; }
+      #dementi { position: absolute; left: 0; right: 0; top: 50%; margin-top: 160px; text-align: center;
+        font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.3em; font-size: 18px; color: var(--highlight); }
+
+      /* 3b — trump quote */
+      .photo { position: absolute; border: 1px solid var(--line); background:
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 12px, rgba(255,255,255,0.0) 12px 24px), rgba(255,255,255,0.02);
+        background-size: cover; background-position: center; overflow: hidden; }
+      .photo .ph-lbl { position: absolute; left: 0; right: 0; bottom: 18px; text-align: center; font-size: 11px; }
+      #trump { left: 200px; top: 230px; width: 520px; height: 640px; }
+      #quoteWrap { position: absolute; left: 800px; top: 0; bottom: 0; width: 880px;
+        display: flex; flex-direction: column; justify-content: center; }
+      #qmark { font-family: "Playfair Display", serif; font-size: 120px; line-height: 0.6; color: var(--line); }
+      #quote { font-weight: 600; font-size: 46px; line-height: 1.25; letter-spacing: -0.01em; margin-top: 8px; }
+      #quoteAttr { margin-top: 28px; font-size: 14px; }
+
+      /* Kriegsverbrechen band */
+      #kvPanel { position: absolute; inset: 0; background: #0a1120; transform: scaleY(0); transform-origin: bottom center; z-index: 10; }
+      #kvPanel .edge { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--highlight); }
+      #kvWrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 11; }
+      #kvKick { font-size: 15px; margin-bottom: 22px; }
+      #kv { font-weight: 800; font-size: 120px; letter-spacing: -0.02em; color: var(--highlight); }
+      #kvLabel { font-size: 16px; margin-top: 26px; color: var(--muted);
+        font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; }
+
+      /* 4a — amnesty */
+      #amnesty { position: absolute; left: 0; right: 0; top: 50%; margin-top: -60px; text-align: center; font-weight: 800; font-size: 80px; letter-spacing: -0.02em; }
+      #amnestySub { position: absolute; left: 0; right: 0; top: 50%; margin-top: 40px; text-align: center; font-size: 18px; }
+
+      /* 4b/4c — satellite analysis */
+      #sat { left: 50%; margin-left: -590px; top: 50%; margin-top: -350px; width: 1180px; height: 700px; }
+      .scanline { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,214,10,0.8), transparent); top: 0; }
+      .zone { position: absolute; border: 1.5px solid var(--highlight); }
+      .zone .z-lbl { position: absolute; top: -28px; left: 0; font-family: "IBM Plex Mono", monospace;
+        text-transform: uppercase; letter-spacing: 0.12em; font-size: 13px; color: var(--highlight); white-space: nowrap; }
+      #zSchule { left: 16%; top: 40%; width: 30%; height: 38%; }
+      #zRG { left: 52%; top: 22%; width: 26%; height: 34%; border-color: var(--danger); }
+      #zRG .z-lbl { color: var(--danger); }
+      #distBracket { position: absolute; left: 46%; top: 52%; width: 6%; height: 1px; background: var(--line); }
+      #distLabel { position: absolute; left: 46%; top: 52%; margin-top: 8px; width: 200px; font-size: 12px; }
+      #irWash { position: absolute; inset: 0; background:
+        radial-gradient(circle at 30% 60%, rgba(210,75,75,0.45), transparent 35%),
+        radial-gradient(circle at 40% 64%, rgba(255,180,40,0.4), transparent 22%),
+        linear-gradient(180deg, rgba(20,40,120,0.25), rgba(120,20,40,0.25)); mix-blend-mode: screen; }
+      .geoV { position: absolute; height: 1px; background: rgba(255,214,10,0.7); transform-origin: left center; }
+      #geoCross { position: absolute; left: 38%; top: 62%; width: 60px; height: 60px; margin: -30px 0 0 -30px; }
+      #geoCross::before, #geoCross::after { content: ""; position: absolute; background: var(--highlight); }
+      #geoCross::before { left: 50%; top: 0; bottom: 0; width: 1.5px; transform: translateX(-50%); }
+      #geoCross::after { top: 50%; left: 0; right: 0; height: 1.5px; transform: translateY(-50%); }
+      #geoLabel { position: absolute; left: 50%; bottom: 130px; transform: translateX(-50%); text-align: center;
+        font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 30px; font-weight: 600; color: var(--highlight); }
+      #anaTag { position: absolute; left: 50%; top: 150px; transform: translateX(-50%); font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="34.7">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+
+      <div class="chrome">
+        <div class="c-tl mono">Minab · Iran</div>
+        <div class="c-tr mono">28. Februar 2026</div>
+        <div class="c-br mono" id="tc">01:16</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <!-- 3a question / denial -->
+      <div class="scene" id="s3a">
+        <div class="mono hid" id="q1kick">Die zentrale Frage</div>
+        <div class="big hid" id="q1">Wer war verantwortlich?</div>
+        <div class="big hid" id="usa">USA</div>
+        <div class="hid" id="usaSub">bestreiten jede Verantwortung</div>
+        <div id="usaStrike"></div>
+        <div class="hid" id="dementi">Dementi</div>
+      </div>
+
+      <!-- 3b trump quote -->
+      <div class="scene" id="s3b">
+        <div class="photo hid" id="trump"><div class="ph-lbl mono">Foto: D. Trump — Platzhalter</div></div>
+        <div id="quoteWrap" class="hid">
+          <div id="qmark">“</div>
+          <div id="quote">Amerika greift keine Zivilisten an.</div>
+          <div class="mono" id="quoteAttr">Donald Trump · US-Präsident</div>
+        </div>
+      </div>
+
+      <!-- Kriegsverbrechen band -->
+      <div id="kvPanel"><div class="edge"></div></div>
+      <div id="kvWrap" class="hid">
+        <div class="mono hid" id="kvKick">Ein gezielter Angriff auf eine Schule</div>
+        <div class="hid" id="kv">Kriegsverbrechen</div>
+        <div class="hid" id="kvLabel">Nach internationalem Recht</div>
+      </div>
+
+      <!-- 4a amnesty -->
+      <div class="scene" id="s4a">
+        <div class="hid" id="amnesty">Amnesty International</div>
+        <div class="mono hid" id="amnestySub">Detaillierte forensische Analyse</div>
+      </div>
+
+      <!-- 4b/4c satellite analysis -->
+      <div class="scene" id="s4b">
+        <div class="mono hid" id="anaTag">Satellitenanalyse · Quelle: Amnesty International</div>
+        <div class="photo hid" id="sat">
+          <div class="ph-lbl mono">Satellit: Gelände — Platzhalter</div>
+          <div class="scanline hid" id="scan"></div>
+          <div class="zone hid" id="zSchule"><div class="z-lbl">Schule</div></div>
+          <div class="zone hid" id="zRG"><div class="z-lbl">Compound · Revolutionsgarden</div></div>
+          <div class="hid" id="distBracket"></div>
+          <div id="irWash" class="hid"></div>
+          <div id="geoCross" class="hid"></div>
+        </div>
+        <div class="mono hid" id="distLabel">Unmittelbar benachbart</div>
+        <div class="hid" id="geoLabel">Einschlaggeometrie</div>
+      </div>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+
+        // timecode 01:16 -> 01:50
+        tl.to({ p: 0 }, { p: 1, duration: 34.7, ease: "none", onUpdate: function () {
+          const t = 76.2 + 34.7 * this.targets()[0].p;
+          const m = Math.floor(t / 60), s = Math.floor(t % 60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+
+        // ===== 3a (0–7.6) =====
+        tl.fromTo("#q1kick", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 0.5);
+        tl.fromTo("#q1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out" }, 0.7);
+        // exit question
+        tl.to(["#q1", "#q1kick"], { opacity: 0, y: -30, duration: 0.4, ease: "power2.in" }, 4.0);
+        // USA denial
+        tl.fromTo("#usa", { opacity: 0, scale: 1.1 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 4.4);
+        tl.fromTo("#usaSub", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5 }, 4.7);
+        tl.to("#usaStrike", { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, 5.5);
+        tl.fromTo("#dementi", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 5.9);
+        tl.to(["#usa", "#usaSub", "#usaStrike", "#dementi"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 7.2);
+
+        // ===== 3b trump quote (7.6–12) =====
+        tl.fromTo("#trump", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 7.8);
+        tl.fromTo("#quoteWrap", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 8.1);
+
+        // ===== Kriegsverbrechen band (12.3–16.6) =====
+        tl.to("#kvPanel", { scaleY: 1, duration: 0.55, ease: "power3.inOut" }, 12.3);
+        // hide trump+quote while the band covers them (so they don't reappear after the wipe)
+        tl.set(["#trump", "#quoteWrap"], { opacity: 0 }, 12.7);
+        tl.set("#kvWrap", { opacity: 1 }, 12.7);
+        tl.fromTo("#kvKick", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 13.0);
+        tl.fromTo("#kv", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 14.2);
+        tl.fromTo("#kvLabel", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 14.9);
+        // wipe band away -> reveal analysis (16.6)
+        tl.to("#kvWrap", { opacity: 0, duration: 0.3 }, 16.3);
+        tl.to("#kvPanel", { scaleY: 0, transformOrigin: "top center", duration: 0.55, ease: "power3.inOut" }, 16.4);
+
+        // ===== 4a amnesty (16.6–21.9) =====
+        tl.fromTo("#amnesty", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 17.0);
+        tl.fromTo("#amnestySub", { opacity: 0, letterSpacing: "0.4em" }, { opacity: 1, letterSpacing: "0.14em", duration: 0.7, ease: "power3.out" }, 17.4);
+        tl.to(["#amnesty", "#amnestySub"], { opacity: 0, y: -24, duration: 0.4, ease: "power2.in" }, 21.4);
+
+        // ===== 4b satellite (21.9–28.3) =====
+        tl.fromTo("#anaTag", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 22.0);
+        tl.fromTo("#sat", { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power2.out" }, 22.0);
+        // scan pass
+        tl.set("#scan", { opacity: 1 }, 22.6);
+        tl.fromTo("#scan", { top: "0%" }, { top: "100%", duration: 1.0, ease: "power1.inOut" }, 22.6);
+        tl.to("#scan", { opacity: 0, duration: 0.2 }, 23.6);
+        // zones
+        tl.fromTo("#zSchule", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out", transformOrigin: "center" }, 23.8);
+        tl.fromTo("#zRG", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out", transformOrigin: "center" }, 25.0);
+        tl.fromTo(["#distBracket", "#distLabel"], { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.1 }, 26.2);
+
+        // ===== 4c infrared + geometry (28.4–34.7) =====
+        tl.fromTo("#irWash", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.inOut" }, 28.4);
+        tl.fromTo("#geoCross", { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 30.0);
+        tl.fromTo("#geoLabel", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 30.4);
+
+        window.__timelines["main"] = tl;
+      </script>
+
+      <audio id="vo" data-start="0" data-duration="34.7" data-media-start="76.2" data-track-index="2" src="audio/voiceover.m4a"></audio>
+    </div>
+  </body>
+</html>
