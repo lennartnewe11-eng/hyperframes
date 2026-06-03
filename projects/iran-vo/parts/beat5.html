@@ -43,14 +43,16 @@
         background: #05080f url('../assets/schule-vorher-styled.jpg') center/cover; }
       #satv svg { position: absolute; inset: 0; width: 1600px; height: 740px; }
       #trajPath { fill: none; stroke: var(--highlight); stroke-width: 3; stroke-linecap: round; }
-      #reticle { position: absolute; left: 46%; top: 50%; width: 96px; height: 96px; margin: -48px 0 0 -48px;
-        border: 1.5px solid var(--highlight); border-radius: 50%; }
-      #reticle::before, #reticle::after { content: ""; position: absolute; background: var(--highlight); }
-      #reticle::before { left: 50%; top: -16px; bottom: -16px; width: 1px; transform: translateX(-50%); }
-      #reticle::after { top: 50%; left: -16px; right: -16px; height: 1px; transform: translateY(-50%); }
-      #impact { position: absolute; left: 46%; top: 50%; width: 40px; height: 40px; margin: -20px 0 0 -20px;
-        border: 2px solid var(--highlight); border-radius: 50%; }
-      #schoolLbl { position: absolute; left: 46%; top: 50%; margin: -86px 0 0 36px;
+      #boom { position: absolute; left: 46%; top: 50%; width: 0; height: 0; }
+      .scorch { position: absolute; left: 0; top: 0; width: 360px; height: 360px; margin: -180px 0 0 -180px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(8,6,5,0.94), rgba(22,14,8,0.55) 38%, transparent 70%); }
+      .bcore { position: absolute; left: 0; top: 0; width: 130px; height: 130px; margin: -65px 0 0 -65px; border-radius: 50%;
+        background: radial-gradient(circle, #ffffff, #ffd60a 42%, rgba(255,140,40,0.7) 68%, transparent 75%); }
+      .bring { position: absolute; left: 0; top: 0; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%;
+        border: 2px solid rgba(255,200,90,0.9); }
+      .spark { position: absolute; left: 0; top: 0; height: 2px; width: 0;
+        background: linear-gradient(90deg, #ffd66a, rgba(255,150,40,0)); transform-origin: left center; }
+      #schoolLbl { position: absolute; left: 46%; top: 50%; margin: -150px 0 0 40px;
         font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.12em; font-size: 14px; color: var(--highlight); white-space: nowrap; }
       #targetNote { position: absolute; left: 0; right: 0; bottom: 150px; text-align: center; font-size: 13px; }
 
@@ -59,9 +61,9 @@
         font-weight: 800; font-size: 132px; letter-spacing: -0.03em; color: var(--highlight); }
       #kvStrike { position: absolute; left: 50%; margin-left: -480px; top: 50%; margin-top: -2px; width: 960px; height: 5px;
         background: var(--ink); transform: scaleX(0); transform-origin: left center; }
-      #num168b { position: absolute; left: 0; right: 0; top: 50%; margin-top: 70px; text-align: center;
-        font-weight: 800; font-size: 150px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-      #num168lbl { position: absolute; left: 0; right: 0; top: 50%; margin-top: 230px; text-align: center; font-size: 16px; }
+      #num168b { position: absolute; left: 0; right: 0; top: 50%; text-align: center;
+        font-weight: 800; font-size: 160px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+      #num168lbl { position: absolute; left: 0; right: 0; top: 50%; margin-top: 120px; text-align: center; font-size: 16px; }
     </style>
   </head>
   <body>
@@ -91,9 +93,15 @@
           <svg viewBox="0 0 1600 740" preserveAspectRatio="none">
             <path id="trajPath" d="M 1560 -40 Q 1140 120 736 370" />
           </svg>
-          <div class="hid" id="reticle"></div>
-          <div class="hid" id="impact"></div>
           <div class="hid" id="schoolLbl">Shajareh Tayebeh School</div>
+          <div id="boom">
+            <div class="scorch hid" id="scorch"></div>
+            <div id="sparks"></div>
+            <div class="bring hid" id="bring3"></div>
+            <div class="bring hid" id="bring2"></div>
+            <div class="bring hid" id="bring1"></div>
+            <div class="bcore hid" id="bcore"></div>
+          </div>
         </div>
         <div class="mono hid" id="targetNote">Primäres Ziel: Militärgelände nebenan — getroffen: die Schule</div>
       </div>
@@ -115,6 +123,10 @@
         const L = traj.getTotalLength();
         traj.style.strokeDasharray = L;
         traj.style.strokeDashoffset = L;
+        // explosion sparks (deterministic angles + lengths)
+        const SPARK = [130,170,110,150,190,120,160,140,180,115,145,165];
+        document.getElementById("sparks").innerHTML = SPARK
+          .map((_, i) => `<div class="spark" style="transform:rotate(${i * 30 + 7}deg)"></div>`).join("");
         const tl = gsap.timeline({ paused: true });
 
         // timecode 01:50 -> 02:10
@@ -147,26 +159,32 @@
         tl.to("#trajPath", { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut" }, 7.9);
         tl.set("#trajPath", { strokeDasharray: "14 12" }, 9.1);
         tl.fromTo("#trajPath", { strokeDashoffset: 0 }, { strokeDashoffset: -52, duration: 0.7, ease: "none", repeat: 3 }, 9.1);
-        // reticle lock + label
-        tl.fromTo("#reticle", { opacity: 0, scale: 1.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out", immediateRender: false }, 9.3);
-        tl.fromTo("#schoolLbl", { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.4 }, 9.7);
-        // impact
+        // school label appears before impact
+        tl.fromTo("#schoolLbl", { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.4 }, 9.6);
+        // ===== EXPLOSION at impact =====
         tl.fromTo("#flash", { opacity: 0 }, { keyframes: [
-          { opacity: 0.7, duration: 0.05 }, { opacity: 0, duration: 0.4, ease: "power2.out" },
+          { opacity: 0.78, duration: 0.05 }, { opacity: 0, duration: 0.45, ease: "power2.out" },
         ] }, 10.2);
-        tl.fromTo("#impact", { scale: 0.2, opacity: 0.9 }, { scale: 7, opacity: 0, duration: 1.0, ease: "power2.out", immediateRender: false }, 10.2);
-        tl.fromTo("#targetNote", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 10.6);
+        tl.fromTo("#bcore", { scale: 0, opacity: 1 }, { scale: 3.2, opacity: 0, duration: 0.5, ease: "power2.out", immediateRender: false }, 10.2);
+        tl.fromTo("#bring1", { scale: 0.2, opacity: 0.95 }, { scale: 7, opacity: 0, duration: 0.9, ease: "power2.out", immediateRender: false }, 10.2);
+        tl.fromTo("#bring2", { scale: 0.2, opacity: 0.8 }, { scale: 10, opacity: 0, duration: 1.1, ease: "power2.out", immediateRender: false }, 10.32);
+        tl.fromTo("#bring3", { scale: 0.2, opacity: 0.6 }, { scale: 13, opacity: 0, duration: 1.3, ease: "power2.out", immediateRender: false }, 10.45);
+        tl.fromTo(".spark", { width: 0, opacity: 0.95 }, { width: (i) => 110 + (i % 4) * 28, opacity: 0, duration: 0.5, ease: "power2.out", immediateRender: false }, 10.22);
+        // lingering scorch / burn mark
+        tl.fromTo("#scorch", { scale: 0.3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: "power2.out", immediateRender: false }, 10.28);
+        tl.fromTo("#targetNote", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 10.7);
         // exit 5b
         tl.to(["#satv", "#targetNote"], { opacity: 0, duration: 0.5, ease: "power2.in" }, 12.8);
 
         // ===== 5c (13–20.5) kollateralschaden -> 168 menschen =====
         tl.fromTo("#kv2", { opacity: 0, scale: 1.06 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 13.2);
-        // recontextualize: strike through the euphemism, reveal the humans
-        tl.to("#kvStrike", { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, 15.3);
-        tl.to("#kv2", { opacity: 0.35, y: -120, duration: 0.6, ease: "power2.inOut" }, 15.9);
-        tl.to("#kvStrike", { opacity: 0.35, y: -120, duration: 0.6, ease: "power2.inOut" }, 15.9);
-        tl.fromTo("#num168b", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 16.1);
-        tl.fromTo("#num168lbl", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 16.6);
+        // strike through the euphemism
+        tl.to("#kvStrike", { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, 15.0);
+        // push "Kollateralschaden" fully up and out of frame
+        tl.to(["#kv2", "#kvStrike"], { y: -780, duration: 0.75, ease: "power3.in" }, 15.7);
+        // "168 Menschen" rises into the now-empty center — only it remains
+        tl.fromTo("#num168b", { yPercent: -50, y: 820, opacity: 1 }, { yPercent: -50, y: 0, duration: 0.85, ease: "power3.out" }, 15.9);
+        tl.fromTo("#num168lbl", { y: 820, opacity: 1 }, { y: 0, duration: 0.85, ease: "power3.out" }, 16.05);
 
         window.__timelines["main"] = tl;
       </script>
