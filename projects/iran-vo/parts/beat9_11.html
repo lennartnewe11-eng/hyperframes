@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --danger: #d24b4b; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; }
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 96px; left: 50%; transform: translateX(-50%); width: 360px; height: 1px; background: var(--line); transform-origin: center; }
+      .hero { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+      .hero .big { font-weight: 800; font-size: 128px; letter-spacing: -0.03em; line-height: 0.98; }
+      .hero .sub { margin-top: 24px; font-size: 15px; }
+      .hl { color: var(--highlight); }
+      .sword { position: absolute; left: 0; right: 0; top: 50%; text-align: center; font-weight: 800; font-size: 150px; letter-spacing: -0.035em; }
+
+      /* ⑨ rewind timeline */
+      #rwAxis { position: absolute; inset: 0; }
+      #rwline { position: absolute; left: 150px; right: 150px; top: 58%; height: 2px; transform-origin: right center;
+        background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.5) 70%, rgba(255,255,255,0.85)); }
+      .rwtick { position: absolute; top: 58%; width: 2px; background: rgba(255,255,255,0.55); }
+      #rwHead { position: absolute; top: 58%; width: 2px; height: 60px; margin-top: -30px; background: var(--highlight); box-shadow: 0 0 16px rgba(255,214,10,0.6); }
+      #rwYear { position: absolute; left: 0; right: 0; top: 40%; text-align: center; font-weight: 800; font-size: 120px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--highlight); }
+      #rwKick { position: absolute; left: 0; right: 0; top: 40%; margin-top: -70px; text-align: center; font-size: 14px; }
+
+      /* ⑩ Project Maven dossier */
+      #mvTitle { position: absolute; left: 0; right: 0; top: 50%; margin-top: -120px; text-align: center; font-weight: 800; font-size: 116px; letter-spacing: -0.02em; }
+      #mvKick { position: absolute; left: 0; right: 0; top: 50%; margin-top: -190px; text-align: center; font-size: 14px; color: var(--highlight); }
+      #mvSpec { position: absolute; left: 0; right: 0; top: 50%; margin-top: 20px; text-align: center; font-size: 16px; }
+      #mvStamp { position: absolute; left: 50%; top: 50%; margin: -60px 0 0 -180px; width: 360px; padding: 10px 0; text-align: center;
+        border: 3px solid var(--danger); color: var(--danger); font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.3em; font-size: 34px; font-weight: 700; transform: rotate(-7deg); }
+      /* drone */
+      #drone { position: absolute; left: 50%; top: 50%; width: 1180px; height: 746px; margin: -373px 0 0 -590px;
+        background: #05080f url('../assets/maven-drone.jpg') center/cover; box-shadow: 0 24px 70px rgba(0,0,0,0.65); }
+      .bbox { position: absolute; border: 2px solid var(--highlight); box-shadow: 0 0 0 1px rgba(0,0,0,0.4); }
+      .bbox .blab { position: absolute; top: -22px; left: 0; font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: 0.08em; color: var(--highlight); white-space: nowrap; }
+      #droneScan { position: absolute; left: 0; right: 0; height: 2px; top: 0; background: linear-gradient(90deg, transparent, rgba(255,214,10,0.7), transparent); }
+      #droneTag { position: absolute; left: 0; right: 0; bottom: 120px; text-align: center; font-size: 13px; }
+      #mvEvo { position: absolute; left: 0; right: 0; bottom: 120px; text-align: center; font-size: 22px; font-weight: 600; }
+      #mvEvo .hl { color: var(--highlight); }
+
+      /* ⑪ Palantir */
+      #plogo { position: absolute; left: 50%; top: 50%; width: 760px; height: 397px; margin: -250px 0 0 -380px;
+        background: url('../assets/palantir-white.jpg') center/contain no-repeat; mix-blend-mode: screen; }
+      #orb { position: absolute; left: 50%; top: 50%; width: 360px; height: 360px; margin: -180px 0 0 -180px; border-radius: 50%;
+        background: radial-gradient(circle at 42% 36%, #fff6d0 0%, #ffd60a 16%, #c08a1c 42%, #3a2906 70%, #0c0a05 100%);
+        box-shadow: 0 0 90px 24px rgba(255,214,10,0.22); }
+      .orbring { position: absolute; left: 50%; top: 50%; border: 1px solid rgba(255,214,10,0.45); border-radius: 50%; }
+      #dataRow { position: absolute; left: 0; right: 0; top: 50%; margin-top: 170px; display: flex; align-items: center; justify-content: center; gap: 38px; }
+      #dataRow .di { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; font-size: 16px; color: var(--muted); }
+      #dataRow .di b { color: var(--ink); font-weight: 700; }
+      #thiel { width: 84px; height: 84px; border-radius: 50%; background: #05080f url('../assets/thiel-styled.jpg') center/cover; border: 1px solid var(--line); }
+      #thWrap { display: flex; align-items: center; gap: 14px; }
+      #orbLbl { position: absolute; left: 0; right: 0; top: 50%; margin-top: 210px; text-align: center; font-size: 14px; }
+      #plClose { position: absolute; left: 0; right: 0; top: 50%; margin-top: 268px; text-align: center; font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+
+      #band { position: absolute; inset: 0; background: #0a1120; transform: scaleY(0); transform-origin: bottom center; z-index: 20; }
+      #band .edge { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--highlight); }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="52.5">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div class="chrome">
+        <div class="c-tl mono">Herkunft</div>
+        <div class="c-tr mono">KI-Krieg 2.0</div>
+        <div class="c-br mono" id="tc">02:42</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <!-- ⑨ rewind -->
+      <div class="sword hid" id="w1">Schritt</div>
+      <div class="sword hid" id="w2">zurück</div>
+      <div id="rwAxis" class="hid">
+        <div id="rwline"></div>
+        <div id="rwTicks"></div>
+        <div id="rwHead"></div>
+        <div class="mono hid" id="rwKick">Rückblende · nicht über Nacht entstanden</div>
+        <div class="hid" id="rwYear">2026</div>
+      </div>
+
+      <!-- ⑩ Project Maven -->
+      <div class="hero hid" id="mvScene">
+        <div></div>
+      </div>
+      <div class="mono hid" id="mvKick">Codename</div>
+      <div class="hid" id="mvTitle">Project Maven</div>
+      <div class="mono hid" id="mvSpec">KI-System · US-Militär · Pentagon · seit 2017</div>
+      <div class="hid" id="mvStamp">Realität</div>
+      <div class="hid" id="drone">
+        <div id="droneScan" class="hid"></div>
+        <div class="bbox hid" id="bb1" style="left:14%; top:58%; width:13%; height:14%;"><div class="blab">Fahrzeug · 0.94</div></div>
+        <div class="bbox hid" id="bb2" style="left:62%; top:64%; width:16%; height:13%;"><div class="blab">Objekt · 0.88</div></div>
+        <div class="bbox hid" id="bb3" style="left:40%; top:30%; width:10%; height:11%;"><div class="blab">Struktur · 0.79</div></div>
+      </div>
+      <div class="mono hid" id="droneTag">Ursprünglich: Analyse von Drohnenvideos</div>
+      <div class="hid" id="mvEvo">2017 · Drohnenanalyse <span class="hl">→</span> 2026 · Rückgrat der Angriffsplanung</div>
+
+      <!-- ⑪ Palantir -->
+      <div class="sword hid" id="w3">Ein einziges</div>
+      <div class="sword hid" id="w4">Unternehmen</div>
+      <div id="orb" class="hid"></div>
+      <div class="orbring hid" id="oring1" style="width:420px;height:420px;margin:-210px 0 0 -210px;"></div>
+      <div class="orbring hid" id="oring2" style="width:520px;height:520px;margin:-260px 0 0 -260px;"></div>
+      <div id="plogo" class="hid"></div>
+      <div id="dataRow" class="hid">
+        <div class="di">Gegründet <b id="plYear">2003</b></div>
+        <div id="thWrap"><div id="thiel"></div><div class="di">Peter <b>Thiel</b></div></div>
+        <div class="di">In-Q-Tel <b>· CIA</b></div>
+      </div>
+      <div class="mono hid" id="orbLbl">Palantír · Seherstein aus „Herr der Ringe"</div>
+      <div class="hid" id="plClose">Kein Zufall — ein <span class="hl">Selbstverständnis</span>.</div>
+
+      <div id="band"><div class="edge"></div></div>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        // rewind ticks
+        (function () {
+          const x0 = 150, x1 = 1920 - 150, N = 18; let s = "";
+          for (let i = 0; i < N; i++) { const f = i / (N - 1); const x = x1 - f * (x1 - x0); const h = 8 + (1 - f) * 16; const op = 0.28 + (1 - f) * 0.5;
+            s += `<div class="rwtick" style="left:${x.toFixed(0)}px;height:${h.toFixed(0)}px;margin-top:-${(h/2).toFixed(0)}px;opacity:${op.toFixed(2)}"></div>`; }
+          document.getElementById("rwTicks").innerHTML = s;
+        })();
+        const rwHead = document.getElementById("rwHead");
+        const tl = gsap.timeline({ paused: true });
+
+        tl.to({ p: 0 }, { p: 1, duration: 51.6, ease: "none", onUpdate: function () {
+          const t = 162.6 + 51.6 * this.targets()[0].p; const m = Math.floor(t / 60), s = Math.floor(t % 60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+
+        // ===== ⑨ rewind (0–9.1) =====
+        tl.fromTo("#w1", { yPercent: -50, x: 640, opacity: 0 }, { yPercent: -50, x: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.7);
+        tl.to("#w1", { x: -640, opacity: 0, duration: 0.45, ease: "power2.in" }, 1.6);
+        tl.fromTo("#w2", { yPercent: -50, x: 640, opacity: 0 }, { yPercent: -50, x: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 1.7);
+        tl.to("#w2", { x: -640, opacity: 0, duration: 0.45, ease: "power2.in" }, 2.6);
+        tl.set("#rwAxis", { opacity: 1 }, 2.9);
+        tl.fromTo("#rwline", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power2.out" }, 2.9);
+        tl.from(".rwtick", { scaleY: 0, opacity: 0, duration: 0.4, stagger: 0.02 }, 3.1);
+        tl.fromTo("#rwHead", { left: "1620px", opacity: 0 }, { left: "1620px", opacity: 1, duration: 0.3 }, 3.3);
+        tl.fromTo("#rwYear", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4 }, 3.3);
+        tl.from("#rwKick", { opacity: 0, duration: 0.5 }, 3.6);
+        // rewind: playhead races left, year counts 2026 -> 2017
+        tl.to("#rwHead", { left: "300px", duration: 3.8, ease: "power1.inOut" }, 3.9);
+        tl.to({ y: 2026 }, { y: 2017, duration: 3.8, ease: "power1.inOut", onUpdate: function () {
+          document.getElementById("rwYear").textContent = Math.round(this.targets()[0].y);
+        } }, 3.9);
+        tl.to(["#rwAxis"], { opacity: 0, duration: 0.4 }, 8.6);
+        tl.to("#rwYear", { opacity: 0, duration: 0.4 }, 8.6);
+
+        // ===== ⑩ Project Maven (9.1–31.6) =====
+        tl.fromTo("#mvKick", { opacity: 0, letterSpacing: "0.5em" }, { opacity: 1, letterSpacing: "0.14em", duration: 0.6, ease: "power3.out" }, 9.2);
+        tl.fromTo("#mvTitle", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 9.4);
+        // "aber Realität" stamp
+        tl.fromTo("#mvStamp", { opacity: 0, scale: 1.5, rotation: -7 }, { opacity: 1, scale: 1, rotation: -7, duration: 0.35, ease: "power3.out", immediateRender: false }, 13.2);
+        tl.to("#mvStamp", { opacity: 0, duration: 0.3 }, 15.0);
+        // spec
+        tl.fromTo("#mvSpec", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6 }, 15.6);
+        // exit title block -> drone
+        tl.to(["#mvKick", "#mvTitle", "#mvSpec"], { opacity: 0, y: -24, duration: 0.45, ease: "power2.in" }, 21.6);
+        // drone footage + bounding boxes
+        tl.fromTo("#drone", { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power2.out" }, 22.1);
+        tl.set("#droneScan", { opacity: 1 }, 22.6);
+        tl.fromTo("#droneScan", { top: "0%" }, { top: "100%", duration: 1.0, ease: "power1.inOut" }, 22.6);
+        tl.to("#droneScan", { opacity: 0, duration: 0.2 }, 23.6);
+        tl.fromTo("#bb3", { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out", immediateRender: false, transformOrigin: "center" }, 23.4);
+        tl.fromTo("#bb1", { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out", immediateRender: false, transformOrigin: "center" }, 23.9);
+        tl.fromTo("#bb2", { opacity: 0, scale: 1.5 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out", immediateRender: false, transformOrigin: "center" }, 24.4);
+        tl.fromTo("#droneTag", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 23.0);
+        // evolution line
+        tl.to("#droneTag", { opacity: 0, duration: 0.3 }, 26.9);
+        tl.fromTo("#mvEvo", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 27.2);
+        // exit maven
+        tl.to(["#drone", "#mvEvo"], { opacity: 0, duration: 0.5, ease: "power2.in" }, 31.0);
+
+        // ===== ⑪ Palantir (31.6–51.6) =====
+        tl.fromTo("#w3", { yPercent: -50, x: 640, opacity: 0 }, { yPercent: -50, x: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 31.8);
+        tl.to("#w3", { x: -640, opacity: 0, duration: 0.45, ease: "power2.in" }, 32.8);
+        tl.fromTo("#w4", { yPercent: -50, x: 640, opacity: 0 }, { yPercent: -50, x: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 32.9);
+        tl.to("#w4", { x: -640, opacity: 0, duration: 0.45, ease: "power2.in" }, 33.9);
+        // reveal: orb ignites + logo
+        tl.fromTo("#orb", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, 34.7);
+        tl.fromTo(["#oring1", "#oring2"], { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out", stagger: 0.12, transformOrigin: "center", immediateRender: false }, 34.9);
+        tl.fromTo("#plogo", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 35.0);
+        // move logo up, orb behind, data row in
+        tl.to("#plogo", { y: -150, scale: 0.7, duration: 0.6, ease: "power2.inOut" }, 36.7);
+        tl.fromTo("#dataRow", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 37.0);
+        tl.to({ y: 1990 }, { y: 2003, duration: 0.9, ease: "power1.out", onUpdate: function () { document.getElementById("plYear").textContent = Math.round(this.targets()[0].y); } }, 37.0);
+        // orb emphasis (Tolkien)
+        tl.to(["#dataRow", "#plogo"], { opacity: 0, duration: 0.45, ease: "power2.in" }, 44.0);
+        tl.to("#orb", { scale: 1.25, duration: 1.2, ease: "power2.inOut" }, 44.2);
+        tl.fromTo("#orbLbl", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6 }, 44.6);
+        // close line
+        tl.fromTo("#plClose", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 48.3);
+
+        window.__timelines["main"] = tl;
+      </script>
+
+      <audio id="vo" data-start="0" data-duration="51.6" data-media-start="162.6" data-track-index="2" src="../audio/voiceover.m4a"></audio>
+    </div>
+  </body>
+</html>
