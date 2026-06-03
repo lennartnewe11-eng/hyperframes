@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; }
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 96px; left: 50%; transform: translateX(-50%); width: 360px; height: 1px; background: var(--line); transform-origin: center; }
+      .hl { color: var(--highlight); }
+
+      /* flying phrase blocks (centered) */
+      .blk { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+      .kick { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 16px; color: var(--highlight); margin-bottom: 22px; }
+      .name { font-weight: 800; font-size: 150px; letter-spacing: -0.03em; }
+      .big { font-weight: 800; font-size: 110px; letter-spacing: -0.025em; line-height: 1.0; max-width: 1500px; }
+      .med { font-weight: 700; font-size: 72px; letter-spacing: -0.02em; max-width: 1400px; }
+      .strike { position: relative; }
+      .strike::after { content: ""; position: absolute; left: -2%; right: -2%; top: 52%; height: 6px; background: var(--highlight); }
+
+      .accent { position: absolute; left: 50%; top: 50%; width: 120px; height: 2px; margin: 120px 0 0 -60px; background: var(--line); transform-origin: center; }
+
+      /* podcast waveform */
+      #wave { position: absolute; left: 50%; top: 50%; margin: 120px 0 0 0; transform: translateX(-50%);
+        display: flex; align-items: center; gap: 7px; height: 90px; }
+      #wave .bar { width: 5px; height: 60px; background: var(--highlight); border-radius: 3px; transform: scaleY(0.18); transform-origin: center; }
+      #podLbl { position: absolute; left: 0; right: 0; top: 50%; margin-top: 250px; text-align: center; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="10.2">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div class="chrome">
+        <div class="c-tl mono">Palantir · CEO</div>
+        <div class="c-tr mono">KI-Krieg 2.0</div>
+        <div class="c-br mono" id="tc">03:34</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <div class="blk hid" id="p1">
+        <div class="kick">Palantir-CEO</div>
+        <div class="name">Alex Karp</div>
+      </div>
+      <div class="blk hid" id="p2">
+        <div class="big">Kein Mann der <span class="strike">leisen</span> Worte</div>
+      </div>
+      <div class="blk hid" id="p3">
+        <div class="name">November 2025</div>
+      </div>
+      <div class="blk hid" id="p4">
+        <div class="med">kurz vor Ausbruch der Kampfhandlungen</div>
+      </div>
+      <div class="blk hid" id="p5">
+        <div class="med">… sagte er in einem Podcast</div>
+      </div>
+      <div class="accent hid" id="accent"></div>
+      <div id="wave" class="hid"></div>
+      <div class="mono hid" id="podLbl">Podcast · November 2025</div>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        // waveform bars
+        (function () {
+          let s = ""; for (let i = 0; i < 30; i++) s += `<div class="bar"></div>`;
+          document.getElementById("wave").innerHTML = s;
+        })();
+        const tl = gsap.timeline({ paused: true });
+
+        tl.to({ p: 0 }, { p: 1, duration: 10.2, ease: "none", onUpdate: function () {
+          const t = 214.2 + 10.2 * this.targets()[0].p; const m = Math.floor(t / 60), s = Math.floor(t % 60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.7, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.7, stagger: 0.06 }, 0.2);
+
+        const inUp = (sel, t, ry) => tl.fromTo(sel, { opacity: 0, y: 130, rotationX: 0, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power3.out" }, t);
+        const outUp = (sel, t) => tl.to(sel, { opacity: 0, y: -120, scale: 0.97, duration: 0.45, ease: "power2.in" }, t);
+
+        // p1 — Alex Karp (fly up in/out)
+        inUp("#p1", 0.6);
+        tl.fromTo("#accent", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.5, ease: "power2.out" }, 1.0);
+        tl.to("#accent", { opacity: 0, duration: 0.3 }, 1.9);
+        outUp("#p1", 2.0);
+        // p2 — fly in from right, out to left
+        tl.fromTo("#p2", { opacity: 0, x: 360, rotation: 2 }, { opacity: 1, x: 0, rotation: 0, duration: 0.6, ease: "power3.out" }, 2.2);
+        tl.to("#p2", { opacity: 0, x: -340, rotation: -2, duration: 0.5, ease: "power2.in" }, 3.9);
+        // p3 — November 2025 (punch in)
+        tl.fromTo("#p3", { opacity: 0, scale: 1.25, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "power3.out" }, 4.5);
+        outUp("#p3", 5.7);
+        // p4 — from below
+        inUp("#p4", 5.95);
+        tl.to("#p4", { opacity: 0, x: -320, duration: 0.45, ease: "power2.in" }, 7.3);
+        // p5 — sagte er in einem Podcast + waveform builds
+        tl.fromTo("#p5", { opacity: 0, y: 90 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 7.6);
+        tl.fromTo("#podLbl", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 8.0);
+        tl.fromTo("#wave", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 8.0);
+        // bars pulse (deterministic varied heights, finite repeats)
+        tl.to("#wave .bar", { scaleY: (i) => [0.55, 1.0, 0.7, 0.9, 0.45, 0.85, 0.6, 1.0, 0.5][i % 9], duration: 0.28, ease: "sine.inOut", yoyo: true, repeat: 7, stagger: { each: 0.045, from: "center" } }, 8.1);
+
+        window.__timelines["main"] = tl;
+      </script>
+
+      <audio id="vo" data-start="0" data-duration="10.2" data-media-start="214.2" data-track-index="2" src="../audio/voiceover.m4a"></audio>
+    </div>
+  </body>
+</html>
