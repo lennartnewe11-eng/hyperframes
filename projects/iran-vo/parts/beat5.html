@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root {
+        --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8;
+        --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --danger: #d24b4b;
+      }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0);
+        font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; }
+      .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 40; }
+
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; }
+      .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 96px; left: 50%; transform: translateX(-50%);
+        width: 360px; height: 1px; background: var(--line); transform-origin: center; }
+      .scene { position: absolute; inset: 0; }
+      #kick { position: absolute; left: 0; right: 0; top: 50%; margin-top: -150px; text-align: center; font-size: 15px; }
+
+      /* horizontal word-scroll */
+      .sword { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center;
+        font-weight: 800; font-size: 150px; letter-spacing: -0.035em; will-change: transform; }
+      .sword.hl { color: var(--highlight); }
+
+      /* tomahawk */
+      #tmh { position: absolute; left: 50%; top: 50%; width: 1280px; height: 825px; margin: -412px 0 0 -640px;
+        background: #05080f url('../assets/tomahawk-styled.jpg') center/contain no-repeat; }
+      #tmhWord { position: absolute; left: 0; right: 0; top: 50%; margin-top: -300px; text-align: center;
+        font-weight: 800; font-size: 96px; letter-spacing: -0.03em; color: var(--highlight); }
+      #tmhLabel { position: absolute; left: 0; right: 0; top: 50%; margin-top: 250px; text-align: center; font-size: 14px; }
+
+      /* satellite + trajectory */
+      #satv { position: absolute; left: 50%; top: 50%; width: 1600px; height: 740px; margin: -370px 0 0 -800px;
+        background: #05080f url('../assets/schule-vorher-styled.jpg') center/cover; }
+      #satv svg { position: absolute; inset: 0; width: 1600px; height: 740px; }
+      #trajPath { fill: none; stroke: var(--highlight); stroke-width: 3; stroke-linecap: round; }
+      #reticle { position: absolute; left: 46%; top: 50%; width: 96px; height: 96px; margin: -48px 0 0 -48px;
+        border: 1.5px solid var(--highlight); border-radius: 50%; }
+      #reticle::before, #reticle::after { content: ""; position: absolute; background: var(--highlight); }
+      #reticle::before { left: 50%; top: -16px; bottom: -16px; width: 1px; transform: translateX(-50%); }
+      #reticle::after { top: 50%; left: -16px; right: -16px; height: 1px; transform: translateY(-50%); }
+      #impact { position: absolute; left: 46%; top: 50%; width: 40px; height: 40px; margin: -20px 0 0 -20px;
+        border: 2px solid var(--highlight); border-radius: 50%; }
+      #schoolLbl { position: absolute; left: 46%; top: 50%; margin: -86px 0 0 36px;
+        font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.12em; font-size: 14px; color: var(--highlight); white-space: nowrap; }
+      #targetNote { position: absolute; left: 0; right: 0; bottom: 150px; text-align: center; font-size: 13px; }
+
+      /* kollateralschaden -> 168 menschen */
+      #kv2 { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center;
+        font-weight: 800; font-size: 132px; letter-spacing: -0.03em; color: var(--highlight); }
+      #kvStrike { position: absolute; left: 50%; margin-left: -480px; top: 50%; margin-top: -2px; width: 960px; height: 5px;
+        background: var(--ink); transform: scaleX(0); transform-origin: left center; }
+      #num168b { position: absolute; left: 0; right: 0; top: 50%; margin-top: 70px; text-align: center;
+        font-weight: 800; font-size: 150px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+      #num168lbl { position: absolute; left: 0; right: 0; top: 50%; margin-top: 230px; text-align: center; font-size: 16px; }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="20.5">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+
+      <div class="chrome">
+        <div class="c-tl mono">Minab · Iran</div>
+        <div class="c-tr mono">Forensik · Amnesty</div>
+        <div class="c-br mono" id="tc">01:50</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <!-- 5a conclusion + tomahawk -->
+      <div class="scene" id="s5a">
+        <div class="mono hid" id="kick">Amnesty · Schlussfolgerung</div>
+        <div class="sword hid" id="w1">Sehr</div>
+        <div class="sword hid" id="w2">wahrscheinlich</div>
+        <div class="hid" id="tmh"></div>
+        <div class="hid" id="tmhWord">US-Tomahawk</div>
+        <div class="mono hid" id="tmhLabel">BGM-109 Tomahawk · Raytheon</div>
+      </div>
+
+      <!-- 5b trajectory on satellite -->
+      <div class="scene" id="s5b">
+        <div class="hid" id="satv">
+          <svg viewBox="0 0 1600 740" preserveAspectRatio="none">
+            <path id="trajPath" d="M 1560 -40 Q 1140 120 736 370" />
+          </svg>
+          <div class="hid" id="reticle"></div>
+          <div class="hid" id="impact"></div>
+          <div class="hid" id="schoolLbl">Shajareh Tayebeh School</div>
+        </div>
+        <div class="mono hid" id="targetNote">Primäres Ziel: Militärgelände nebenan — getroffen: die Schule</div>
+      </div>
+
+      <!-- 5c kollateralschaden -> 168 menschen -->
+      <div class="scene" id="s5c">
+        <div class="hid" id="kv2">Kollateralschaden</div>
+        <div id="kvStrike"></div>
+        <div class="hid" id="num168b">168 Menschen</div>
+        <div class="mono hid" id="num168lbl">Opfer von Minab</div>
+      </div>
+
+      <div class="flash" id="flash"></div>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        // trajectory draw-on setup
+        const traj = document.getElementById("trajPath");
+        const L = traj.getTotalLength();
+        traj.style.strokeDasharray = L;
+        traj.style.strokeDashoffset = L;
+        const tl = gsap.timeline({ paused: true });
+
+        // timecode 01:50 -> 02:10
+        tl.to({ p: 0 }, { p: 1, duration: 19.2, ease: "none", onUpdate: function () {
+          const t = 110.9 + 19.2 * this.targets()[0].p;
+          const m = Math.floor(t / 60), s = Math.floor(t % 60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+
+        // ===== 5a (0–7.3) conclusion + tomahawk =====
+        tl.fromTo("#kick", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 0.5);
+        // word-scroll: each word enters from right -> center -> exits left
+        tl.fromTo("#w1", { opacity: 0, x: 620 }, { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, 2.6);
+        tl.to("#w1", { opacity: 0, x: -620, duration: 0.55, ease: "power2.in" }, 3.7);
+        tl.fromTo("#w2", { opacity: 0, x: 620 }, { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, 3.8);
+        tl.to("#w2", { opacity: 0, x: -620, duration: 0.55, ease: "power2.in" }, 4.9);
+        // tomahawk flies in from the right (matches missile direction)
+        tl.to("#kick", { opacity: 0, duration: 0.3 }, 4.9);
+        tl.fromTo("#tmh", { opacity: 0, x: 700 }, { opacity: 1, x: 0, duration: 0.9, ease: "power3.out" }, 5.0);
+        tl.fromTo("#tmhWord", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 5.5);
+        tl.fromTo("#tmhLabel", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 5.8);
+        // exit 5a to the left
+        tl.to(["#tmh", "#tmhWord", "#tmhLabel"], { opacity: 0, x: -420, duration: 0.5, ease: "power2.in" }, 7.0);
+
+        // ===== 5b (7.3–13) trajectory =====
+        tl.fromTo("#satv", { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power2.out" }, 7.4);
+        // draw the incoming trajectory
+        tl.to("#trajPath", { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut" }, 7.9);
+        tl.set("#trajPath", { strokeDasharray: "14 12" }, 9.1);
+        tl.fromTo("#trajPath", { strokeDashoffset: 0 }, { strokeDashoffset: -52, duration: 0.7, ease: "none", repeat: 3 }, 9.1);
+        // reticle lock + label
+        tl.fromTo("#reticle", { opacity: 0, scale: 1.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out", immediateRender: false }, 9.3);
+        tl.fromTo("#schoolLbl", { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.4 }, 9.7);
+        // impact
+        tl.fromTo("#flash", { opacity: 0 }, { keyframes: [
+          { opacity: 0.7, duration: 0.05 }, { opacity: 0, duration: 0.4, ease: "power2.out" },
+        ] }, 10.2);
+        tl.fromTo("#impact", { scale: 0.2, opacity: 0.9 }, { scale: 7, opacity: 0, duration: 1.0, ease: "power2.out", immediateRender: false }, 10.2);
+        tl.fromTo("#targetNote", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 10.6);
+        // exit 5b
+        tl.to(["#satv", "#targetNote"], { opacity: 0, duration: 0.5, ease: "power2.in" }, 12.8);
+
+        // ===== 5c (13–20.5) kollateralschaden -> 168 menschen =====
+        tl.fromTo("#kv2", { opacity: 0, scale: 1.06 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 13.2);
+        // recontextualize: strike through the euphemism, reveal the humans
+        tl.to("#kvStrike", { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, 15.3);
+        tl.to("#kv2", { opacity: 0.35, y: -120, duration: 0.6, ease: "power2.inOut" }, 15.9);
+        tl.to("#kvStrike", { opacity: 0.35, y: -120, duration: 0.6, ease: "power2.inOut" }, 15.9);
+        tl.fromTo("#num168b", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 16.1);
+        tl.fromTo("#num168lbl", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 16.6);
+
+        window.__timelines["main"] = tl;
+      </script>
+
+      <audio id="vo" data-start="0" data-duration="19.2" data-media-start="110.9" data-track-index="2" src="../audio/voiceover.m4a"></audio>
+    </div>
+  </body>
+</html>

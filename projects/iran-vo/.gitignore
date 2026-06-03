@@ -8,3 +8,4 @@ ref/
 node_modules/
 .hyperframes/
 out*.mp4
+*.gif
