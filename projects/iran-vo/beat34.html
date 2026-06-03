@@ -67,25 +67,20 @@
       .dmg { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px;
         border: 1.5px solid var(--highlight); }
       #adjNote { position: absolute; left: 50%; top: 190px; transform: translateX(-50%); font-size: 13px; }
+      #irWash { position: absolute; inset: 0; mix-blend-mode: screen; pointer-events: none; background:
+        radial-gradient(circle at 37% 45%, rgba(255,120,40,0.55), transparent 20%),
+        radial-gradient(circle at 27% 30%, rgba(255,95,40,0.45), transparent 15%),
+        radial-gradient(circle at 70% 22%, rgba(255,95,40,0.45), transparent 15%),
+        radial-gradient(circle at 50% 50%, rgba(120,180,255,0.12), transparent 72%); }
       .scanline { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,214,10,0.8), transparent); top: 0; }
       .zone { position: absolute; border: 1.5px solid var(--highlight); }
       .zone .z-lbl { position: absolute; top: -28px; left: 0; font-family: "IBM Plex Mono", monospace;
         text-transform: uppercase; letter-spacing: 0.12em; font-size: 13px; color: var(--highlight); white-space: nowrap; }
-      #zSchule { left: 16%; top: 40%; width: 30%; height: 38%; }
-      #zRG { left: 52%; top: 22%; width: 26%; height: 34%; border-color: var(--danger); }
-      #zRG .z-lbl { color: var(--danger); }
-      #distBracket { position: absolute; left: 46%; top: 52%; width: 6%; height: 1px; background: var(--line); }
-      #distLabel { position: absolute; left: 46%; top: 52%; margin-top: 8px; width: 200px; font-size: 12px; }
-      #irWash { position: absolute; inset: 0; background:
-        radial-gradient(circle at 30% 60%, rgba(210,75,75,0.45), transparent 35%),
-        radial-gradient(circle at 40% 64%, rgba(255,180,40,0.4), transparent 22%),
-        linear-gradient(180deg, rgba(20,40,120,0.25), rgba(120,20,40,0.25)); mix-blend-mode: screen; }
-      .geoV { position: absolute; height: 1px; background: rgba(255,214,10,0.7); transform-origin: left center; }
       #geoCross { position: absolute; left: 38%; top: 62%; width: 60px; height: 60px; margin: -30px 0 0 -30px; }
       #geoCross::before, #geoCross::after { content: ""; position: absolute; background: var(--highlight); }
       #geoCross::before { left: 50%; top: 0; bottom: 0; width: 1.5px; transform: translateX(-50%); }
       #geoCross::after { top: 50%; left: 0; right: 0; height: 1.5px; transform: translateY(-50%); }
-      #geoLabel { position: absolute; left: 50%; bottom: 130px; transform: translateX(-50%); text-align: center;
+      #geoLabel, #irLabel { position: absolute; left: 50%; bottom: 130px; transform: translateX(-50%); text-align: center;
         font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 30px; font-weight: 600; color: var(--highlight); }
       #anaTag { position: absolute; left: 50%; top: 150px; transform: translateX(-50%); font-size: 13px; }
     </style>
@@ -140,6 +135,7 @@
         <div class="mono hid" id="anaTag">Satellitenanalyse · Quelle: Amnesty International</div>
         <div class="photo hid" id="sat" style="background:#05080f url('assets/schule-teaser.jpg') center/cover;">
           <div class="scanline hid" id="scan"></div>
+          <div id="irWash" class="hid"></div>
           <div class="satlbl hid" id="satLbl">Mädchenschule · Minab</div>
           <div class="dmg hid" id="dmg1" style="left:37%; top:45%;"></div>
           <div class="dmg hid" id="dmg2" style="left:27%; top:30%;"></div>
@@ -147,6 +143,7 @@
           <div id="geoCross" class="hid" style="left:40%; top:46%;"></div>
         </div>
         <div class="mono hid" id="adjNote">Compound der Revolutionsgarden · unmittelbar benachbart</div>
+        <div class="hid" id="irLabel">Infrarot · Brandspuren</div>
         <div class="hid" id="geoLabel">Einschlaggeometrie</div>
       </div>
 
@@ -209,9 +206,18 @@
         // damage markers on destroyed buildings
         tl.fromTo(".dmg", { opacity: 0, scale: 1.7 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.2, ease: "power3.out", immediateRender: false }, 25.6);
 
-        // ===== 4c geometry (28.4–34.7) =====
-        tl.fromTo("#geoCross", { opacity: 0, scale: 1.7 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out", immediateRender: false }, 28.4);
-        tl.fromTo("#geoLabel", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 28.8);
+        // ===== 4c infrared "lamp" + geometry (28.4–34.7) =====
+        // infrared lamp flickers ON, revealing the burn/heat traces on the destroyed buildings
+        tl.fromTo("#irWash", { opacity: 0 }, { keyframes: [
+          { opacity: 0.55, duration: 0.04 }, { opacity: 0.0, duration: 0.05 },
+          { opacity: 0.7, duration: 0.03 }, { opacity: 0.1, duration: 0.06 },
+          { opacity: 0.85, duration: 0.04 }, { opacity: 1, duration: 0.45, ease: "power2.out" },
+        ], immediateRender: false }, 28.4);
+        tl.fromTo("#irLabel", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 28.7);
+        // hand off to impact geometry
+        tl.to("#irLabel", { opacity: 0, duration: 0.3 }, 30.4);
+        tl.fromTo("#geoCross", { opacity: 0, scale: 1.7 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out", immediateRender: false }, 30.4);
+        tl.fromTo("#geoLabel", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 30.7);
 
         window.__timelines["main"] = tl;
       </script>
