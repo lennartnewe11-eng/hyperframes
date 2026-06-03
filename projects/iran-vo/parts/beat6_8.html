@@ -57,10 +57,10 @@
       .curl { position: absolute; top: 0; bottom: 0; width: 70px; left: 444px; z-index: 3; pointer-events: none; }
       #curlL { background: linear-gradient(90deg, rgba(12,8,3,0.65) 0%, rgba(12,8,3,0) 100%); }
       #curlR { background: linear-gradient(270deg, rgba(12,8,3,0.65) 0%, rgba(12,8,3,0) 100%); }
-      #handImg { position: absolute; left: 46%; bottom: -40px; width: 280px; height: 566px; margin-left: -140px;
-        background: url('../assets/hand-point.png') center bottom/contain no-repeat; z-index: 5; }
-      .ripple { position: absolute; left: 40%; top: 34%; width: 28px; height: 28px; margin: -14px 0 0 -14px;
-        border: 2px solid rgba(255,255,255,0.75); border-radius: 50%; z-index: 6; }
+      #handImg { position: absolute; left: 290px; top: 285px; width: 250px; height: 770px;
+        background: url('../assets/hand-left.png') top center/contain no-repeat; z-index: 5; }
+      .ripple { position: absolute; left: 52%; top: 40%; width: 26px; height: 26px; margin: -13px 0 0 -13px;
+        border: 2px solid rgba(255,255,255,0.9); border-radius: 50%; z-index: 6; }
       #tapLbl { position: absolute; left: 0; right: 0; bottom: 120px; text-align: center; font-size: 14px; }
 
       /* ⑦b HUD grid */
@@ -213,8 +213,8 @@
         // old hand reaches in and taps the map
         tl.fromTo("#handImg", { opacity: 0, y: 260 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 10.2);
         tl.to("#handImg", { keyframes: [ { y: -22, duration: 0.18 }, { y: 0, duration: 0.22 }, { y: -22, duration: 0.18 }, { y: 0, duration: 0.22 } ], ease: "power2.inOut" }, 10.95);
-        tl.fromTo("#rip1", { scale: 0.3, opacity: 0.9 }, { scale: 4, opacity: 0, duration: 0.7, ease: "power2.out", immediateRender: false }, 11.05);
-        tl.fromTo("#rip2", { scale: 0.3, opacity: 0.9 }, { scale: 4, opacity: 0, duration: 0.7, ease: "power2.out", immediateRender: false }, 11.4);
+        tl.fromTo("#rip1", { scale: 0.3, opacity: 0.95 }, { scale: 4, opacity: 0, duration: 0.7, ease: "power2.out", immediateRender: false }, 11.13);
+        tl.fromTo("#rip2", { scale: 0.3, opacity: 0.95 }, { scale: 4, opacity: 0, duration: 0.7, ease: "power2.out", immediateRender: false }, 11.51);
         tl.fromTo("#tapLbl", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 10.9);
 
         // ===== ⑦b HUD digitalize + words (12.3–17.0) =====
