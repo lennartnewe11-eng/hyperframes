@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a;
+        --grn: #76ff9c; --grn-dim: #3a9a58; --red: #ff6a60; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #04060a; font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; }
+      .scene { position: absolute; inset: 0; opacity: 0; }
+      .tag { position: absolute; left: 60px; top: 50px; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 14px; color: var(--muted); z-index: 50; }
+      .tagN { position: absolute; right: 60px; top: 50px; font-family: "IBM Plex Mono", monospace; letter-spacing: 0.16em; font-size: 13px; color: var(--highlight); z-index: 50; }
+
+      /* navy text beats */
+      .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+      .kick { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.22em; font-size: 16px; color: var(--highlight); margin-bottom: 24px; }
+      .big { font-weight: 800; font-size: 96px; letter-spacing: -0.025em; line-height: 1.04; max-width: 1500px; }
+      .hl { color: var(--highlight); }
+      .strike { position: relative; } .strike::after { content: ""; position: absolute; left: -2%; right: -2%; top: 52%; height: 7px; background: var(--highlight); }
+      .small { margin-top: 26px; font-size: 18px; color: var(--muted); }
+      .navy { position: absolute; inset: 0; background: var(--bg-0); }
+
+      /* CRT scene (real photo): native screen rect ≈ (364,232,200,120); shown at frame rect (600,306,720,432) */
+      .crtbg { position: absolute; inset: 0; background: url('../assets/crt.jpg') center/cover; }
+      .vlight { position: absolute; inset: 0; background: #04060a; }
+      .screen { position: absolute; left: 686px; top: 250px; width: 384px; height: 266px; overflow: hidden; border-radius: 16px/12px;
+        background: radial-gradient(120% 120% at 50% 45%, #0e3a1e 0%, #07210f 70%, #041007 100%);
+        box-shadow: inset 0 0 60px rgba(0,0,0,0.8), inset 0 0 22px rgba(80,255,150,0.12); }
+      .prog { position: absolute; inset: 15px 18px; font-family: "IBM Plex Mono", monospace; color: var(--grn); text-shadow: 0 0 6px rgba(110,255,150,0.6); }
+      .phdr { display: flex; justify-content: space-between; font-size: 13px; letter-spacing: 0.06em; border-bottom: 1px solid rgba(118,255,156,0.35); padding-bottom: 7px; }
+      .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; height: calc(100% - 44px); }
+      .col { border: 1px solid rgba(118,255,156,0.26); border-radius: 3px; padding: 6px; }
+      .ch { font-size: 9px; letter-spacing: 0.04em; color: var(--grn-dim); border-bottom: 1px dashed rgba(118,255,156,0.3); padding-bottom: 5px; margin-bottom: 7px; display: flex; justify-content: space-between; }
+      .card { border: 1px solid rgba(118,255,156,0.5); border-radius: 2px; padding: 5px 6px; margin-bottom: 6px; font-size: 11px; }
+      .card.act { background: rgba(118,255,156,0.14); box-shadow: 0 0 10px rgba(118,255,156,0.3); }
+      .card .c2 { color: var(--grn-dim); font-size: 8.5px; margin-top: 2px; }
+      .card.done .c2 { color: rgba(118,255,156,0.45); }
+      .cursor { position: absolute; width: 0; height: 0; border-left: 11px solid #e0ffe9; border-bottom: 16px solid transparent; transform: rotate(-12deg); filter: drop-shadow(0 0 5px rgba(120,255,160,0.8)); z-index: 4; }
+      .clk { position: absolute; width: 22px; height: 22px; border: 2px solid rgba(180,255,200,0.85); border-radius: 50%; margin: -11px 0 0 -11px; z-index: 4; }
+      .scan { position: absolute; inset: 0; pointer-events: none; opacity: 0.55; background: repeating-linear-gradient(0deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0.30) 2px, rgba(0,0,0,0) 3px); }
+      .vig { position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 70px rgba(0,0,0,0.6); border-radius: 26px/20px; }
+      /* explosion on screen */
+      .boom { position: absolute; left: 50%; top: 48%; width: 200px; height: 200px; margin: -100px 0 0 -100px; border-radius: 50%;
+        background: radial-gradient(circle at 48% 42%, #fff 0%, #c9ffe0 14%, #76ff9c 34%, #1f6b38 62%, rgba(8,28,14,0) 78%); }
+      .boomLbl { position: absolute; left: 0; right: 0; bottom: 40px; text-align: center; font-size: 16px; letter-spacing: 0.16em; color: var(--grn); text-shadow: 0 0 8px rgba(110,255,150,0.6); }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="4">
+
+      <!-- ⑭ -->
+      <div class="scene" id="s14">
+        <div class="navy"></div>
+        <div class="tag">Frame ⑭ · 235,9–245,0 s</div><div class="tagN">Live-Demo</div>
+        <div class="center">
+          <div class="kick">Live-Demo · Palantir-Konferenz</div>
+          <div class="big">Ziele verwalten<br />wie ein <span class="hl">Projektmanagement-Tool</span></div>
+          <div class="small mono">Ein Pentagon-Beamter demonstriert „Maven" live</div>
+        </div>
+      </div>
+
+      <!-- ⑮ pipeline on the real CRT -->
+      <div class="scene" id="s15">
+        <div class="vlight"></div><div class="crtbg"></div>
+        <div class="tag">Frame ⑮ · läuft auf deinem Monitor</div><div class="tagN">Target Pipeline</div>
+        <div class="screen">
+          <div class="prog">
+            <div class="phdr"><span>MAVEN — TARGET MANAGEMENT</span><span>// DEMO</span></div>
+            <div class="cols">
+              <div class="col"><div class="ch"><span>AUSSTEHEND</span><span>2</span></div>
+                <div class="card">TGT-0451<div class="c2">29.8N 91.2W</div></div>
+                <div class="card">TGT-0452<div class="c2">30.1N 90.7W</div></div></div>
+              <div class="col"><div class="ch"><span>ZUGEORDNET</span><span>1</span></div>
+                <div class="card">TGT-0449<div class="c2">31.5N 90.9W</div></div></div>
+              <div class="col"><div class="ch"><span>AUSFÜHRUNG</span><span>1</span></div>
+                <div class="card act">TGT-0447 ◀<div class="c2">32.4N 90.1W · ENGAGE</div></div></div>
+              <div class="col"><div class="ch"><span>ABGESCHL.</span><span>3</span></div>
+                <div class="card done">TGT-0444<div class="c2">DESTROYED</div></div>
+                <div class="card done">TGT-0445<div class="c2">DESTROYED</div></div></div>
+            </div>
+          </div>
+          <div class="cursor" style="left: 62%; top: 58%;"></div>
+          <div class="clk" style="left: 62%; top: 59%;"></div>
+          <div class="scan"></div><div class="vig"></div>
+        </div>
+      </div>
+
+      <!-- ⑯ explosion on the real CRT -->
+      <div class="scene" id="s16">
+        <div class="vlight"></div><div class="crtbg"></div>
+        <div class="tag">Frame ⑯ · Explosion auf dem Monitor</div><div class="tagN">Engage</div>
+        <div class="screen">
+          <div class="prog"><div class="phdr"><span>MAVEN — TGT-0447 · ENGAGE</span><span>// DEMO</span></div></div>
+          <div class="boom"></div>
+          <div class="boomLbl mono">LINKSKLICK · RECHTSKLICK · LINKSKLICK</div>
+          <div class="cursor" style="left: 50%; top: 48%;"></div>
+          <div class="scan"></div><div class="vig"></div>
+        </div>
+      </div>
+
+      <!-- ⑰ -->
+      <div class="scene" id="s17">
+        <div class="navy"></div>
+        <div class="tag">Frame ⑰ · 260,7–268,6 s</div><div class="tagN">Realität</div>
+        <div class="center">
+          <div class="kick" style="color:var(--muted)"><span class="strike">Fiktives Demonstrationsszenario</span></div>
+          <div class="big">Aber echte <span class="hl">Kriege</span>.<br />Echte <span class="hl">Menschen</span>.</div>
+          <div class="small mono">Dieselbe Software — in echten Kriegen eingesetzt</div>
+        </div>
+      </div>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+        tl.set("#s14", { opacity: 1 }, 0.0); tl.set("#s14", { opacity: 0 }, 1.0);
+        tl.set("#s15", { opacity: 1 }, 1.0); tl.set("#s15", { opacity: 0 }, 2.0);
+        tl.set("#s16", { opacity: 1 }, 2.0); tl.set("#s16", { opacity: 0 }, 3.0);
+        tl.set("#s17", { opacity: 1 }, 3.0);
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>
