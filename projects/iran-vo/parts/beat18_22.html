@@ -6,53 +6,55 @@
     <script src="../gsap.min.js"></script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --cyan: rgba(120,180,230,0.5); }
       html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
       .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
       .hid { opacity: 0; }
-      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
       .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
       .chrome > div { position: absolute; }
       .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
-      .baseline { position: absolute; bottom: 96px; left: 50%; transform: translateX(-50%); width: 360px; height: 1px; background: var(--line); transform-origin: center; }
+      .baseline { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 300px; height: 1px; background: var(--line); transform-origin: center; }
       .hl { color: var(--highlight); }
-
-      .num { position: absolute; left: 0; right: 0; top: 50%; text-align: center; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+      .num { position: absolute; left: 0; right: 0; text-align: center; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
       .lbl { position: absolute; left: 0; right: 0; text-align: center; }
       .big { font-weight: 800; letter-spacing: -0.03em; }
 
-      /* dot grids */
-      .grid { position: absolute; left: 50%; top: 50%; display: grid; transform-origin: top center; }
-      .dot { border-radius: 50%; }
-
-      /* ⑱ */
-      #s18kick { position: absolute; left: 0; right: 0; top: 50%; margin-top: -250px; text-align: center; font-size: 14px; }
-      #num1000 { top: 50%; margin-top: -200px; font-size: 150px; }
-      #lbl1000 { top: 50%; margin-top: -30px; font-size: 15px; }
-      #grid1000 { grid-template-columns: repeat(40, 1fr); gap: 9px; width: 760px; margin: -10px 0 0 -380px; }
-      #grid1000 .dot { width: 9px; height: 9px; background: rgba(255,255,255,0.55); }
+      /* ⑱ map */
+      #s18kick { position: absolute; left: 0; right: 0; top: 130px; text-align: center; font-size: 14px; }
+      #num1000 { top: 196px; font-size: 124px; }
+      #lbl1000 { top: 360px; font-size: 15px; }
+      #mapWrap { position: absolute; left: 50%; top: 432px; width: 880px; height: 478px; margin-left: -440px; }
+      #mapImg { position: absolute; inset: 0; background: #05080f url('../assets/iran-map.jpg') center/cover; opacity: 0.92; border-radius: 4px; }
+      #mapGrid { position: absolute; inset: 0; pointer-events: none; border-radius: 4px;
+        background-image: repeating-linear-gradient(0deg, transparent 0 43px, var(--cyan) 43px 44px), repeating-linear-gradient(90deg, transparent 0 43px, var(--cyan) 43px 44px);
+        opacity: 0.25; }
+      #mapFrame { position: absolute; inset: 0; border: 1px solid rgba(120,180,230,0.35); border-radius: 4px; pointer-events: none; }
+      #mapTag { position: absolute; left: 14px; top: 12px; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px; color: rgba(150,200,235,0.8); }
+      #targets { position: absolute; inset: 0; }
+      .tgt { position: absolute; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: rgba(255,255,255,0.9); box-shadow: 0 0 4px rgba(255,255,255,0.5); }
 
       /* ⑲ weeks->minutes */
-      #wkLbl, #minLbl { top: 50%; margin-top: -120px; font-size: 64px; }
-      #wkBar { position: absolute; left: 50%; top: 50%; margin: 0 0 0 -640px; width: 1280px; height: 10px; background: var(--ink); transform-origin: left center; border-radius: 5px; }
-      #wkCap { top: 50%; margin-top: 70px; font-size: 15px; }
+      #wkLbl, #minLbl { top: 396px; left: 0; right: 0; text-align: center; font-weight: 800; letter-spacing: -0.03em; font-size: 64px; position: absolute; }
+      #wkBar { position: absolute; left: 50%; top: 540px; margin-left: -640px; width: 1280px; height: 10px; background: var(--ink); transform-origin: left center; border-radius: 5px; }
+      #wkCap { top: 600px; font-size: 15px; }
 
       /* ⑳ 20 vs 2000 */
-      #ggKick { position: absolute; left: 0; right: 0; top: 50%; margin-top: -300px; text-align: center; font-size: 14px; }
-      #numScale { top: 50%; margin-top: -250px; font-size: 130px; }
-      #grid2000 { grid-template-columns: repeat(50, 1fr); gap: 5px; width: 750px; margin: -30px 0 0 -375px; }
-      #grid2000 .dot { width: 5px; height: 5px; background: rgba(255,255,255,0.4); }
+      #ggKick { position: absolute; left: 0; right: 0; top: 140px; text-align: center; font-size: 14px; }
+      #numScale { top: 196px; font-size: 110px; }
+      #grid2000 { position: absolute; left: 50%; top: 360px; width: 760px; margin-left: -380px; display: grid; grid-template-columns: repeat(50, 1fr); gap: 5px; transform-origin: top center; }
+      #grid2000 .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.4); }
       #grid2000 .dot.hi { background: var(--highlight); }
-      #scaleLbl { top: 50%; margin-top: 260px; font-size: 16px; }
+      #scaleLbl { top: 812px; font-size: 16px; }
 
       /* ㉑ speed & scale */
-      .ss { position: absolute; left: 0; right: 0; text-align: center; font-weight: 800; font-size: 150px; letter-spacing: -0.03em; }
-      #ssTrans { position: absolute; left: 0; right: 0; top: 50%; margin-top: 110px; text-align: center; font-size: 18px; }
-      #ssPrice { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 800; font-size: 88px; letter-spacing: -0.025em; }
+      .ss { position: absolute; left: 0; right: 0; text-align: center; font-weight: 800; font-size: 144px; letter-spacing: -0.03em; }
+      #ssTrans { position: absolute; left: 0; right: 0; top: 720px; text-align: center; font-size: 18px; }
+      #ssPrice { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 800; font-size: 84px; letter-spacing: -0.025em; }
 
       /* ㉒ kern */
-      #kern { position: absolute; left: 0; right: 0; top: 50%; margin-top: -90px; text-align: center; font-weight: 800; font-size: 76px; letter-spacing: -0.02em; }
-      #kernSub { position: absolute; left: 0; right: 0; top: 50%; margin-top: 40px; text-align: center; font-weight: 700; font-size: 64px; letter-spacing: -0.02em; }
+      #kern { position: absolute; left: 0; right: 0; top: 410px; text-align: center; font-weight: 800; font-size: 74px; letter-spacing: -0.02em; }
+      #kernSub { position: absolute; left: 0; right: 0; top: 560px; text-align: center; font-weight: 700; font-size: 60px; letter-spacing: -0.02em; }
       .strike { position: relative; } .strike::after { content: ""; position: absolute; left: -3%; right: -3%; top: 52%; height: 6px; background: var(--muted); }
     </style>
   </head>
@@ -66,18 +68,24 @@
       </div>
       <div class="baseline" id="baseline"></div>
 
-      <!-- ⑱ 1000 Ziele -->
+      <!-- ⑱ 1000 Ziele auf Iran-Karte -->
       <div id="s18">
         <div class="mono hid" id="s18kick">Tag 1 · US-Angriffe · Analyse in Echtzeit</div>
         <div class="num hid" id="num1000">0</div>
         <div class="lbl mono hid" id="lbl1000">Priorisierte Ziele · in Minuten</div>
-        <div class="grid" id="grid1000"></div>
+        <div id="mapWrap" class="hid">
+          <div id="mapImg"></div>
+          <div id="mapGrid"></div>
+          <div id="mapFrame"></div>
+          <div id="mapTag">Zielzuweisung · Iran</div>
+          <div id="targets"></div>
+        </div>
       </div>
 
       <!-- ⑲ Wochen -> Minuten -->
       <div id="s19">
-        <div class="lbl big hid" id="wkLbl">Wochen</div>
-        <div class="lbl big hid" id="minLbl"><span class="hl">Minuten</span></div>
+        <div class="hid" id="wkLbl">Wochen</div>
+        <div class="hid" id="minLbl"><span class="hl">Minuten</span></div>
         <div id="wkBar" class="hid"></div>
         <div class="lbl mono hid" id="wkCap">Planungsarbeit der Analysten</div>
       </div>
@@ -86,14 +94,14 @@
       <div id="s20">
         <div class="mono hid" id="ggKick">Georgetown-Studie</div>
         <div class="num hid" id="numScale">20</div>
-        <div class="grid" id="grid2000"></div>
+        <div id="grid2000" class="hid"></div>
         <div class="lbl mono hid" id="scaleLbl">20 Soldaten — Arbeit von früher 2000 Menschen</div>
       </div>
 
       <!-- ㉑ Speed & Scale -->
       <div id="s21">
-        <div class="ss hid" id="ssA" style="top:50%; margin-top:-180px;">Speed</div>
-        <div class="ss hid" id="ssB" style="top:50%; margin-top:-20px;">and Scale</div>
+        <div class="ss hid" id="ssA" style="top:300px;">Speed</div>
+        <div class="ss hid" id="ssB" style="top:470px;">and Scale</div>
         <div class="mono hid" id="ssTrans">Geschwindigkeit und Skalierung · die Schlagworte des neuen Krieges</div>
         <div id="ssPrice" class="hid">Aber Geschwindigkeit<br />hat einen <span class="hl">Preis</span>.</div>
       </div>
@@ -101,20 +109,21 @@
       <!-- ㉒ Kern -->
       <div id="s22">
         <div id="kern" class="hid">Der Kern des Problems</div>
-        <div id="kernSub" class="hid">nicht <span class="strike" id="kTech">technisch</span> — sondern <span class="hl">menschlich</span></div>
+        <div id="kernSub" class="hid">nicht <span class="strike">technisch</span> — sondern <span class="hl">menschlich</span></div>
       </div>
 
       <script>
         window.__timelines = window.__timelines || {};
-        // build grids
-        function fillGrid(id, n, hiCount) {
-          let s = ""; for (let i = 0; i < n; i++) s += `<div class="dot${hiCount && i < hiCount ? " hi" : ""}"></div>`;
-          document.getElementById(id).innerHTML = s;
-        }
-        fillGrid("grid1000", 1000, 0);
-        fillGrid("grid2000", 2000, 20);
-        const tl = gsap.timeline({ paused: true });
+        // seeded PRNG -> scatter target dots within an ellipse over Iran on the map
+        function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+        (function(){ const rnd=mulberry32(20260228); const MW=880,MH=478,cx=440,cy=232,rx=250,ry=188; let s=""; const N=520;
+          for(let i=0;i<N;i++){ let x,y,k=0; do{ x=rnd()*MW; y=rnd()*MH; k++; } while(((x-cx)/rx)**2+((y-cy)/ry)**2>1 && k<40);
+            s+=`<div class="tgt" style="left:${x.toFixed(0)}px;top:${y.toFixed(0)}px"></div>`; }
+          document.getElementById("targets").innerHTML=s; })();
+        // 2000-dot grid (20 highlighted)
+        (function(){ let s=""; for(let i=0;i<2000;i++) s+=`<div class="dot${i<20?" hi":""}"></div>`; document.getElementById("grid2000").innerHTML=s; })();
 
+        const tl = gsap.timeline({ paused: true });
         tl.to({ p: 0 }, { p: 1, duration: 43, ease: "none", onUpdate: function () {
           const t = 268.6 + 43 * this.targets()[0].p; const m = Math.floor(t / 60), s = Math.floor(t % 60);
           document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
@@ -124,20 +133,19 @@
 
         // ===== ⑱ 1000 Ziele (0–10.6) =====
         tl.fromTo("#s18kick", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6 }, 0.6);
+        tl.fromTo("#mapWrap", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, 4.6);
         tl.fromTo("#num1000", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 5.4);
         tl.fromTo("#lbl1000", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 5.6);
         tl.to({ v: 0 }, { v: 1000, duration: 3.4, ease: "power1.out", onUpdate: function () {
           document.getElementById("num1000").textContent = Math.round(this.targets()[0].v).toLocaleString("de-DE");
         } }, 5.5);
-        tl.fromTo("#grid1000", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 5.6);
-        tl.fromTo("#grid1000", { scaleY: 0 }, { scaleY: 1, duration: 3.2, ease: "power1.out" }, 5.6);
-        tl.to(["#s18kick", "#num1000", "#lbl1000", "#grid1000"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 10.2);
+        tl.fromTo(".tgt", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.4, stagger: 0.005, ease: "power1.out" }, 5.7);
+        tl.to(["#s18kick", "#num1000", "#lbl1000", "#mapWrap"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 10.2);
 
         // ===== ⑲ Wochen → Minuten (10.6–17.3) =====
-        tl.fromTo("#wkLbl", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 10.8);
+        tl.fromTo("#wkLbl", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 10.8);
         tl.fromTo("#wkBar", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.6, ease: "power2.out" }, 10.9);
         tl.fromTo("#wkCap", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 11.4);
-        // collapse to minutes
         tl.to("#wkBar", { scaleX: 0.03, duration: 1.0, ease: "power3.inOut" }, 13.6);
         tl.to("#wkLbl", { opacity: 0, duration: 0.3 }, 13.6);
         tl.fromTo("#minLbl", { opacity: 0, scale: 1.1 }, { opacity: 1, scale: 1, duration: 0.45, ease: "power3.out" }, 13.95);
@@ -145,13 +153,11 @@
 
         // ===== ⑳ 20 → 2000 (17.3–28.4) =====
         tl.fromTo("#ggKick", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 17.5);
-        tl.fromTo("#numScale", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 17.7);
+        tl.fromTo("#numScale", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 17.7);
         tl.set("#numScale", { color: "#ffd60a" }, 17.7);
-        // show only the 20 highlighted dots first
         tl.set("#grid2000", { opacity: 1 }, 17.8);
         tl.set("#grid2000 .dot:not(.hi)", { opacity: 0 }, 17.8);
         tl.fromTo("#grid2000 .dot.hi", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.02, ease: "power2.out" }, 17.9);
-        // scale jump to 2000
         tl.to({ v: 20 }, { v: 2000, duration: 1.6, ease: "power2.inOut", onUpdate: function () {
           document.getElementById("numScale").textContent = Math.round(this.targets()[0].v).toLocaleString("de-DE");
         } }, 23.0);
