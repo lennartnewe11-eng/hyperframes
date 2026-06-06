@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --red: #d24b4b; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 300px; height: 1px; background: var(--line); transform-origin: center; }
+      .layer { position: absolute; inset: 0; }
+      .hl { color: var(--highlight); }
+
+      /* ㉙ version cards */
+      #vKick { position: absolute; left: 0; right: 0; top: 230px; text-align: center; font-size: 14px; }
+      .vcard { position: absolute; top: 360px; width: 540px; height: 300px; border: 1px solid var(--line); border-radius: 10px; padding: 38px 40px; }
+      #vUkr { left: 50%; margin-left: -580px; }
+      #vIran { left: 50%; margin-left: 40px; }
+      .vcard .vc-loc { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 16px; color: var(--muted); }
+      .vcard .vc-ver { font-weight: 800; font-size: 92px; letter-spacing: -0.02em; margin-top: 14px; }
+      .vcard .vc-desc { font-size: 22px; color: var(--ink); margin-top: 8px; }
+      #vIran { border-color: rgba(255,214,10,0.4); }
+      #vIran .vc-ver { color: var(--highlight); }
+      #vArrow { position: absolute; left: 50%; top: 480px; margin-left: -30px; width: 60px; text-align: center; font-family: "IBM Plex Mono", monospace; font-size: 30px; color: var(--muted); }
+
+      /* numbered consequence marker */
+      .conMark { position: absolute; left: 160px; top: 360px; }
+      .conMark .cn { font-weight: 800; font-size: 200px; letter-spacing: -0.03em; color: rgba(255,255,255,0.1); line-height: 0.8; }
+      .conMark .ct { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 30px; margin-top: 6px; }
+
+      #konsHead { position: absolute; left: 0; right: 0; top: 50%; margin-top: -40px; text-align: center; font-weight: 800; font-size: 88px; letter-spacing: -0.025em; }
+
+      /* ㉚ screens / abstraction */
+      #scStage { position: absolute; left: 50%; top: 300px; width: 520px; height: 360px; margin-left: -260px; }
+      .scr { position: absolute; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 6px; }
+      #scrTgt { position: absolute; left: 50%; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: var(--red); box-shadow: 0 0 12px rgba(210,75,75,0.6); }
+      .scrLbl { position: absolute; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; color: rgba(255,255,255,0.45); }
+      #abstractWord { position: absolute; left: 0; right: 0; top: 712px; text-align: center; font-weight: 800; font-size: 60px; letter-spacing: -0.02em; }
+
+      /* contrast pilot vs ai */
+      #ctRow { position: absolute; left: 0; right: 0; top: 320px; display: flex; justify-content: center; gap: 0; }
+      .ctCol { width: 600px; padding: 0 50px; text-align: center; }
+      .ctCol h4 { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; font-size: 15px; color: var(--muted); margin-bottom: 26px; }
+      .ctCol .v { font-weight: 800; font-size: 52px; letter-spacing: -0.02em; }
+      .ctCol .s { font-size: 17px; color: var(--muted); margin-top: 14px; }
+      #ctDiv { position: absolute; left: 50%; top: 330px; width: 1px; height: 300px; background: var(--line); }
+      .obsBar { height: 8px; background: rgba(255,255,255,0.5); border-radius: 4px; margin: 22px auto 0; width: 0; }
+      .aiStream { display: flex; gap: 4px; justify-content: center; margin-top: 22px; flex-wrap: wrap; max-width: 420px; margin-left: auto; margin-right: auto; }
+      .aiStream .a { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+
+      /* reduction face->score->click */
+      #redKick { position: absolute; left: 0; right: 0; top: 300px; text-align: center; font-weight: 800; font-size: 64px; letter-spacing: -0.02em; }
+      #redRow { position: absolute; left: 0; right: 0; top: 470px; display: flex; align-items: center; justify-content: center; gap: 46px; }
+      #redRow .step { text-align: center; }
+      #redRow .stxt { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.12em; font-size: 14px; color: var(--muted); margin-top: 14px; }
+      .rface svg { width: 110px; height: 128px; display: block; margin: 0 auto; }
+      .pfill { fill: rgba(255,255,255,0.8); }
+      #redScore { font-weight: 800; font-size: 84px; }
+      #redCursor { width: 0; height: 0; border-left: 26px solid var(--ink); border-bottom: 38px solid transparent; transform: rotate(-12deg); margin: 0 auto; }
+      #redArrow1, #redArrow2 { font-family: "IBM Plex Mono", monospace; font-size: 26px; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="47.9">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div class="chrome">
+        <div class="c-tl mono">Konsequenzen</div>
+        <div class="c-tr mono">KI-Krieg 2.0</div>
+        <div class="c-br mono" id="tc">06:12</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <!-- ㉙ versions -->
+      <div class="layer hid" id="b29">
+        <div class="mono hid" id="vKick">V. Jackson · Universität der Bundeswehr</div>
+        <div class="vcard hid" id="vUkr">
+          <div class="vc-loc">Ukraine · KI-Krieg</div><div class="vc-ver">1.0</div><div class="vc-desc">Das Testfeld</div>
+        </div>
+        <div class="mono hid" id="vArrow">→</div>
+        <div class="vcard hid" id="vIran">
+          <div class="vc-loc">Iran · KI-Krieg</div><div class="vc-ver">2.0</div><div class="vc-desc">Erster echter Einsatz · großer Maßstab</div>
+        </div>
+      </div>
+
+      <!-- ㉚ Konsequenz 01 Entkopplung -->
+      <div class="layer hid" id="b30">
+        <div id="konsHead" class="hid">Welche Konsequenzen?</div>
+        <div class="conMark hid" id="con1"><div class="cn">01</div><div class="ct">Entkopplung</div></div>
+
+        <!-- screens / abstraction -->
+        <div id="b30scr" class="hid">
+          <div id="scStage">
+            <div class="scr" id="scr1" style="inset:0;"></div>
+            <div class="scr" id="scr2" style="inset:46px;"></div>
+            <div class="scr" id="scr3" style="inset:92px;"></div>
+            <div id="scrTgt"></div>
+            <div class="scrLbl" id="scl1" style="left:0; top:-22px;">Distanz</div>
+            <div class="scrLbl" id="scl2" style="left:46px; top:24px;">Bildschirm</div>
+            <div class="scrLbl" id="scl3" style="left:92px; top:70px;">Interface</div>
+          </div>
+          <div id="abstractWord" class="hid">Töten wird <span class="hl">abstrakt</span></div>
+        </div>
+
+        <!-- contrast pilot vs ai -->
+        <div id="b30ct" class="hid">
+          <div id="ctRow">
+            <div class="ctCol" id="ctPilot">
+              <h4>Drohnenpilot</h4>
+              <div class="v">Stunden</div>
+              <div class="obsBar" id="obsBar"></div>
+              <div class="s">beobachtet das Ziel · psychische Belastung</div>
+            </div>
+            <div class="ctCol" id="ctAi">
+              <h4>KI-System</h4>
+              <div class="v">1000 / Tag</div>
+              <div class="aiStream" id="aiStream"></div>
+              <div class="s">keine Verbindung mehr</div>
+            </div>
+          </div>
+          <div id="ctDiv"></div>
+        </div>
+
+        <!-- reduction -->
+        <div id="b30red" class="hid">
+          <div id="redKick" class="hid">Kein Gesicht. Kein Kontext.</div>
+          <div id="redRow">
+            <div class="step rface" id="rs1"><svg viewBox="0 0 70 82"><circle class="pfill" cx="35" cy="18" r="14"/><path class="pfill" d="M6 82 C6 50 64 50 64 82 Z"/></svg><div class="stxt">Mensch</div></div>
+            <div id="redArrow1" class="hid">→</div>
+            <div class="step" id="rs2"><div id="redScore" class="hl">87</div><div class="stxt">Ein Score</div></div>
+            <div id="redArrow2" class="hid">→</div>
+            <div class="step" id="rs3"><div id="redCursor"></div><div class="stxt">Ein Klick</div></div>
+          </div>
+        </div>
+      </div>
+
+      <audio id="vo" src="../audio/voiceover.m4a" data-start="0" data-duration="47.9" data-media-start="372.0" data-track-index="2"></audio>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        (function(){ let s=""; for(let i=0;i<60;i++) s+='<div class="a"></div>'; document.getElementById("aiStream").innerHTML=s; })();
+        const tl = gsap.timeline({ paused: true });
+        tl.to({ p: 0 }, { p: 1, duration: 47.9, ease: "none", onUpdate: function () {
+          const t = 372.0 + 47.9 * this.targets()[0].p; const m = Math.floor(t/60), s = Math.floor(t%60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+
+        // ===== ㉙ versions (2.5–16.0) =====
+        tl.set("#b29", { opacity: 1 }, 2.4);
+        tl.fromTo("#vKick", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 2.5);
+        tl.fromTo("#vUkr", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 3.0);
+        tl.fromTo("#vArrow", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 7.8);
+        tl.fromTo("#vIran", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 8.2);
+        // version bump 1.0 -> 2.0 emphasis already (Iran shows 2.0). small pulse on Iran ver
+        tl.fromTo("#vIran .vc-ver", { scale: 1.12 }, { scale: 1, duration: 0.4, ease: "power3.out" }, 8.4);
+        tl.to("#b29", { opacity: 0, duration: 0.4, ease: "power2.in" }, 15.6);
+
+        // ===== ㉚ Konsequenz 01 Entkopplung (16.2–47.9) =====
+        tl.set("#b30", { opacity: 1 }, 16.0);
+        tl.fromTo("#konsHead", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 16.2);
+        tl.to("#konsHead", { opacity: 0, y: -24, duration: 0.4 }, 17.8);
+        // 01 marker
+        tl.fromTo("#con1", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 18.2);
+        // screens
+        tl.set("#b30scr", { opacity: 1 }, 20.0);
+        tl.fromTo("#scrTgt", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.4 }, 20.1);
+        tl.fromTo("#scr3", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.5, transformOrigin: "center" }, 20.5);
+        tl.fromTo(["#scl3"], { opacity: 0 }, { opacity: 1, duration: 0.4 }, 20.7);
+        tl.fromTo("#scr2", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, transformOrigin: "center" }, 21.4);
+        tl.fromTo(["#scl2"], { opacity: 0 }, { opacity: 1, duration: 0.4 }, 21.6);
+        tl.fromTo("#scr1", { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 0.5, transformOrigin: "center" }, 22.3);
+        tl.fromTo(["#scl1"], { opacity: 0 }, { opacity: 1, duration: 0.4 }, 22.5);
+        // target dims (abstract)
+        tl.to("#scrTgt", { opacity: 0.25, duration: 1.0 }, 24.6);
+        tl.fromTo("#abstractWord", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 25.4);
+        tl.to("#b30scr", { opacity: 0, duration: 0.4, ease: "power2.in" }, 31.0);
+
+        // contrast
+        tl.set("#b30ct", { opacity: 1 }, 31.6);
+        tl.fromTo("#ctDiv", { opacity: 0, scaleY: 0 }, { opacity: 1, scaleY: 1, duration: 0.5, ease: "power2.out" }, 31.7);
+        tl.fromTo("#ctPilot", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 32.0);
+        tl.fromTo("#obsBar", { width: 0 }, { width: "420px", duration: 2.2, ease: "power1.inOut" }, 32.6);
+        tl.fromTo("#ctAi", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 39.8);
+        tl.from("#aiStream .a", { opacity: 0, scale: 0.3, duration: 0.3, stagger: 0.012 }, 40.2);
+        tl.to("#b30ct", { opacity: 0, duration: 0.4, ease: "power2.in" }, 44.6);
+
+        // reduction
+        tl.set("#b30red", { opacity: 1 }, 45.0);
+        tl.fromTo("#redKick", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 45.1);
+        tl.fromTo("#rs1", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45 }, 45.4);
+        tl.fromTo("#redArrow1", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 46.0);
+        tl.fromTo("#rs2", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2)" }, 46.2);
+        tl.fromTo("#redArrow2", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 46.9);
+        tl.fromTo("#rs3", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2)" }, 47.1);
+
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>
