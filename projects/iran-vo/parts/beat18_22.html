@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; }
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 96px; left: 50%; transform: translateX(-50%); width: 360px; height: 1px; background: var(--line); transform-origin: center; }
+      .hl { color: var(--highlight); }
+
+      .num { position: absolute; left: 0; right: 0; top: 50%; text-align: center; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+      .lbl { position: absolute; left: 0; right: 0; text-align: center; }
+      .big { font-weight: 800; letter-spacing: -0.03em; }
+
+      /* dot grids */
+      .grid { position: absolute; left: 50%; top: 50%; display: grid; transform-origin: top center; }
+      .dot { border-radius: 50%; }
+
+      /* ⑱ */
+      #s18kick { position: absolute; left: 0; right: 0; top: 50%; margin-top: -250px; text-align: center; font-size: 14px; }
+      #num1000 { top: 50%; margin-top: -200px; font-size: 150px; }
+      #lbl1000 { top: 50%; margin-top: -30px; font-size: 15px; }
+      #grid1000 { grid-template-columns: repeat(40, 1fr); gap: 9px; width: 760px; margin: -10px 0 0 -380px; }
+      #grid1000 .dot { width: 9px; height: 9px; background: rgba(255,255,255,0.55); }
+
+      /* ⑲ weeks->minutes */
+      #wkLbl, #minLbl { top: 50%; margin-top: -120px; font-size: 64px; }
+      #wkBar { position: absolute; left: 50%; top: 50%; margin: 0 0 0 -640px; width: 1280px; height: 10px; background: var(--ink); transform-origin: left center; border-radius: 5px; }
+      #wkCap { top: 50%; margin-top: 70px; font-size: 15px; }
+
+      /* ⑳ 20 vs 2000 */
+      #ggKick { position: absolute; left: 0; right: 0; top: 50%; margin-top: -300px; text-align: center; font-size: 14px; }
+      #numScale { top: 50%; margin-top: -250px; font-size: 130px; }
+      #grid2000 { grid-template-columns: repeat(50, 1fr); gap: 5px; width: 750px; margin: -30px 0 0 -375px; }
+      #grid2000 .dot { width: 5px; height: 5px; background: rgba(255,255,255,0.4); }
+      #grid2000 .dot.hi { background: var(--highlight); }
+      #scaleLbl { top: 50%; margin-top: 260px; font-size: 16px; }
+
+      /* ㉑ speed & scale */
+      .ss { position: absolute; left: 0; right: 0; text-align: center; font-weight: 800; font-size: 150px; letter-spacing: -0.03em; }
+      #ssTrans { position: absolute; left: 0; right: 0; top: 50%; margin-top: 110px; text-align: center; font-size: 18px; }
+      #ssPrice { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 800; font-size: 88px; letter-spacing: -0.025em; }
+
+      /* ㉒ kern */
+      #kern { position: absolute; left: 0; right: 0; top: 50%; margin-top: -90px; text-align: center; font-weight: 800; font-size: 76px; letter-spacing: -0.02em; }
+      #kernSub { position: absolute; left: 0; right: 0; top: 50%; margin-top: 40px; text-align: center; font-weight: 700; font-size: 64px; letter-spacing: -0.02em; }
+      .strike { position: relative; } .strike::after { content: ""; position: absolute; left: -3%; right: -3%; top: 52%; height: 6px; background: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="43">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div class="chrome">
+        <div class="c-tl mono">Iran · KI-Krieg</div>
+        <div class="c-tr mono">Speed &amp; Scale</div>
+        <div class="c-br mono" id="tc">04:28</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <!-- ⑱ 1000 Ziele -->
+      <div id="s18">
+        <div class="mono hid" id="s18kick">Tag 1 · US-Angriffe · Analyse in Echtzeit</div>
+        <div class="num hid" id="num1000">0</div>
+        <div class="lbl mono hid" id="lbl1000">Priorisierte Ziele · in Minuten</div>
+        <div class="grid" id="grid1000"></div>
+      </div>
+
+      <!-- ⑲ Wochen -> Minuten -->
+      <div id="s19">
+        <div class="lbl big hid" id="wkLbl">Wochen</div>
+        <div class="lbl big hid" id="minLbl"><span class="hl">Minuten</span></div>
+        <div id="wkBar" class="hid"></div>
+        <div class="lbl mono hid" id="wkCap">Planungsarbeit der Analysten</div>
+      </div>
+
+      <!-- ⑳ 20 vs 2000 -->
+      <div id="s20">
+        <div class="mono hid" id="ggKick">Georgetown-Studie</div>
+        <div class="num hid" id="numScale">20</div>
+        <div class="grid" id="grid2000"></div>
+        <div class="lbl mono hid" id="scaleLbl">20 Soldaten — Arbeit von früher 2000 Menschen</div>
+      </div>
+
+      <!-- ㉑ Speed & Scale -->
+      <div id="s21">
+        <div class="ss hid" id="ssA" style="top:50%; margin-top:-180px;">Speed</div>
+        <div class="ss hid" id="ssB" style="top:50%; margin-top:-20px;">and Scale</div>
+        <div class="mono hid" id="ssTrans">Geschwindigkeit und Skalierung · die Schlagworte des neuen Krieges</div>
+        <div id="ssPrice" class="hid">Aber Geschwindigkeit<br />hat einen <span class="hl">Preis</span>.</div>
+      </div>
+
+      <!-- ㉒ Kern -->
+      <div id="s22">
+        <div id="kern" class="hid">Der Kern des Problems</div>
+        <div id="kernSub" class="hid">nicht <span class="strike" id="kTech">technisch</span> — sondern <span class="hl">menschlich</span></div>
+      </div>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        // build grids
+        function fillGrid(id, n, hiCount) {
+          let s = ""; for (let i = 0; i < n; i++) s += `<div class="dot${hiCount && i < hiCount ? " hi" : ""}"></div>`;
+          document.getElementById(id).innerHTML = s;
+        }
+        fillGrid("grid1000", 1000, 0);
+        fillGrid("grid2000", 2000, 20);
+        const tl = gsap.timeline({ paused: true });
+
+        tl.to({ p: 0 }, { p: 1, duration: 43, ease: "none", onUpdate: function () {
+          const t = 268.6 + 43 * this.targets()[0].p; const m = Math.floor(t / 60), s = Math.floor(t % 60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+
+        // ===== ⑱ 1000 Ziele (0–10.6) =====
+        tl.fromTo("#s18kick", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6 }, 0.6);
+        tl.fromTo("#num1000", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 5.4);
+        tl.fromTo("#lbl1000", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 5.6);
+        tl.to({ v: 0 }, { v: 1000, duration: 3.4, ease: "power1.out", onUpdate: function () {
+          document.getElementById("num1000").textContent = Math.round(this.targets()[0].v).toLocaleString("de-DE");
+        } }, 5.5);
+        tl.fromTo("#grid1000", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 5.6);
+        tl.fromTo("#grid1000", { scaleY: 0 }, { scaleY: 1, duration: 3.2, ease: "power1.out" }, 5.6);
+        tl.to(["#s18kick", "#num1000", "#lbl1000", "#grid1000"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 10.2);
+
+        // ===== ⑲ Wochen → Minuten (10.6–17.3) =====
+        tl.fromTo("#wkLbl", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 10.8);
+        tl.fromTo("#wkBar", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.6, ease: "power2.out" }, 10.9);
+        tl.fromTo("#wkCap", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 11.4);
+        // collapse to minutes
+        tl.to("#wkBar", { scaleX: 0.03, duration: 1.0, ease: "power3.inOut" }, 13.6);
+        tl.to("#wkLbl", { opacity: 0, duration: 0.3 }, 13.6);
+        tl.fromTo("#minLbl", { opacity: 0, scale: 1.1 }, { opacity: 1, scale: 1, duration: 0.45, ease: "power3.out" }, 13.95);
+        tl.to(["#minLbl", "#wkBar", "#wkCap"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 16.9);
+
+        // ===== ⑳ 20 → 2000 (17.3–28.4) =====
+        tl.fromTo("#ggKick", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 17.5);
+        tl.fromTo("#numScale", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 17.7);
+        tl.set("#numScale", { color: "#ffd60a" }, 17.7);
+        // show only the 20 highlighted dots first
+        tl.set("#grid2000", { opacity: 1 }, 17.8);
+        tl.set("#grid2000 .dot:not(.hi)", { opacity: 0 }, 17.8);
+        tl.fromTo("#grid2000 .dot.hi", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.02, ease: "power2.out" }, 17.9);
+        // scale jump to 2000
+        tl.to({ v: 20 }, { v: 2000, duration: 1.6, ease: "power2.inOut", onUpdate: function () {
+          document.getElementById("numScale").textContent = Math.round(this.targets()[0].v).toLocaleString("de-DE");
+        } }, 23.0);
+        tl.set("#numScale", { color: "#f4f7fb" }, 23.0);
+        tl.to("#grid2000 .dot:not(.hi)", { opacity: 1, duration: 1.4, stagger: 0.0006, ease: "power1.out" }, 23.0);
+        tl.fromTo("#scaleLbl", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 23.6);
+        tl.to(["#ggKick", "#numScale", "#grid2000", "#scaleLbl"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 28.0);
+
+        // ===== ㉑ Speed & Scale (28.4–37.9) =====
+        tl.fromTo("#ssA", { opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 28.5);
+        tl.fromTo("#ssB", { opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 28.9);
+        tl.fromTo("#ssTrans", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 30.4);
+        tl.to(["#ssA", "#ssB", "#ssTrans"], { opacity: 0, y: -50, duration: 0.4, ease: "power2.in" }, 33.0);
+        tl.fromTo("#ssPrice", { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 33.4);
+        tl.to("#ssPrice", { opacity: 0, duration: 0.4, ease: "power2.in" }, 37.5);
+
+        // ===== ㉒ Kern (37.9–43.0) =====
+        tl.fromTo("#kern", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 38.0);
+        tl.fromTo("#kernSub", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 40.3);
+
+        window.__timelines["main"] = tl;
+      </script>
+
+      <audio id="vo" src="../audio/voiceover.m4a" data-start="0" data-duration="43" data-media-start="268.6" data-track-index="2"></audio>
+    </div>
+  </body>
+</html>
