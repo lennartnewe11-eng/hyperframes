@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --red: #d24b4b; --grn: #3a9a58; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 300px; height: 1px; background: var(--line); transform-origin: center; }
+      .layer { position: absolute; inset: 0; }
+      .hl { color: var(--highlight); }
+      .ctr { position: absolute; left: 0; right: 0; text-align: center; }
+      .big { font-weight: 800; letter-spacing: -0.025em; }
+      .strike { position: relative; } .strike::after { content:""; position:absolute; left:-3%; right:-3%; top:52%; height:6px; background: var(--muted); }
+
+      /* ㉓ */
+      #q23 { position: absolute; left: 0; right: 0; top: 470px; text-align: center; font-weight: 800; font-size: 78px; letter-spacing: -0.02em; line-height: 1.1; max-width: 1400px; margin: 0 auto; padding: 0 60px; }
+      #r23row { position: absolute; left: 0; right: 0; top: 250px; display: flex; align-items: center; justify-content: center; gap: 40px; }
+      #swarm { position: relative; width: 220px; height: 130px; }
+      #swarm .d { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.6); }
+      .person { width: 70px; }
+      .person svg { width: 70px; height: 82px; display: block; }
+      .pfill { fill: rgba(255,255,255,0.8); }
+      #r23lbl { position: absolute; left: 0; right: 0; top: 400px; text-align: center; font-size: 13px; }
+
+      /* ㉔ Lavender */
+      #lavTitle { position: absolute; left: 0; right: 0; top: 50%; margin-top: -70px; text-align: center; font-weight: 800; font-size: 130px; letter-spacing: 0.02em; }
+      #lavKick { position: absolute; left: 0; right: 0; top: 50%; margin-top: -150px; text-align: center; font-size: 14px; }
+      #lavRedact { position: absolute; left: 50%; top: 50%; margin: -56px 0 0 -300px; width: 600px; height: 120px; background: #1a2336; transform-origin: right center; }
+      /* score */
+      #scoreWrap { position: absolute; left: 0; right: 0; top: 300px; display: flex; align-items: center; justify-content: center; gap: 64px; }
+      #scorePerson svg { width: 150px; height: 175px; display: block; }
+      #scoreBox { width: 520px; }
+      #scoreBox .sb-lbl { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.12em; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+      #scoreTrack { width: 100%; height: 16px; background: rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; }
+      #scoreFill { height: 100%; width: 0%; background: var(--red); border-radius: 8px; }
+      #scoreNum { font-weight: 800; font-size: 56px; font-variant-numeric: tabular-nums; margin-top: 14px; }
+      #scoreNum span { font-size: 26px; color: var(--muted); }
+      #lavGrid { position: absolute; left: 50%; top: 300px; width: 980px; margin-left: -490px; display: grid; grid-template-columns: repeat(40, 1fr); gap: 7px; transform-origin: top center; }
+      #lavGrid .pd { width: 9px; height: 9px; border-radius: 2px; }
+      #lavGridLbl { position: absolute; left: 0; right: 0; top: 700px; text-align: center; font-size: 15px; }
+      #lavSrc { position: absolute; left: 0; right: 0; top: 744px; text-align: center; font-size: 12px; }
+
+      /* ㉕ countdown */
+      #cdWrap { position: absolute; left: 50%; top: 300px; width: 260px; height: 260px; margin-left: -130px; }
+      #cdWrap svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+      #cdTrack { fill: none; stroke: rgba(255,255,255,0.12); stroke-width: 8; }
+      #cdArc { fill: none; stroke: var(--highlight); stroke-width: 8; stroke-linecap: round; }
+      #cdNum { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 64px; font-variant-numeric: tabular-nums; }
+      #cdConfirm { position: absolute; left: 0; right: 0; top: 600px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.2em; font-size: 22px; color: var(--grn); }
+      #cdTally { position: absolute; left: 0; right: 0; top: 668px; text-align: center; font-size: 14px; }
+      #cdCap { position: absolute; left: 0; right: 0; top: 712px; text-align: center; font-size: 13px; }
+      #perHuman { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 800; font-size: 96px; letter-spacing: -0.025em; }
+
+      /* ㉖ signature */
+      #b26l1 { position: absolute; left: 0; right: 0; top: 50%; margin-top: -120px; text-align: center; font-weight: 800; font-size: 70px; letter-spacing: -0.02em; }
+      #b26l2 { position: absolute; left: 0; right: 0; top: 50%; margin-top: 10px; text-align: center; font-weight: 700; font-size: 54px; letter-spacing: -0.02em; }
+      #sig { position: absolute; left: 50%; top: 50%; margin: 90px 0 0 -220px; width: 440px; height: 120px; }
+      #sig svg { width: 100%; height: 100%; }
+      #sig path { fill: none; stroke: var(--ink); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+      #sigLine { position: absolute; left: 50%; top: 50%; margin: 150px 0 0 -240px; width: 480px; height: 1px; background: var(--line); }
+
+      /* ㉗ Minab questions */
+      #minabMark { position: absolute; left: 0; right: 0; top: 230px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 22px; color: var(--highlight); }
+      .qrow { position: absolute; left: 50%; width: 1200px; margin-left: -600px; display: flex; align-items: center; gap: 30px; font-weight: 700; font-size: 44px; letter-spacing: -0.015em; }
+      .qrow .qicon { width: 90px; height: 90px; flex: none; position: relative; }
+      .qtag { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--line); border-radius: 6px; font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: 0.08em; }
+
+      /* ㉘ */
+      #b28a { position: absolute; left: 0; right: 0; top: 50%; margin-top: -70px; text-align: center; font-weight: 800; font-size: 104px; letter-spacing: -0.025em; }
+      #b28b { position: absolute; left: 0; right: 0; top: 50%; margin-top: 60px; text-align: center; font-size: 30px; color: var(--muted); }
+      #b28c { position: absolute; left: 0; right: 0; top: 50%; margin-top: 140px; text-align: center; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="60.4">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div class="chrome">
+        <div class="c-tl mono">Der menschliche Faktor</div>
+        <div class="c-tr mono">Aufsicht</div>
+        <div class="c-br mono" id="tc">05:11</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <!-- ㉓ Aufsichts-Frage -->
+      <div class="layer hid" id="b23">
+        <div id="r23row">
+          <div id="swarm"></div>
+          <div class="mono" style="font-size:20px;">→</div>
+          <div class="person"><svg viewBox="0 0 70 82"><circle class="pfill" cx="35" cy="18" r="14"/><path class="pfill" d="M6 82 C6 50 64 50 64 82 Z"/></svg></div>
+        </div>
+        <div class="mono" id="r23lbl">1.000 Ziele · 1 Prüfer</div>
+        <div id="q23">Wie lange kann ein Mensch noch <span class="hl">jedes einzelne</span> prüfen?</div>
+      </div>
+
+      <!-- ㉔ Lavender -->
+      <div class="layer hid" id="b24">
+        <div class="mono hid" id="lavKick">Israel · Gaza-Krieg · Zielsystem</div>
+        <div class="big hid" id="lavTitle">Lavender</div>
+        <div id="lavRedact" class="hid"></div>
+        <div id="scoreWrap" class="hid">
+          <div id="scorePerson"><svg viewBox="0 0 70 82"><circle class="pfill" cx="35" cy="18" r="14"/><path class="pfill" d="M6 82 C6 50 64 50 64 82 Z"/></svg></div>
+          <div id="scoreBox">
+            <div class="sb-lbl">Wahrscheinlichkeit: Kämpfer</div>
+            <div id="scoreTrack"><div id="scoreFill"></div></div>
+            <div id="scoreNum">0<span>/100</span></div>
+          </div>
+        </div>
+        <div id="lavGrid" class="hid"></div>
+        <div class="mono hid" id="lavGridLbl">Jedem Bewohner Gazas ein Score</div>
+        <div class="mono hid" id="lavSrc">Laut investigativen Berichten</div>
+      </div>
+
+      <!-- ㉕ 20 Sekunden -->
+      <div class="layer hid" id="b25">
+        <div id="cdWrap" class="hid">
+          <svg viewBox="0 0 260 260"><circle id="cdTrack" cx="130" cy="130" r="118"/><circle id="cdArc" cx="130" cy="130" r="118"/></svg>
+          <div id="cdNum">20</div>
+        </div>
+        <div id="cdConfirm" class="hid">Bestätigt</div>
+        <div class="hid" id="cdTally"><span class="mono">Geprüft ▲</span> &nbsp;·&nbsp; <span class="mono">Abgelehnt ≈ 0</span></div>
+        <div class="mono hid" id="cdCap">~20 Sek pro maschinell generiertem Ziel</div>
+        <div id="perHuman" class="hid">20 Sekunden <span class="hl">pro Mensch</span>.</div>
+      </div>
+
+      <!-- ㉖ Unterschrift -->
+      <div class="layer hid" id="b26">
+        <div id="b26l1" class="hid">Kein <span class="strike">menschliches Urteil</span> mehr.</div>
+        <div id="b26l2" class="hid">Eine <span class="hl">Unterschrift</span> unter einem maschinellen Beschluss.</div>
+        <div id="sigLine" class="hid"></div>
+        <div id="sig"><svg viewBox="0 0 440 120"><path id="sigPath" d="M20 80 C60 20 90 110 120 70 C150 30 175 95 205 60 C240 20 270 90 300 64 C330 40 360 70 420 50" /></svg></div>
+      </div>
+
+      <!-- ㉗ Minab Fragen -->
+      <div class="layer hid" id="b27">
+        <div id="minabMark" class="hid">Zurück nach Minab</div>
+        <div class="qrow hid" id="q1" style="top:340px;">
+          <div class="qicon"><div class="qtag" id="q1tag">ZIVIL</div></div>
+          <div>In der Datenbank <span class="hl">falsch klassifiziert?</span></div>
+        </div>
+        <div class="qrow hid" id="q2" style="top:450px;">
+          <div class="qicon"><svg viewBox="0 0 90 90"><circle cx="28" cy="45" r="6" fill="#f4f7fb"/><circle cx="62" cy="45" r="6" fill="#d24b4b"/><line id="q2line" x1="34" y1="45" x2="56" y2="45" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-dasharray="3 3"/></svg></div>
+          <div>Das Compound zu <span class="hl">nah?</span></div>
+        </div>
+        <div class="qrow hid" id="q3" style="top:560px;">
+          <div class="qicon"><svg viewBox="0 0 90 90"><circle id="q3ring" cx="45" cy="45" r="38" fill="none" stroke="#d24b4b" stroke-width="2"/><circle cx="45" cy="45" r="4" fill="#f4f7fb"/></svg></div>
+          <div>Sprengradius <span class="hl">unterschätzt?</span></div>
+        </div>
+        <div class="qrow hid" id="q4" style="top:670px;">
+          <div class="qicon"><svg viewBox="0 0 90 90"><rect x="10" y="38" width="16" height="14" rx="2" fill="rgba(255,255,255,0.6)"/><rect x="37" y="38" width="16" height="14" rx="2" fill="rgba(255,255,255,0.4)"/><rect x="64" y="38" width="16" height="14" rx="2" fill="rgba(255,255,255,0.25)"/></svg></div>
+          <div>Die Pipeline zu <span class="hl">schnell durchgewunken?</span></div>
+        </div>
+      </div>
+
+      <!-- ㉘ Wir wissen es nicht -->
+      <div class="layer hid" id="b28">
+        <div id="b28a" class="hid">Wir wissen es nicht.</div>
+        <div id="b28b" class="hid">Und vielleicht werden wir es nie wissen.</div>
+        <div class="mono hid" id="b28c">Das ist Teil des Problems</div>
+      </div>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        function mb(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+        // ㉓ swarm dots
+        (function(){ const r=mb(77); let s=""; for(let i=0;i<150;i++){ s+=`<div class="d" style="left:${(r()*214).toFixed(0)}px;top:${(r()*124).toFixed(0)}px"></div>`; } document.getElementById("swarm").innerHTML=s; })();
+        // ㉔ lavGrid colored person-dots by pseudo-score
+        (function(){ const r=mb(404); let s=""; for(let i=0;i<400;i++){ const v=r(); const col = v>0.62 ? "#d24b4b" : v>0.4 ? "#caa23a" : "#3a9a58"; s+=`<div class="pd" data-s="${(v*100)|0}" style="background:${col}"></div>`; } document.getElementById("lavGrid").innerHTML=s; })();
+        // countdown arc circumference
+        const CIRC = 2*Math.PI*118;
+        const cdArc = document.getElementById("cdArc"); cdArc.style.strokeDasharray = CIRC; cdArc.style.strokeDashoffset = 0;
+        // signature path length
+        const sigP = document.getElementById("sigPath"); const SL = sigP.getTotalLength(); sigP.style.strokeDasharray = SL; sigP.style.strokeDashoffset = SL;
+
+        const tl = gsap.timeline({ paused: true });
+        tl.to({ p: 0 }, { p: 1, duration: 60.4, ease: "none", onUpdate: function () {
+          const t = 311.6 + 60.4 * this.targets()[0].p; const m = Math.floor(t/60), s = Math.floor(t%60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+
+        // ===== ㉓ (0–7.0) =====
+        tl.set("#b23", { opacity: 1 }, 0.5);
+        tl.from("#swarm .d", { opacity: 0, scale: 0.3, duration: 0.4, stagger: 0.003 }, 0.6);
+        tl.fromTo(".person svg", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 1.4);
+        tl.fromTo("#r23lbl", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.6);
+        tl.fromTo("#q23", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out" }, 2.6);
+        tl.to("#b23", { opacity: 0, duration: 0.4, ease: "power2.in" }, 6.6);
+
+        // ===== ㉔ Lavender (7.0–18.7) =====
+        tl.set("#b24", { opacity: 1 }, 6.9);
+        tl.fromTo("#lavKick", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 7.2);
+        tl.set("#lavTitle", { opacity: 1 }, 7.2);
+        tl.fromTo("#lavRedact", { opacity: 1, scaleX: 1 }, { opacity: 1, scaleX: 0, duration: 0.6, ease: "power3.inOut" }, 7.4);
+        tl.set("#lavRedact", { opacity: 0 }, 8.0);
+        tl.to(["#lavTitle", "#lavKick"], { opacity: 0, y: -30, duration: 0.4, ease: "power2.in" }, 11.2);
+        // score
+        tl.fromTo("#scoreWrap", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5 }, 11.7);
+        tl.to({ v: 0 }, { v: 87, duration: 1.6, ease: "power1.out", onUpdate: function () {
+          const v = Math.round(this.targets()[0].v); document.getElementById("scoreNum").innerHTML = v + "<span>/100</span>";
+          document.getElementById("scoreFill").style.width = v + "%";
+        } }, 12.2);
+        // zoom out to grid
+        tl.to("#scoreWrap", { opacity: 0, duration: 0.4 }, 15.0);
+        tl.set("#lavGrid", { opacity: 1 }, 15.2);
+        tl.fromTo("#lavGrid .pd", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.004, ease: "power1.out" }, 15.2);
+        tl.fromTo("#lavGridLbl", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 16.0);
+        tl.fromTo("#lavSrc", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 16.4);
+        tl.to("#b24", { opacity: 0, duration: 0.4, ease: "power2.in" }, 18.3);
+
+        // ===== ㉕ 20 Sekunden (18.7–33.2) =====
+        tl.set("#b25", { opacity: 1 }, 18.6);
+        tl.fromTo("#cdWrap", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 18.8);
+        tl.fromTo("#cdCap", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 19.2);
+        tl.fromTo("#cdTally", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 19.4);
+        // 3 cycles of deplete + confirm + tally tick
+        for (let i = 0; i < 3; i++) {
+          const t0 = 19.6 + i * 2.7;
+          tl.fromTo("#cdArc", { strokeDashoffset: 0 }, { strokeDashoffset: CIRC, duration: 2.0, ease: "none", immediateRender: false }, t0);
+          tl.to({ v: 20 }, { v: 0, duration: 2.0, ease: "none", onUpdate: function () { document.getElementById("cdNum").textContent = Math.ceil(this.targets()[0].v); } }, t0);
+          tl.fromTo("#cdConfirm", { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 0.25, ease: "power3.out", immediateRender: false }, t0 + 2.0);
+          tl.to("#cdConfirm", { opacity: 0, duration: 0.25 }, t0 + 2.45);
+        }
+        // exit countdown -> "20 Sekunden pro Mensch"
+        tl.to(["#cdWrap", "#cdConfirm", "#cdTally", "#cdCap"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 30.4);
+        tl.fromTo("#perHuman", { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 30.8);
+        tl.to("#b25", { opacity: 0, duration: 0.4, ease: "power2.in" }, 33.0);
+
+        // ===== ㉖ Unterschrift (33.2–38.5) =====
+        tl.set("#b26", { opacity: 1 }, 33.1);
+        tl.fromTo("#b26l1", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 33.3);
+        tl.fromTo("#b26l2", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 34.8);
+        tl.fromTo("#sigLine", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.5, ease: "power2.out" }, 35.6);
+        tl.to("#sigPath", { strokeDashoffset: 0, duration: 1.3, ease: "power2.inOut" }, 35.9);
+        tl.to("#b26", { opacity: 0, duration: 0.4, ease: "power2.in" }, 38.2);
+
+        // ===== ㉗ Minab Fragen (38.5–54.5) =====
+        tl.set("#b27", { opacity: 1 }, 38.4);
+        tl.fromTo("#minabMark", { opacity: 0, letterSpacing: "0.4em" }, { opacity: 1, letterSpacing: "0.18em", duration: 0.6, ease: "power3.out" }, 38.6);
+        const qin = (sel, t) => tl.fromTo(sel, { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, t);
+        qin("#q1", 40.2); tl.fromTo("#q1tag", { color: "#8492a8", borderColor: "rgba(255,255,255,0.22)" }, { color: "#d24b4b", borderColor: "#d24b4b", duration: 0.4 }, 41.2);
+        // q1 tag flips ZIVIL -> ZIEL
+        tl.add(() => { document.getElementById("q1tag").textContent = "ZIEL"; }, 41.2);
+        qin("#q2", 43.5); tl.fromTo("#q2line", { attr: { x2: 56 } }, { attr: { x2: 40 }, duration: 0.6, ease: "power2.inOut" }, 44.2);
+        qin("#q3", 46.0); tl.fromTo("#q3ring", { attr: { r: 10 }, opacity: 0.9 }, { attr: { r: 40 }, opacity: 1, duration: 0.9, ease: "power2.out" }, 46.4);
+        qin("#q4", 49.0);
+        tl.to("#b27", { opacity: 0, duration: 0.5, ease: "power2.in" }, 54.0);
+
+        // ===== ㉘ Wir wissen es nicht (54.5–60.4) =====
+        tl.set("#b28", { opacity: 1 }, 54.4);
+        tl.fromTo("#b28a", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 54.6);
+        tl.fromTo("#b28b", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 56.0);
+        tl.fromTo("#b28c", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 58.4);
+
+        window.__timelines["main"] = tl;
+      </script>
+
+      <audio id="vo" src="../audio/voiceover.m4a" data-start="0" data-duration="60.4" data-media-start="311.6" data-track-index="2"></audio>
+    </div>
+  </body>
+</html>
