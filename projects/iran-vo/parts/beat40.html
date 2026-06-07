@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --red: #d24b4b; --grn: #4caf6a; --blue: #5b8fd6; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 300px; height: 1px; background: var(--line); transform-origin: center; }
+      .layer { position: absolute; inset: 0; }
+      .sub { position: absolute; inset: 0; }
+      .hl { color: var(--highlight); }
+      .rd { color: var(--red); }
+
+      /* ===== A — akademisch -> operativ ===== */
+      #aRow1 { position: absolute; left: 0; right: 0; top: 372px; text-align: center; }
+      #aRow2 { position: absolute; left: 0; right: 0; top: 560px; text-align: center; }
+      .aKick { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.2em; font-size: 16px; color: var(--muted); margin-bottom: 14px; }
+      .aWord { font-weight: 800; font-size: 96px; letter-spacing: -0.03em; }
+      #aWord1 { color: var(--muted); position: relative; display: inline-block; }
+      #aWord1 .strike { position: absolute; left: -6px; right: -6px; top: 52%; height: 4px; background: var(--red); transform: scaleX(0); transform-origin: left center; }
+      #aWord2 { color: var(--highlight); }
+      #aConn { position: absolute; left: 50%; top: 490px; transform: translateX(-50%); font-size: 34px; color: var(--muted); }
+
+      /* ===== B — Mensch aus der Schleife ===== */
+      #loopWrap { position: absolute; left: 50%; top: 300px; width: 520px; height: 460px; margin-left: -260px; }
+      #loopSvg { position: absolute; left: 0; top: 0; }
+      .lnode { position: absolute; transform: translate(-50%,-50%); text-align: center; }
+      .lnode .ld { width: 12px; height: 12px; border-radius: 50%; background: var(--ink); margin: 0 auto 8px; }
+      .lnode .lt { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.12em; font-size: 14px; color: var(--ink); }
+      #lnTop { left: 260px; top: 36px; } #lnRight { left: 470px; top: 230px; } #lnBot { left: 260px; top: 424px; } #lnLeft { left: 50px; top: 230px; }
+      #loopCenter { position: absolute; left: 260px; top: 230px; transform: translate(-50%,-50%); text-align: center; }
+      #lcMensch { font-weight: 800; font-size: 34px; letter-spacing: -0.01em; position: relative; display: inline-block; }
+      #lcMensch .cstrike { position: absolute; left: -8px; right: -8px; top: 52%; height: 4px; background: var(--red); transform: scaleX(0); transform-origin: left center; }
+      #lcAuto { margin-top: 8px; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 16px; color: var(--highlight); }
+      #loopLabel { position: absolute; left: 0; right: 0; top: 800px; text-align: center; font-weight: 700; font-size: 38px; letter-spacing: -0.01em; }
+
+      /* ===== C — Prinzip der Unterscheidung ===== */
+      #cHead { position: absolute; left: 0; right: 0; top: 110px; text-align: center; font-weight: 800; font-size: 52px; letter-spacing: -0.02em; }
+      #cLegal { position: absolute; left: 0; right: 0; top: 178px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 14px; color: var(--muted); }
+      #cDivide { position: absolute; left: 959px; top: 260px; width: 2px; height: 470px; background: var(--line); transform-origin: top center; z-index: 3; }
+      .zone { position: absolute; top: 300px; width: 680px; text-align: center; }
+      #zoneL { left: 220px; } #zoneR { left: 1020px; }
+      .zone .fig { width: 96px; height: 116px; margin: 0 auto 22px; }
+      .zone .zlabel { font-weight: 800; font-size: 56px; letter-spacing: -0.02em; }
+      .zone .zhere { margin-top: 14px; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.2em; font-size: 18px; }
+      #zoneL .zlabel { color: var(--blue); } #zoneL .zhere { color: var(--blue); }
+      #zoneR .zlabel { color: var(--highlight); } #zoneR .zhere { color: var(--highlight); }
+      .cdot { position: absolute; width: 18px; height: 18px; border-radius: 50%; top: 600px; left: 951px; }
+      #ambDot { position: absolute; width: 22px; height: 22px; border-radius: 50%; top: 560px; left: 949px; background: var(--red); box-shadow: 0 0 0 0 rgba(210,75,75,0.7); z-index: 6; }
+
+      /* ===== D — Wer haftet ===== */
+      #dDim { position: absolute; inset: 0; background: rgba(5,8,15,0.82); z-index: 7; }
+      #dQ { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 1500px; text-align: center; font-weight: 800; font-size: 76px; line-height: 1.1; letter-spacing: -0.02em; z-index: 8; }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="21">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div class="chrome">
+        <div class="c-tl mono">Recht &amp; Maschine</div>
+        <div class="c-tr mono">KI-Krieg 2.0</div>
+        <div class="c-br mono" id="tc">10:52</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <div class="layer hid" id="b40">
+
+        <!-- A -->
+        <div class="sub hid" id="s40a">
+          <div id="aRow1">
+            <div class="aKick">Vor zehn Jahren</div>
+            <div class="aWord" id="aWord1">akademisch<span class="strike"></span></div>
+          </div>
+          <div id="aConn" class="hid">↓</div>
+          <div id="aRow2">
+            <div class="aKick">Jetzt</div>
+            <div class="aWord" id="aWord2">operativ</div>
+          </div>
+        </div>
+
+        <!-- B -->
+        <div class="sub hid" id="s40b">
+          <div id="loopWrap">
+            <svg id="loopSvg" width="520" height="460" viewBox="0 0 520 460" fill="none">
+              <circle cx="260" cy="230" r="178" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/>
+              <circle id="loopRun" cx="260" cy="230" r="178" stroke="#ffd60a" stroke-width="3" stroke-dasharray="26 70" stroke-linecap="round"/>
+            </svg>
+            <div class="lnode" id="lnTop"><div class="ld"></div><div class="lt">Erfassen</div></div>
+            <div class="lnode" id="lnRight"><div class="ld"></div><div class="lt">Bewerten</div></div>
+            <div class="lnode" id="lnBot"><div class="ld"></div><div class="lt">Entscheiden</div></div>
+            <div class="lnode" id="lnLeft"><div class="ld"></div><div class="lt">Bekämpfen</div></div>
+            <div id="loopCenter">
+              <div id="lcMensch">MENSCH<span class="cstrike"></span></div>
+              <div id="lcAuto" class="hid">Autonom</div>
+            </div>
+          </div>
+          <div id="loopLabel" class="hid">Kein Mensch in der Schleife.</div>
+        </div>
+
+        <!-- C -->
+        <div class="sub hid" id="s40c">
+          <div id="cHead" class="hid">Das Prinzip der <span class="hl">Unterscheidung</span></div>
+          <div id="cLegal" class="hid">Kriegsvölkerrecht · Genfer Zusatzprotokoll I, Art. 48</div>
+          <div id="cDivide" class="hid"></div>
+          <div class="zone hid" id="zoneL">
+            <svg class="fig" viewBox="0 0 96 116"><circle cx="48" cy="26" r="22" fill="#5b8fd6"/><path d="M14,114 C14,74 82,74 82,114 Z" fill="#5b8fd6"/></svg>
+            <div class="zlabel">Zivilisten</div>
+            <div class="zhere">hier</div>
+          </div>
+          <div class="zone hid" id="zoneR">
+            <svg class="fig" viewBox="0 0 96 116"><circle cx="48" cy="26" r="22" fill="#ffd60a"/><path d="M14,114 C14,74 82,74 82,114 Z" fill="#ffd60a"/></svg>
+            <div class="zlabel">Kämpfer</div>
+            <div class="zhere">dort</div>
+          </div>
+          <!-- classification dots -->
+          <div class="cdot" id="cd1" style="background:#5b8fd6;"></div>
+          <div class="cdot" id="cd2" style="background:#ffd60a;"></div>
+          <div class="cdot" id="cd3" style="background:#5b8fd6;"></div>
+          <div class="cdot" id="cd4" style="background:#ffd60a;"></div>
+          <div class="cdot" id="cd5" style="background:#5b8fd6;"></div>
+          <div id="ambDot" class="hid"></div>
+        </div>
+
+        <!-- D -->
+        <div id="dDim" class="hid"></div>
+        <div id="dQ" class="hid">Wer haftet, wenn die Maschine <span class="rd">falsch</span> liegt?</div>
+      </div>
+
+      <audio id="vo" src="../audio/voiceover.m4a" data-start="0" data-duration="21" data-media-start="652.6" data-track-index="2"></audio>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+
+        // running timecode (10:52 -> 11:13)
+        tl.to({ p: 0 }, { p: 1, duration: 21, ease: "none", onUpdate: function () {
+          const t = 652.6 + 21 * this.targets()[0].p; const m = Math.floor(t/60), s = Math.floor(t%60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+        tl.set("#b40", { opacity: 1 }, 0.2);
+
+        // ===== A — akademisch -> operativ (0.4 – 4.6) =====
+        tl.set("#s40a", { opacity: 1 }, 0.3);
+        tl.fromTo("#aRow1", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 0.5);
+        tl.fromTo("#aConn", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 2.2);
+        tl.to("#aWord1 .strike", { scaleX: 1, duration: 0.45, ease: "power2.in" }, 2.4);
+        tl.fromTo("#aRow2", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "back.out(1.6)" }, 2.7);
+        tl.to("#s40a", { opacity: 0, duration: 0.4, ease: "power2.in" }, 4.4);
+
+        // ===== B — Mensch aus der Schleife (4.9 – 10.6) =====
+        tl.set("#s40b", { opacity: 1 }, 4.8);
+        tl.fromTo("#loopSvg", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 4.9);
+        // draw circle
+        const lr = document.getElementById("loopRun");
+        tl.fromTo("#loopWrap", { scale: 0.92 }, { scale: 1, duration: 0.6, ease: "power2.out", transformOrigin: "center" }, 4.9);
+        tl.from(["#lnTop", "#lnRight", "#lnBot", "#lnLeft"], { opacity: 0, scale: 0.6, duration: 0.4, stagger: 0.18, transformOrigin: "center" }, 5.1);
+        // spinning process ring (continuous)
+        gsap.set(lr, { transformOrigin: "260px 230px" });
+        tl.to(lr, { rotation: 360, duration: 3.4, ease: "none", repeat: -1 }, 5.4);
+        // center human, then struck -> autonom
+        tl.fromTo("#lcMensch", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)", transformOrigin: "center" }, 6.2);
+        tl.to("#lcMensch .cstrike", { scaleX: 1, duration: 0.4, ease: "power2.in" }, 7.6);
+        tl.to("#lcMensch", { opacity: 0.35, duration: 0.4 }, 7.9);
+        tl.fromTo("#lcAuto", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 8.1);
+        tl.fromTo("#loopLabel", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 8.8);
+        tl.to("#s40b", { opacity: 0, duration: 0.45, ease: "power2.in" }, 10.4);
+
+        // ===== C — Prinzip der Unterscheidung (10.8 – 17.8) =====
+        tl.set("#s40c", { opacity: 1 }, 10.7);
+        tl.fromTo("#cHead", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 10.8);
+        tl.fromTo("#cLegal", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 11.4);
+        tl.fromTo("#cDivide", { scaleY: 0, opacity: 0 }, { scaleY: 1, opacity: 1, duration: 0.8, ease: "power2.inOut" }, 12.3);
+        tl.fromTo("#zoneL", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 12.6);
+        tl.fromTo("#zoneR", { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 12.9);
+        // classification dots sort into zones (VO 16.0: "Zivilisten hier, Kämpfer dort")
+        const dots = [
+          { id: "#cd1", x: -420, y: 150 }, { id: "#cd3", x: -300, y: 210 }, { id: "#cd5", x: -480, y: 250 },
+          { id: "#cd2", x: 400, y: 160 }, { id: "#cd4", x: 320, y: 220 },
+        ];
+        dots.forEach((d, i) => {
+          tl.fromTo(d.id, { opacity: 0, x: 0, y: -40, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.2 }, 15.3 + i * 0.18);
+          tl.to(d.id, { x: d.x, y: d.y, duration: 0.7, ease: "power2.inOut" }, 15.4 + i * 0.18);
+        });
+
+        // ===== D — Wer haftet (17.9 – 21.0) =====
+        // ambiguous marker lands on the dividing line
+        tl.fromTo("#ambDot", { opacity: 0, y: -50, scale: 0.4 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power2.in" }, 17.9);
+        tl.to("#ambDot", { boxShadow: "0 0 0 22px rgba(210,75,75,0)", duration: 0.9, ease: "power1.out", repeat: -1 }, 18.4);
+        tl.to("#cDivide", { background: "#d24b4b", duration: 0.3, yoyo: true, repeat: 3 }, 18.4);
+        tl.fromTo("#dDim", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.inOut" }, 18.6);
+        tl.fromTo("#dQ", { opacity: 0, scale: 1.06 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, 18.9);
+
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>
