@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --red: #d24b4b; --grn: #4caf6a; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 300px; height: 1px; background: var(--line); transform-origin: center; }
+      .layer { position: absolute; inset: 0; }
+      .hl { color: var(--highlight); }
+      .rd { color: var(--red); }
+
+      /* ===== ㊳ Der Widerspruch ===== */
+      #b38title { position: absolute; left: 0; right: 0; top: 96px; text-align: center; font-weight: 800; font-size: 58px; letter-spacing: -0.02em; }
+      #divider { position: absolute; left: 959px; top: 280px; width: 2px; height: 540px; background: var(--line); transform-origin: top center; z-index: 3; }
+
+      .kick { position: absolute; top: 244px; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 14px; color: var(--muted); }
+      #kickL { left: 96px; }
+      #kickR { left: 1008px; }
+
+      .panel { position: absolute; top: 280px; width: 816px; height: 540px; border: 1px solid var(--line); overflow: hidden; background-size: cover; background-position: center; }
+      #panelL { left: 96px; background-image: url('../assets/un-styled.jpg'); }
+      #panelR { left: 1008px; background-image: url('../assets/helsing-styled.jpg'); }
+      .panel .scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 58%; background: linear-gradient(to top, rgba(5,8,15,0.94) 12%, rgba(5,8,15,0.6) 48%, transparent 100%); }
+      .panel .tint { position: absolute; inset: 0; background: rgba(8,14,28,0.28); mix-blend-mode: multiply; }
+      .chip { position: absolute; top: 22px; left: 22px; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 13px; padding: 7px 12px; border: 1px solid var(--line); background: rgba(7,12,22,0.55); }
+      #chipL { color: var(--grn); border-color: rgba(76,175,106,0.5); }
+      #chipR { color: var(--highlight); border-color: rgba(255,214,10,0.45); }
+
+      .pdata { position: absolute; left: 30px; right: 30px; bottom: 28px; }
+      .pdata .big { font-weight: 800; font-size: 76px; letter-spacing: -0.02em; line-height: 0.96; font-variant-numeric: tabular-nums; }
+      .pdata .sub { margin-top: 10px; font-size: 21px; color: var(--ink); }
+      #dataL .big { color: var(--ink); }
+      #dataR .big { color: var(--highlight); }
+
+      /* euro stream on right panel */
+      #estream { position: absolute; inset: 0; pointer-events: none; }
+      #estream span { position: absolute; font-family: "IBM Plex Mono", monospace; font-weight: 700; color: rgba(255,214,10,0.5); }
+
+      /* contradiction gap mark */
+      #gapMark { position: absolute; left: 50%; top: 510px; transform: translateX(-50%); text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 14px; color: var(--red); border: 1px dashed rgba(210,75,75,0.7); padding: 8px 14px; background: rgba(7,12,22,0.85); z-index: 4; }
+
+      /* dim + center caption for the "debate went silent" turn */
+      #dim { position: absolute; inset: 0; background: rgba(5,8,15,0.72); z-index: 6; }
+      #cap { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 1400px; text-align: center; font-weight: 700; font-size: 46px; line-height: 1.18; letter-spacing: -0.01em; z-index: 7; }
+
+      /* ===== ㊴ Wie schnell vs. was dürfen ===== */
+      #rings { position: absolute; left: 50%; top: 392px; width: 0; height: 0; z-index: 1; }
+      #rings i { position: absolute; left: 0; top: 0; width: 520px; height: 520px; margin: -260px 0 0 -260px; border: 1.5px solid rgba(255,214,10,0.5); border-radius: 50%; }
+      #q1 { position: absolute; left: 0; right: 0; top: 320px; text-align: center; font-weight: 800; font-size: 92px; letter-spacing: -0.025em; color: var(--highlight); z-index: 2; }
+      #q1tag { position: absolute; left: 0; right: 0; top: 268px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.2em; font-size: 14px; color: var(--highlight); z-index: 2; }
+      #q2 { position: absolute; left: 0; right: 0; top: 560px; text-align: center; font-weight: 600; font-size: 40px; letter-spacing: -0.01em; color: var(--muted); z-index: 2; }
+      #q2tag { position: absolute; left: 0; right: 0; top: 524px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; color: var(--muted); z-index: 2; }
+      #punch { position: absolute; left: 0; right: 0; top: 50%; margin-top: -44px; text-align: center; font-weight: 800; font-size: 84px; letter-spacing: -0.025em; z-index: 8; }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="34">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div class="chrome">
+        <div class="c-tl mono">Konsens &amp; Kapital</div>
+        <div class="c-tr mono">KI-Krieg 2.0</div>
+        <div class="c-br mono" id="tc">10:18</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <!-- ㊳ Der Widerspruch -->
+      <div class="layer hid" id="b38">
+        <div id="b38title" class="hid">Ein <span class="hl">Widerspruch</span>.</div>
+        <div id="divider"></div>
+
+        <div id="kickL" class="kick hid">Auf der einen Seite</div>
+        <div id="kickR" class="kick hid">Auf der anderen Seite</div>
+
+        <div id="panelL" class="panel hid">
+          <div class="tint"></div>
+          <div class="scrim"></div>
+          <div id="chipL" class="chip">Konsens</div>
+          <div id="dataL" class="pdata">
+            <div class="big"><span id="num164">0</span> Staaten</div>
+            <div class="sub">fordern Regeln für autonome Waffen.</div>
+          </div>
+        </div>
+
+        <div id="panelR" class="panel hid">
+          <div class="tint"></div>
+          <div id="estream">
+            <span style="left:120px; top:300px; font-size:30px;">€</span>
+            <span style="left:300px; top:360px; font-size:22px;">€</span>
+            <span style="left:520px; top:320px; font-size:34px;">€</span>
+            <span style="left:680px; top:380px; font-size:26px;">€</span>
+            <span style="left:230px; top:280px; font-size:20px;">€</span>
+            <span style="left:600px; top:300px; font-size:24px;">€</span>
+          </div>
+          <div class="scrim"></div>
+          <div id="chipR" class="chip">Kapital</div>
+          <div id="dataR" class="pdata">
+            <div class="big">Hunderte Mrd&nbsp;€</div>
+            <div class="sub">fließen in dieselben Systeme — <span class="rd">ohne jede Regel.</span></div>
+          </div>
+        </div>
+
+        <div id="gapMark" class="hid">Keine Regeln</div>
+
+        <div id="dim" class="hid"></div>
+        <div id="cap" class="hid"></div>
+      </div>
+
+      <!-- ㊴ Wie schnell vs. was dürfen -->
+      <div class="layer hid" id="b39">
+        <div id="rings" class="hid"><i></i><i></i><i></i></div>
+        <div id="q1tag" class="hid">laut</div>
+        <div id="q1" class="hid">Wie schnell können wir bauen?</div>
+        <div id="q2tag" class="hid">leise</div>
+        <div id="q2" class="hid">Was dürfen wir bauen?</div>
+        <div id="punch" class="hid">Verständlich. Aber <span class="rd">gefährlich</span>.</div>
+      </div>
+
+      <audio id="vo" src="../audio/voiceover.m4a" data-start="0" data-duration="34" data-media-start="618.6" data-track-index="2"></audio>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+
+        // running timecode (10:18 -> 10:52)
+        tl.to({ p: 0 }, { p: 1, duration: 34, ease: "none", onUpdate: function () {
+          const t = 618.6 + 34 * this.targets()[0].p; const m = Math.floor(t/60), s = Math.floor(t%60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+
+        // ===== ㊳ Der Widerspruch (0.0 – 24.5) =====
+        tl.set("#b38", { opacity: 1 }, 0.2);
+        // title + divider draw
+        tl.fromTo("#b38title", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 0.4);
+        tl.fromTo("#divider", { scaleY: 0, opacity: 0 }, { scaleY: 1, opacity: 1, duration: 1.0, ease: "power2.inOut" }, 1.0);
+
+        // LEFT — Konsens (VO 4.0: "auf der einen Seite ... ein breiter Konsens")
+        tl.fromTo("#kickL", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 3.9);
+        tl.fromTo("#panelL", { opacity: 0, x: -28 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 4.1);
+        tl.fromTo("#chipL", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.5 }, 4.6);
+        // 164 count-up (VO 8.0: "164 Staaten wollen Regeln")
+        tl.fromTo("#dataL", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 7.9);
+        tl.to({ v: 0 }, { v: 164, duration: 1.1, ease: "power2.out", onUpdate: function(){ document.getElementById("num164").textContent = Math.round(this.targets()[0].v); } }, 8.0);
+
+        // RIGHT — Kapital (VO 12.0: "auf der anderen Seite fließen hunderte Milliarden")
+        tl.fromTo("#kickR", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 11.9);
+        tl.fromTo("#panelR", { opacity: 0, x: 28 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 12.1);
+        tl.fromTo("#chipR", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.5 }, 12.6);
+        tl.fromTo("#dataR", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 13.6);
+        // euro stream (continuous rising)
+        tl.set("#estream", { opacity: 1 }, 12.6);
+        gsap.utils.toArray("#estream span").forEach((el, i) => {
+          tl.fromTo(el, { y: 30, opacity: 0 }, { y: -36, opacity: 0.5, duration: 2.0, ease: "none", repeat: -1, yoyo: false, immediateRender: false,
+            onRepeat: function(){ gsap.set(el, { opacity: 0 }); } }, 12.8 + i * 0.32);
+        });
+        // "für die es keine Regeln gibt" (VO ~16.0) — red gap stamp between panels
+        tl.fromTo("#gapMark", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2.2)", transformOrigin: "center" }, 16.0);
+
+        // TURN — debate went silent (VO 18.0 / 22.0)
+        tl.fromTo("#dim", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.inOut" }, 18.0);
+        tl.set("#cap", { opacity: 1 }, 18.0);
+        tl.call(() => { document.getElementById("cap").innerHTML = "Die Debatte ist nicht verstummt,<br>weil sich die Fragen erledigt hätten."; }, null, 18.0);
+        tl.fromTo("#cap", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 18.2);
+        tl.to("#cap", { opacity: 0, y: -14, duration: 0.45, ease: "power2.in" }, 21.6);
+        tl.call(() => { document.getElementById("cap").innerHTML = "Sie ist verstummt, weil die Welt<br><span class='hl'>gefährlicher</span> geworden ist."; }, null, 22.0);
+        tl.fromTo("#cap", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 22.1);
+
+        // exit ㊳
+        tl.to("#b38", { opacity: 0, duration: 0.6, ease: "power2.in" }, 24.0);
+
+        // ===== ㊴ Wie schnell vs. was dürfen (25.0 – 34.0) =====
+        tl.set("#b39", { opacity: 1 }, 24.6);
+        // Q1 — loud
+        tl.fromTo("#q1tag", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 25.0);
+        tl.fromTo("#q1", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.5)" }, 25.1);
+        // sound rings (louder)
+        tl.set("#rings", { opacity: 1 }, 25.3);
+        gsap.utils.toArray("#rings i").forEach((el, i) => {
+          tl.fromTo(el, { scale: 0.35, opacity: 0.55 }, { scale: 1.5, opacity: 0, duration: 2.4, ease: "power1.out", repeat: -1, immediateRender: false, transformOrigin: "center" }, 25.4 + i * 0.8);
+        });
+        // Q2 — quiet
+        tl.fromTo("#q2tag", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 27.6);
+        tl.fromTo("#q2", { opacity: 0, scale: 1.04 }, { opacity: 0.85, scale: 1, duration: 0.6, ease: "power2.out" }, 27.7);
+
+        // PUNCH — "Verständlich. Aber gefährlich." (VO 31.0)
+        tl.to(["#q1", "#q1tag", "#q2", "#q2tag", "#rings"], { opacity: 0, duration: 0.5, ease: "power2.in" }, 30.4);
+        tl.fromTo("#punch", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, 31.0);
+        tl.fromTo("#punch .rd", { color: "#f4f7fb" }, { color: "#d24b4b", duration: 0.5 }, 31.7);
+
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>
