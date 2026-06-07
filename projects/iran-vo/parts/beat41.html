@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --red: #d24b4b; --grn: #4caf6a; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 300px; height: 1px; background: var(--line); transform-origin: center; }
+      .sub { position: absolute; inset: 0; }
+      .hl { color: var(--highlight); }
+      .rd { color: var(--red); }
+
+      /* ===== A/B — Fehlerrate 10 % + akzeptabel ===== */
+      #lavChip { position: absolute; left: 50%; top: 240px; transform: translateX(-50%); font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.2em; font-size: 14px; color: var(--red); border: 1px solid rgba(210,75,75,0.5); background: rgba(210,75,75,0.06); padding: 8px 16px; }
+      #feLbl { position: absolute; left: 0; right: 0; top: 330px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 18px; color: var(--muted); }
+      #fe10 { position: absolute; left: 0; right: 0; top: 360px; text-align: center; font-weight: 800; font-size: 200px; letter-spacing: -0.03em; color: var(--red); font-variant-numeric: tabular-nums; }
+      #stampWrap { position: absolute; left: 0; right: 0; top: 640px; text-align: center; }
+      #stamp { display: inline-block; border: 3px solid var(--muted); color: var(--ink); font-weight: 800; font-size: 40px; letter-spacing: 0.06em; text-transform: uppercase; padding: 10px 28px; transform: rotate(-7deg); }
+      #stampAttr { margin-top: 26px; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; font-size: 15px; color: var(--muted); }
+
+      /* ===== C — 37.000 Ziele ===== */
+      #cNumLbl { position: absolute; left: 0; right: 0; top: 350px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 16px; color: var(--muted); }
+      #cNum { position: absolute; left: 0; right: 0; top: 388px; text-align: center; font-weight: 800; font-size: 190px; letter-spacing: -0.03em; color: var(--ink); font-variant-numeric: tabular-nums; }
+      #cSub { position: absolute; left: 0; right: 0; top: 628px; text-align: center; font-size: 24px; color: var(--ink); }
+      #cSub .rd { font-weight: 700; }
+
+      /* ===== D — 1.700 Menschen grid ===== */
+      #dNum { position: absolute; left: 0; right: 0; top: 224px; text-align: center; font-weight: 800; font-size: 86px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+      #dNum .hl { color: var(--red); }
+      #dSub { position: absolute; left: 0; right: 0; top: 332px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 15px; color: var(--muted); }
+      .gridbox { position: absolute; left: 50%; top: 384px; margin-left: -298px; display: grid; grid-template-columns: repeat(50, 7px); gap: 5px; }
+      .pd2 { width: 7px; height: 7px; border-radius: 2px; background: var(--red); }
+      #dKick { position: absolute; left: 0; right: 0; top: 832px; text-align: center; font-weight: 700; font-size: 32px; letter-spacing: -0.01em; }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="17">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div class="chrome">
+        <div class="c-tl mono">Fehlerrate</div>
+        <div class="c-tr mono">KI-Krieg 2.0</div>
+        <div class="c-br mono" id="tc">11:13</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <div class="sub hid" id="b41">
+
+        <!-- A/B -->
+        <div class="sub hid" id="s41ab">
+          <div id="lavChip">Lavender · Israel · Gaza</div>
+          <div id="feLbl" class="hid">Fehlerrate</div>
+          <div id="fe10" class="hid">0&thinsp;%</div>
+          <div id="stampWrap" class="hid">
+            <div id="stamp">Akzeptabel</div>
+            <div id="stampAttr">— laut israelischen Betreibern</div>
+          </div>
+        </div>
+
+        <!-- C -->
+        <div class="sub hid" id="s41c">
+          <div id="cNumLbl">Identifizierte Ziele</div>
+          <div id="cNum">0</div>
+          <div id="cSub">bewertet mit einer <span class="rd">Fehlerrate von 10 %</span>.</div>
+        </div>
+
+        <!-- D -->
+        <div class="sub hid" id="s41d">
+          <div id="dNum"><span class="hl" id="dNumV">0</span> Menschen</div>
+          <div id="dSub">als mutmaßliche Terroristen markiert</div>
+          <div class="gridbox" id="gridSolid"></div>
+          <div id="dKick" class="hid">obwohl die Maschine wusste: <span class="rd">wahrscheinlich unschuldig.</span></div>
+        </div>
+      </div>
+
+      <audio id="vo" src="../audio/voiceover.m4a" data-start="0" data-duration="17" data-media-start="673.6" data-track-index="2"></audio>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+
+        // build the 1.700-dot grids (50 cols x 34 rows = 1700)
+        const N = 1700;
+        const gs = document.getElementById("gridSolid");
+        for (let i = 0; i < N; i++) {
+          const a = document.createElement("div"); a.className = "pd2"; gs.appendChild(a);
+        }
+
+        const tl = gsap.timeline({ paused: true });
+
+        // running timecode (11:13 -> 11:30)
+        tl.to({ p: 0 }, { p: 1, duration: 17, ease: "none", onUpdate: function () {
+          const t = 673.6 + 17 * this.targets()[0].p; const m = Math.floor(t/60), s = Math.floor(t%60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+        tl.set("#b41", { opacity: 1 }, 0.2);
+
+        // ===== A/B — 10 % Fehlerrate + akzeptabel (0.2 – 5.4) =====
+        tl.set("#s41ab", { opacity: 1 }, 0.2);
+        tl.fromTo("#lavChip", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.5 }, 0.3);
+        tl.fromTo("#feLbl", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.6);
+        tl.fromTo("#fe10", { opacity: 0, scale: 1.06 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 0.7);
+        tl.to({ v: 0 }, { v: 10, duration: 1.1, ease: "power2.out", onUpdate: function(){ document.getElementById("fe10").innerHTML = Math.round(this.targets()[0].v) + " %"; } }, 0.8);
+        // "akzeptabel" stamp (VO 3.0)
+        tl.fromTo("#stampWrap", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 3.0);
+        tl.fromTo("#stamp", { opacity: 0, scale: 1.6, rotate: -7 }, { opacity: 1, scale: 1, rotate: -7, duration: 0.4, ease: "power3.out" }, 3.0);
+        tl.fromTo("#stampAttr", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 3.6);
+        tl.to("#s41ab", { opacity: 0, duration: 0.45, ease: "power2.in" }, 5.4);
+
+        // ===== C — 37.000 Ziele (5.9 – 9.6) =====
+        tl.set("#s41c", { opacity: 1 }, 5.8);
+        tl.fromTo("#cNumLbl", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 5.9);
+        tl.fromTo("#cNum", { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 6.0);
+        tl.to({ v: 0 }, { v: 37000, duration: 1.6, ease: "power2.out", onUpdate: function(){ document.getElementById("cNum").textContent = Math.round(this.targets()[0].v).toLocaleString("de-DE"); } }, 6.1);
+        tl.fromTo("#cSub", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5 }, 8.0);
+        tl.to("#s41c", { opacity: 0, duration: 0.45, ease: "power2.in" }, 9.6);
+
+        // ===== D — 1.700 Menschen grid (10.0 – 17.0) =====
+        tl.set("#s41d", { opacity: 1 }, 10.0);
+        tl.fromTo("#dNum", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 10.1);
+        tl.to({ v: 0 }, { v: 1700, duration: 1.4, ease: "power2.out", onUpdate: function(){ document.getElementById("dNumV").textContent = Math.round(this.targets()[0].v).toLocaleString("de-DE"); } }, 10.2);
+        tl.fromTo("#dSub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 10.6);
+        // reveal 1700 dots
+        tl.fromTo("#gridSolid .pd2", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power1.out", stagger: { amount: 1.5, from: "center", grid: [34, 50] } }, 10.9);
+        // kicker — machine knew (VO ~13.5): dim the marked grid so the line lands
+        tl.fromTo("#dKick", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 13.6);
+        tl.to("#gridSolid", { opacity: 0.5, duration: 0.8, ease: "power2.inOut" }, 13.6);
+
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>
