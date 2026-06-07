@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --red: #d24b4b; --grn: #4caf6a; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 300px; height: 1px; background: var(--line); transform-origin: center; }
+      .layer { position: absolute; inset: 0; }
+      .hl { color: var(--highlight); }
+
+      /* ㊱ divergence */
+      #d36a { position: absolute; left: 0; right: 0; top: 50%; margin-top: -56px; text-align: center; font-weight: 800; font-size: 72px; letter-spacing: -0.02em; }
+      #d36b { position: absolute; left: 0; right: 0; top: 50%; margin-top: 24px; text-align: center; font-weight: 800; font-size: 72px; letter-spacing: -0.02em; }
+      #chartWrap { position: absolute; left: 50%; top: 250px; width: 1320px; margin-left: -660px; }
+      #chartTitle { position: absolute; left: 0; top: -4px; font-family: "IBM Plex Mono", monospace; letter-spacing: 0.12em; font-size: 13px; color: var(--muted); text-transform: uppercase; }
+      #chartSvg { position: absolute; left: 0; top: 60px; }
+      .curveLbl { position: absolute; font-weight: 700; font-size: 22px; }
+      #lblDeb { color: var(--muted); }
+      #lblRue { color: var(--highlight); }
+      .evt { position: absolute; top: 540px; transform: translateX(-50%); text-align: center; }
+      .evt .et { font-family: "IBM Plex Mono", monospace; font-size: 13px; letter-spacing: 0.1em; color: var(--ink); }
+      .evt .ey { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--muted); margin-top: 4px; }
+      #crossLbl { position: absolute; text-align: center; font-family: "IBM Plex Mono", monospace; font-size: 13px; letter-spacing: 0.12em; color: var(--red); transform: translateX(-50%); }
+
+      /* ㊲ dashboard */
+      #bigKicker { position: absolute; left: 0; right: 0; top: 300px; text-align: center; font-family: "IBM Plex Mono", monospace; letter-spacing: 0.16em; font-size: 15px; color: var(--muted); text-transform: uppercase; }
+      #bigNum { position: absolute; left: 0; right: 0; top: 360px; text-align: center; font-weight: 800; font-size: 200px; letter-spacing: -0.03em; color: var(--highlight); font-variant-numeric: tabular-nums; }
+      #bigSub { position: absolute; left: 0; right: 0; top: 620px; text-align: center; font-size: 22px; color: var(--ink); }
+
+      #catTitle { position: absolute; left: 0; right: 0; top: 210px; text-align: center; font-weight: 800; font-size: 52px; letter-spacing: -0.02em; }
+      #cats { position: absolute; left: 50%; top: 350px; width: 1100px; margin-left: -550px; }
+      .cat { position: relative; height: 64px; margin-bottom: 22px; }
+      .cat .cl { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 260px; font-family: "IBM Plex Mono", monospace; letter-spacing: 0.08em; font-size: 16px; text-transform: uppercase; color: var(--ink); }
+      .cat .ctrack { position: absolute; left: 300px; right: 180px; top: 50%; transform: translateY(-50%); height: 16px; background: rgba(255,255,255,0.06); border-radius: 8px; }
+      .cat .cbar { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; border-radius: 8px; background: var(--highlight); transform-origin: left center; }
+      .cat .cv { position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 160px; text-align: right; font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
+
+      #rdTitle { position: absolute; left: 0; right: 0; top: 230px; text-align: center; font-weight: 800; font-size: 48px; letter-spacing: -0.02em; }
+      #rdWrap { position: absolute; left: 50%; top: 380px; width: 760px; margin-left: -380px; display: flex; align-items: flex-end; justify-content: space-between; }
+      .rdcol { width: 240px; text-align: center; }
+      .rdbar { width: 130px; margin: 0 auto; background: rgba(255,255,255,0.1); border-radius: 8px 8px 0 0; transform-origin: bottom center; }
+      .rdbar.hot { background: var(--highlight); }
+      .rdval { font-weight: 800; font-size: 56px; letter-spacing: -0.02em; margin-bottom: 14px; font-variant-numeric: tabular-nums; }
+      .rdcap { margin-top: 16px; font-family: "IBM Plex Mono", monospace; font-size: 13px; letter-spacing: 0.1em; color: var(--muted); }
+      #rdArrow { position: absolute; left: 50%; top: 470px; transform: translateX(-50%); font-size: 40px; color: var(--muted); }
+
+      #finNum { position: absolute; left: 0; right: 0; top: 380px; text-align: center; font-weight: 800; font-size: 150px; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+      #finNum .ar { color: var(--muted); font-weight: 400; }
+      #finNum .hl { color: var(--highlight); }
+      #finSub { position: absolute; left: 0; right: 0; top: 600px; text-align: center; font-weight: 700; font-size: 36px; letter-spacing: -0.01em; }
+      #finSub .pct { color: var(--red); }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="52">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div class="chrome">
+        <div class="c-tl mono">Recht &amp; Rüstung</div>
+        <div class="c-tr mono">KI-Krieg 2.0</div>
+        <div class="c-br mono" id="tc">09:26</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <!-- ㊱ Divergenz -->
+      <div class="layer hid" id="b36">
+        <div id="d36a" class="hid">Die Debatte wird <span style="color:var(--muted)">leiser</span>.</div>
+        <div id="d36b" class="hid">Die Rüstung wird <span class="hl">lauter</span>.</div>
+
+        <div id="chartWrap" class="hid">
+          <div id="chartTitle">2022 — 2026 · Aufmerksamkeit vs. Aufrüstung</div>
+          <svg id="chartSvg" width="1320" height="470" viewBox="0 0 1320 470" fill="none">
+            <line x1="40" y1="430" x2="1300" y2="430" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+            <line id="evL1" x1="300" y1="60" x2="300" y2="430" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4 6"/>
+            <line id="evL2" x1="660" y1="60" x2="660" y2="430" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4 6"/>
+            <line id="evL3" x1="1020" y1="60" x2="1020" y2="430" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4 6"/>
+            <path id="curveDeb" d="M 40,90 C 280,120 420,200 660,270 C 900,340 1120,400 1300,410" stroke="#8492a8" stroke-width="3" stroke-linecap="round"/>
+            <path id="curveRue" d="M 40,410 C 280,395 440,330 660,265 C 900,200 1120,95 1300,60" stroke="#ffd60a" stroke-width="4" stroke-linecap="round"/>
+            <circle id="crossDot" cx="660" cy="267" r="9" fill="#070c16" stroke="#d24b4b" stroke-width="3"/>
+          </svg>
+          <div class="curveLbl" id="lblDeb" style="left:1090px; top:480px;">Öffentliche Debatte</div>
+          <div class="curveLbl" id="lblRue" style="left:1110px; top:118px;">Autonome Rüstung</div>
+          <div class="evt" id="ev1" style="left:300px;"><div class="et">Ukraine</div><div class="ey">2022</div></div>
+          <div class="evt" id="ev2" style="left:660px;"><div class="et">Gaza</div><div class="ey">2023</div></div>
+          <div class="evt" id="ev3" style="left:1020px;"><div class="et">Iran</div><div class="ey">2025</div></div>
+          <div id="crossLbl" style="left:660px; top:375px;">Kipppunkt</div>
+        </div>
+      </div>
+
+      <!-- ㊲ Rüstungs-Dashboard -->
+      <div class="layer hid" id="b37">
+        <!-- A: 800 Mrd -->
+        <div id="bigKicker" class="hid">Weltweite Militärausgaben · 2024</div>
+        <div id="bigNum" class="hid">0 Mrd €</div>
+        <div id="bigSub" class="hid">Rekordhoch — so viel wie nie zuvor.</div>
+
+        <!-- B: categories -->
+        <div id="catTitle" class="hid">Wohin das Geld fließt</div>
+        <div id="cats" class="hid">
+          <div class="cat" id="cat1"><div class="cl">KI-Systeme</div><div class="ctrack"><div class="cbar" data-w="100"></div></div><div class="cv" data-v="7.3">0,0 Mrd €</div></div>
+          <div class="cat" id="cat2"><div class="cl">Drohnen</div><div class="ctrack"><div class="cbar" data-w="72"></div></div><div class="cv" data-v="5.2">0,0 Mrd €</div></div>
+          <div class="cat" id="cat3"><div class="cl">Cyber</div><div class="ctrack"><div class="cbar" data-w="44"></div></div><div class="cv" data-v="3.1">0,0 Mrd €</div></div>
+          <div class="cat" id="cat4"><div class="cl">Autonome Systeme</div><div class="ctrack"><div class="cbar" data-w="14"></div></div><div class="cv" data-v="1.0">0,0 Mrd €</div></div>
+        </div>
+
+        <!-- C: R&D share jump -->
+        <div id="rdTitle" class="hid">Anteil <span class="hl">autonomer</span> Forschung am Budget</div>
+        <div id="rdWrap" class="hid">
+          <div class="rdcol"><div class="rdval" id="rdv1">6 %</div><div class="rdbar" id="rdb1" style="height:48px;"></div><div class="rdcap">2019</div></div>
+          <div class="rdcol"><div class="rdval hl" id="rdv2">20 %</div><div class="rdbar hot" id="rdb2" style="height:160px;"></div><div class="rdcap">2025</div></div>
+        </div>
+        <div id="rdArrow" class="hid">↗</div>
+
+        <!-- D: +66% -->
+        <div id="finNum" class="hid">3 <span class="ar">→</span> <span class="hl">5</span> Mrd €</div>
+        <div id="finSub" class="hid"><span class="pct">+66 %</span> in einem einzigen Jahr.</div>
+      </div>
+
+      <audio id="vo" src="../audio/voiceover.m4a" data-start="0" data-duration="52" data-media-start="566.6" data-track-index="2"></audio>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+
+        // running timecode
+        tl.to({ p: 0 }, { p: 1, duration: 52, ease: "none", onUpdate: function () {
+          const t = 566.6 + 52 * this.targets()[0].p; const m = Math.floor(t/60), s = Math.floor(t%60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+
+        // ===== ㊱ Divergenz (1.5 – 27.0) =====
+        tl.set("#b36", { opacity: 1 }, 1.4);
+        tl.fromTo("#d36a", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 1.5);
+        tl.fromTo("#d36b", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 3.2);
+        tl.to(["#d36a", "#d36b"], { opacity: 0, y: -24, duration: 0.4, ease: "power2.in" }, 6.4);
+
+        // chart
+        tl.fromTo("#chartWrap", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 7.2);
+        tl.from("#chartTitle", { opacity: 0, duration: 0.5 }, 7.3);
+        // draw-on prep
+        const dDeb = document.getElementById("curveDeb"); const dRue = document.getElementById("curveRue");
+        const Ldeb = dDeb.getTotalLength(); const Lrue = dRue.getTotalLength();
+        dDeb.style.strokeDasharray = Ldeb; dDeb.style.strokeDashoffset = Ldeb;
+        dRue.style.strokeDasharray = Lrue; dRue.style.strokeDashoffset = Lrue;
+        gsap.set("#crossDot", { opacity: 0 });
+        tl.to(dRue, { strokeDashoffset: 0, duration: 2.6, ease: "power1.inOut" }, 8.0);
+        tl.to(dDeb, { strokeDashoffset: 0, duration: 2.6, ease: "power1.inOut" }, 8.4);
+        tl.fromTo("#lblRue", { opacity: 0, x: 12 }, { opacity: 1, x: 0, duration: 0.5 }, 10.4);
+        tl.fromTo("#lblDeb", { opacity: 0, x: 12 }, { opacity: 1, x: 0, duration: 0.5 }, 10.8);
+        // event markers
+        tl.from(["#evL1", "#ev1"], { opacity: 0, duration: 0.4 }, 12.0);
+        tl.from(["#evL2", "#ev2"], { opacity: 0, duration: 0.4 }, 13.2);
+        tl.from(["#evL3", "#ev3"], { opacity: 0, duration: 0.4 }, 14.4);
+        // crossing point
+        tl.fromTo("#crossDot", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.5)", transformOrigin: "center" }, 16.4);
+        tl.fromTo("#crossLbl", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 16.8);
+        // hold, then exit
+        tl.to("#b36", { opacity: 0, duration: 0.5, ease: "power2.in" }, 26.4);
+
+        // ===== ㊲ Rüstungs-Dashboard (27.0 – 52.0) =====
+        tl.set("#b37", { opacity: 1 }, 26.9);
+        // A — 800 Mrd hero
+        tl.fromTo("#bigKicker", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 27.0);
+        tl.fromTo("#bigNum", { opacity: 0, scale: 1.06 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 27.3);
+        tl.to({ v: 0 }, { v: 800, duration: 1.8, ease: "power2.out", onUpdate: function(){ document.getElementById("bigNum").textContent = Math.round(this.targets()[0].v).toLocaleString("de-DE") + " Mrd €"; } }, 27.4);
+        tl.fromTo("#bigSub", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 29.6);
+        tl.to(["#bigKicker", "#bigNum", "#bigSub"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 32.6);
+
+        // B — category bars
+        tl.fromTo("#catTitle", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 33.2);
+        tl.set("#cats", { opacity: 1 }, 33.4);
+        const cats = ["#cat1", "#cat2", "#cat3", "#cat4"];
+        cats.forEach((c, i) => {
+          const t = 33.6 + i * 0.55;
+          const bar = document.querySelector(c + " .cbar");
+          const cv = document.querySelector(c + " .cv");
+          const w = parseFloat(bar.getAttribute("data-w"));
+          const v = parseFloat(cv.getAttribute("data-v"));
+          tl.fromTo(c, { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.4 }, t);
+          tl.fromTo(bar, { scaleX: 0 }, { scaleX: w / 100, duration: 0.7, ease: "power2.out" }, t + 0.05);
+          tl.to({ v: 0 }, { v: v, duration: 0.7, ease: "power1.out", onUpdate: function(){ cv.textContent = this.targets()[0].v.toFixed(1).replace(".", ",") + " Mrd €"; } }, t + 0.05);
+        });
+        tl.to(["#catTitle", "#cats"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 39.6);
+
+        // C — R&D share jump 6% -> 20%
+        tl.fromTo("#rdTitle", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 40.2);
+        tl.set("#rdWrap", { opacity: 1 }, 40.4);
+        tl.fromTo("#rdb1", { scaleY: 0 }, { scaleY: 1, duration: 0.5, ease: "power2.out" }, 40.5);
+        tl.fromTo("#rdv1", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 40.6);
+        tl.fromTo("#rdArrow", { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.4 }, 41.4);
+        tl.fromTo("#rdb2", { scaleY: 0 }, { scaleY: 1, duration: 0.7, ease: "back.out(1.6)" }, 41.6);
+        tl.fromTo("#rdv2", { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 41.7);
+        tl.to(["#rdTitle", "#rdWrap", "#rdArrow"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 45.6);
+
+        // D — +66%
+        tl.fromTo("#finNum", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 46.2);
+        tl.fromTo("#finSub", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 48.2);
+
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>

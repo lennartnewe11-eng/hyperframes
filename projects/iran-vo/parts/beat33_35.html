@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --red: #d24b4b; --grn: #4caf6a; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 300px; height: 1px; background: var(--line); transform-origin: center; }
+      .layer { position: absolute; inset: 0; }
+      .hl { color: var(--highlight); }
+      .ctrbig { position: absolute; left: 0; right: 0; text-align: center; font-weight: 800; letter-spacing: -0.025em; }
+      .strike { position: relative; } .strike::after { content:""; position:absolute; left:-3%; right:-3%; top:52%; height:6px; background: var(--muted); }
+
+      /* ㉝ AI-Act coverage bar */
+      #konsens { position: absolute; left: 0; right: 0; top: 50%; margin-top: -70px; text-align: center; font-weight: 800; font-size: 78px; letter-spacing: -0.02em; }
+      #konsensSub { position: absolute; left: 0; right: 0; top: 50%; margin-top: 40px; text-align: center; font-size: 18px; color: var(--muted); }
+      #aiTitle { position: absolute; left: 0; right: 0; top: 250px; text-align: center; font-weight: 800; font-size: 70px; letter-spacing: -0.02em; }
+      #aiSub { position: absolute; left: 0; right: 0; top: 350px; text-align: center; font-size: 15px; }
+      #coverBar { position: absolute; left: 50%; top: 480px; width: 1400px; height: 96px; margin-left: -700px; display: flex; gap: 8px; }
+      .seg { flex: 1; border: 1px solid var(--line); border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; position: relative; background: rgba(255,255,255,0.04); }
+      .seg .sl { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; color: var(--ink); }
+      .seg .ck { width: 18px; height: 18px; border-radius: 50%; background: var(--grn); }
+      .seg.mil { background: rgba(255,255,255,0.04); }
+      #coverLbl { position: absolute; left: 50%; top: 610px; width: 1400px; margin-left: -700px; text-align: left; }
+      #militGap { position: absolute; left: 1386px; width: 274px; top: 480px; height: 96px; border: 2px dashed var(--red); border-radius: 6px; transform-origin: center; }
+      #militStamp { position: absolute; left: 1386px; width: 274px; text-align: center; top: 596px; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 16px; color: var(--red); }
+      #aiFacts { position: absolute; left: 0; right: 0; top: 700px; text-align: center; font-size: 14px; }
+      #cautious { position: absolute; left: 0; right: 0; top: 760px; text-align: center; font-size: 26px; color: var(--muted); font-weight: 600; }
+
+      /* ㉞ 164:5 */
+      #lawTitle { position: absolute; left: 0; right: 0; top: 250px; text-align: center; font-weight: 800; font-size: 70px; letter-spacing: -0.02em; }
+      #killerSub { position: absolute; left: 0; right: 0; top: 350px; text-align: center; font-size: 16px; }
+      #goalTl { position: absolute; left: 50%; top: 470px; width: 700px; margin-left: -350px; }
+      #goalTl .gline { position: absolute; left: 0; right: 0; top: 20px; height: 2px; background: var(--line); transform-origin: left center; }
+      #goalTl .gnode { position: absolute; top: 14px; width: 14px; height: 14px; border-radius: 50%; background: var(--ink); margin-left: -7px; }
+      #goalTl .glbl { position: absolute; top: 40px; font-family: "IBM Plex Mono", monospace; letter-spacing: 0.1em; font-size: 14px; transform: translateX(-50%); }
+      #goalGoal { position: absolute; left: 0; right: 0; top: 92px; text-align: center; font-size: 15px; }
+      #voteGrid { position: absolute; left: 50%; top: 300px; width: 560px; margin-left: -280px; display: grid; grid-template-columns: repeat(20, 1fr); gap: 7px; }
+      #voteGrid .v { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.85); }
+      #voteGrid .v.no { background: var(--red); }
+      #voteCount { position: absolute; left: 0; right: 0; top: 620px; text-align: center; font-weight: 800; font-size: 90px; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+      #voteCount .no { color: var(--red); }
+      #voteLbl { position: absolute; left: 0; right: 0; top: 740px; text-align: center; font-size: 15px; }
+      #nothing { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 800; font-size: 104px; letter-spacing: -0.03em; }
+      #resultArrow { position: absolute; left: 0; right: 0; top: 300px; text-align: center; font-size: 16px; }
+
+      /* ㉟ Re-Aim */
+      #confTitle { position: absolute; left: 0; right: 0; top: 250px; text-align: center; font-weight: 800; font-size: 64px; letter-spacing: -0.02em; }
+      #summit { position: absolute; left: 50%; top: 440px; width: 1300px; margin-left: -650px; }
+      #summit .sline { position: absolute; left: 0; right: 0; top: 30px; height: 2px; background: var(--line); transform-origin: left center; }
+      .snode { position: absolute; top: 18px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); margin-left: -9px; }
+      .stext { position: absolute; top: 56px; transform: translateX(-50%); text-align: center; }
+      .stext .sy { font-weight: 700; font-size: 26px; }
+      .stext .sc { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: 0.1em; color: var(--muted); }
+      .stag { position: absolute; top: -28px; transform: translateX(-50%); font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.12em; color: var(--red); }
+      #outcomes { position: absolute; left: 50%; top: 640px; width: 1300px; margin-left: -650px; display: flex; justify-content: space-between; }
+      .ocard { width: 410px; border: 1px solid var(--line); border-radius: 8px; padding: 22px 26px; }
+      .ocard .ot { font-weight: 700; font-size: 26px; }
+      .ocard .ob { margin-top: 12px; font-family: "IBM Plex Mono", monospace; font-size: 13px; letter-spacing: 0.1em; color: var(--red); }
+      #voelker { position: absolute; left: 0; right: 0; top: 50%; margin-top: -70px; text-align: center; font-weight: 800; font-size: 60px; letter-spacing: -0.02em; max-width: 1500px; margin-left: auto; margin-right: auto; padding: 0 60px; }
+      #voelkerSub { position: absolute; left: 0; right: 0; top: 50%; margin-top: 80px; text-align: center; font-size: 20px; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="83">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div class="chrome">
+        <div class="c-tl mono">Recht &amp; Rüstung</div>
+        <div class="c-tr mono">KI-Krieg 2.0</div>
+        <div class="c-br mono" id="tc">08:03</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <!-- ㉝ AI-Act -->
+      <div class="layer hid" id="b33">
+        <div id="konsens" class="hid">Es gab einmal einen Konsens.</div>
+        <div id="konsensSub" class="hid">nicht laut, nicht berühmt — aber real</div>
+        <div id="aiTitle" class="hid">EU · <span class="hl">AI-Act</span> 2024</div>
+        <div id="aiSub" class="mono hid">Historisches Regelwerk zur KI-Regulierung</div>
+        <div id="coverBar" class="hid">
+          <div class="seg" id="sg1"><span class="ck"></span><span class="sl">Gesundheit</span></div>
+          <div class="seg" id="sg2"><span class="ck"></span><span class="sl">Justiz</span></div>
+          <div class="seg" id="sg3"><span class="ck"></span><span class="sl">Arbeit</span></div>
+          <div class="seg" id="sg4"><span class="ck"></span><span class="sl">Polizei</span></div>
+          <div class="seg mil" id="sg5"><span class="ck"></span><span class="sl">Militär</span></div>
+        </div>
+        <div id="militGap" class="hid"></div>
+        <div id="militStamp" class="hid">Ausgeklammert</div>
+        <div id="aiFacts" class="mono hid">getrennte Verhandlungen · eigene Prozesse · keine überstürzten Entscheidungen</div>
+        <div id="cautious" class="hid">Das klang nach Vorsicht.</div>
+      </div>
+
+      <!-- ㉞ 164:5 -->
+      <div class="layer hid" id="b34">
+        <div id="lawTitle" class="hid">Letale autonome Waffen</div>
+        <div id="killerSub" class="mono hid">im Volksmund: Killer Robots · UN-Generalsekretär · IKRK</div>
+        <div id="goalTl" class="hid">
+          <div class="gline" id="gline"></div>
+          <div class="gnode" id="gn1" style="left:0;"></div>
+          <div class="gnode" id="gn2" style="left:100%;"></div>
+          <div class="glbl" id="gl1" style="left:0;">2023</div>
+          <div class="glbl" id="gl2" style="left:100%;">2026</div>
+          <div id="goalGoal">Ziel: ein rechtlich <span class="hl">bindendes</span> Abkommen</div>
+        </div>
+        <div id="voteGrid" class="hid"></div>
+        <div id="voteCount" class="hid"><span id="vcYes">0</span> : <span class="no" id="vcNo">0</span></div>
+        <div id="voteLbl" class="mono hid">Generalversammlung · überwältigende Mehrheit</div>
+        <div id="resultArrow" class="mono hid">Ergebnis →</div>
+        <div id="nothing" class="hid">Es passierte nichts.</div>
+      </div>
+
+      <!-- ㉟ Re-Aim -->
+      <div class="layer hid" id="b35">
+        <div id="confTitle" class="hid">Stattdessen: <span class="hl">Konferenzen</span></div>
+        <div id="summit" class="hid">
+          <div class="sline" id="sline"></div>
+          <div class="snode" id="sn1" style="left:8%;"></div>
+          <div class="snode" id="sn2" style="left:50%;"></div>
+          <div class="snode" id="sn3" style="left:92%;"></div>
+          <div class="stext" id="st1" style="left:8%;"><div class="sy">Den Haag</div><div class="sc">2023</div></div>
+          <div class="stext" id="st2" style="left:50%;"><div class="sy">Seoul</div><div class="sc">2024</div></div>
+          <div class="stext" id="st3" style="left:92%;"><div class="sy">Madrid</div><div class="sc">Feb 2026</div></div>
+          <div class="stag" id="sg_t1" style="left:8%;">Unverbindlich</div>
+          <div class="stag" id="sg_t2" style="left:50%;">Unverbindlich</div>
+          <div class="stag" id="sg_t3" style="left:92%;">Unverbindlich</div>
+        </div>
+        <div id="outcomes" class="hid">
+          <div class="ocard" id="oc1"><div class="ot">Politische Erklärungen</div><div class="ob">Bindend? — Nein</div></div>
+          <div class="ocard" id="oc2"><div class="ot">Freiwillige Prinzipien</div><div class="ob">Bindend? — Nein</div></div>
+          <div class="ocard" id="oc3"><div class="ot">Unverbindliche Zusagen</div><div class="ob">Bindend? — Nein</div></div>
+        </div>
+        <div id="voelker" class="hid">Das Völkerrecht ist auf <span class="hl">Menschen</span> ausgerichtet — nicht auf Maschinen.</div>
+        <div id="voelkerSub" class="hid">Und niemand hat das ernsthaft geändert.</div>
+      </div>
+
+      <audio id="vo" src="../audio/voiceover.m4a" data-start="0" data-duration="83" data-media-start="483.6" data-track-index="2"></audio>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        // 164:5 grid (169 dots, last 5 = red "dagegen")
+        (function(){ let s=""; for(let i=0;i<169;i++) s+=`<div class="v${i>=164?" no":""}"></div>`; document.getElementById("voteGrid").innerHTML=s; })();
+        const tl = gsap.timeline({ paused: true });
+        tl.to({ p: 0 }, { p: 1, duration: 83, ease: "none", onUpdate: function () {
+          const t = 483.6 + 83 * this.targets()[0].p; const m = Math.floor(t/60), s = Math.floor(t%60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+
+        // ===== ㉝ AI-Act (2.0–29.5) =====
+        tl.set("#b33", { opacity: 1 }, 1.9);
+        tl.fromTo("#konsens", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 2.0);
+        tl.fromTo("#konsensSub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 3.6);
+        tl.to(["#konsens", "#konsensSub"], { opacity: 0, y: -24, duration: 0.4, ease: "power2.in" }, 6.6);
+        tl.fromTo("#aiTitle", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 7.4);
+        tl.fromTo("#aiSub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 8.0);
+        tl.fromTo("#coverBar", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5 }, 9.6);
+        // civil segments check in
+        tl.from("#sg1 .ck", { scale: 0, duration: 0.3, ease: "back.out(2)" }, 11.0);
+        tl.from("#sg2 .ck", { scale: 0, duration: 0.3, ease: "back.out(2)" }, 11.5);
+        tl.from("#sg3 .ck", { scale: 0, duration: 0.3, ease: "back.out(2)" }, 12.0);
+        tl.from("#sg4 .ck", { scale: 0, duration: 0.3, ease: "back.out(2)" }, 12.5);
+        tl.from("#sg5 .ck", { scale: 0, duration: 0.3, ease: "back.out(2)" }, 13.0);
+        // cut out militär at "ausgeklammert" (~18.6)
+        tl.to("#sg5", { opacity: 0, duration: 0.4 }, 18.6);
+        tl.set("#militGap", { opacity: 1 }, 18.9);
+        tl.fromTo("#militGap", { scale: 0.92, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "power3.out", transformOrigin: "center" }, 18.9);
+        tl.fromTo("#militStamp", { opacity: 0, scale: 1.3, rotation: -6 }, { opacity: 1, scale: 1, rotation: -6, duration: 0.4, ease: "power3.out" }, 19.3);
+        tl.fromTo("#aiFacts", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 22.0);
+        tl.fromTo("#cautious", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 27.5);
+        tl.to("#b33", { opacity: 0, duration: 0.45, ease: "power2.in" }, 29.0);
+
+        // ===== ㉞ 164:5 (29.5–61.0) =====
+        tl.set("#b34", { opacity: 1 }, 29.4);
+        tl.fromTo("#lawTitle", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 29.5);
+        tl.fromTo("#killerSub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 36.6);
+        tl.set("#goalTl", { opacity: 1 }, 38.6);
+        tl.fromTo("#gline", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power2.out" }, 38.6);
+        tl.from(["#gn1","#gl1"], { opacity: 0, duration: 0.4 }, 38.8);
+        tl.from(["#gn2","#gl2"], { opacity: 0, duration: 0.4 }, 39.4);
+        tl.fromTo("#goalGoal", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 40.0);
+        // clear title/goal -> vote
+        tl.to(["#lawTitle","#killerSub","#goalTl"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 49.8);
+        tl.set("#voteGrid", { opacity: 1 }, 50.6);
+        tl.from("#voteGrid .v:not(.no)", { opacity: 0, scale: 0.3, duration: 0.4, stagger: 0.004, ease: "power1.out" }, 50.6);
+        tl.fromTo("#voteCount", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 50.7);
+        tl.to({ v: 0 }, { v: 164, duration: 1.6, ease: "power1.out", onUpdate: function(){ document.getElementById("vcYes").textContent = Math.round(this.targets()[0].v); } }, 50.7);
+        // 5 dagegen
+        tl.from("#voteGrid .v.no", { opacity: 0, scale: 0.3, duration: 0.4, stagger: 0.06, ease: "back.out(2)" }, 55.0);
+        tl.to({ v: 0 }, { v: 5, duration: 0.6, ease: "power1.out", onUpdate: function(){ document.getElementById("vcNo").textContent = Math.round(this.targets()[0].v); } }, 55.0);
+        tl.fromTo("#voteLbl", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 57.0);
+        // result -> nothing
+        tl.to(["#voteGrid","#voteCount","#voteLbl"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 58.6);
+        tl.fromTo("#resultArrow", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 58.8);
+        tl.fromTo("#nothing", { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 59.0);
+        tl.to(["#b34"], { opacity: 0, duration: 0.45, ease: "power2.in" }, 60.6);
+
+        // ===== ㉟ Re-Aim (61.0–83.0) =====
+        tl.set("#b35", { opacity: 1 }, 60.9);
+        tl.fromTo("#confTitle", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 61.0);
+        tl.set("#summit", { opacity: 1 }, 62.6);
+        tl.fromTo("#sline", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power2.out" }, 62.6);
+        const snodeIn = (n, t) => { tl.fromTo(`#sn${n}`, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2)" }, t); tl.fromTo(`#st${n}`, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 }, t + 0.1); tl.fromTo(`#sg_t${n}`, { opacity: 0 }, { opacity: 1, duration: 0.3 }, t + 0.5); };
+        snodeIn(1, 64.0); snodeIn(2, 66.0); snodeIn(3, 68.0);
+        // outcomes
+        tl.set("#outcomes", { opacity: 1 }, 71.0);
+        tl.from(".ocard", { opacity: 0, y: 18, duration: 0.45, stagger: 0.5 }, 71.2);
+        // exit summit/outcomes -> völkerrecht
+        tl.to(["#confTitle","#summit","#outcomes"], { opacity: 0, duration: 0.45, ease: "power2.in" }, 76.6);
+        tl.fromTo("#voelker", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 77.2);
+        tl.fromTo("#voelkerSub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 79.8);
+
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>
