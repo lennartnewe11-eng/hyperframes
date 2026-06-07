@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --red: #d24b4b; --grn: #4caf6a; --blue: #5b8fd6; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 5; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .baseline { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 300px; height: 1px; background: var(--line); transform-origin: center; }
+      .sub { position: absolute; inset: 0; }
+      .hl { color: var(--highlight); } .rd { color: var(--red); } .bl { color: var(--blue); }
+
+      /* ===== A — die schwierigste Frage ===== */
+      #aL1 { position: absolute; left: 0; right: 0; top: 440px; text-align: center; font-weight: 600; font-size: 40px; color: var(--muted); }
+      #aL2 { position: absolute; left: 0; right: 0; top: 510px; text-align: center; font-weight: 800; font-size: 92px; letter-spacing: -0.03em; }
+
+      /* ===== Waage (B–E) ===== */
+      #scaleQ { position: absolute; left: 0; right: 0; top: 92px; text-align: center; font-weight: 800; font-size: 50px; letter-spacing: -0.02em; }
+      #fulcrum { position: absolute; left: 930px; top: 430px; width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 200px solid rgba(255,255,255,0.09); }
+      #fbase { position: absolute; left: 820px; top: 628px; width: 280px; height: 4px; background: rgba(255,255,255,0.14); border-radius: 2px; }
+      #beam { position: absolute; left: 520px; top: 426px; width: 880px; height: 8px; background: var(--ink); border-radius: 4px; transform-origin: 440px 4px; }
+      #pivot { position: absolute; left: 432px; top: -4px; width: 16px; height: 16px; border-radius: 50%; background: var(--highlight); }
+      .platHang { position: absolute; top: 4px; transform-origin: 0 0; }
+      #hangL { left: 0px; } #hangR { left: 872px; }
+      .platHang .str { position: absolute; left: 0; top: 0; width: 1.5px; height: 92px; background: var(--line); }
+      .platHang .plat { position: absolute; top: 92px; left: -95px; width: 190px; height: 6px; border-radius: 3px; }
+      #hangL .plat { background: var(--blue); } #hangR .plat { background: var(--highlight); }
+      .platHang .phead { position: absolute; top: 108px; left: -130px; width: 260px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 17px; }
+      #hangL .phead { color: var(--blue); } #hangR .phead { color: var(--highlight); }
+      .wchip { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; font-size: 14px; padding: 7px 12px; border: 1px solid var(--line); background: rgba(7,12,22,0.85); border-radius: 4px; }
+      #cvL { position: absolute; top: 150px; left: -150px; width: 300px; text-align: center; font-family: "IBM Plex Mono", monospace; letter-spacing: 0.08em; font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+      /* photo takeovers */
+      #photoDim { position: absolute; inset: 0; background: rgba(5,8,15,0.82); z-index: 10; }
+      .takeover { position: absolute; z-index: 11; left: 50%; top: 232px; width: 1040px; margin-left: -520px; }
+      .takeover .ph { width: 1040px; height: 560px; border: 1px solid var(--line); background-size: cover; background-position: center; position: relative; overflow: hidden; }
+      .takeover .ph .ptint { position: absolute; inset: 0; background: rgba(8,14,28,0.2); mix-blend-mode: multiply; }
+      .takeover .cap { margin-top: 26px; text-align: center; font-weight: 700; font-size: 38px; letter-spacing: -0.01em; }
+      .takeover .cap .mn { display: block; margin-top: 10px; font-family: "IBM Plex Mono", monospace; font-weight: 400; text-transform: uppercase; letter-spacing: 0.16em; font-size: 15px; color: var(--muted); }
+      #sargStrike { position: absolute; z-index: 12; left: 50%; top: 470px; margin-left: -430px; width: 860px; text-align: center; font-weight: 800; font-size: 76px; letter-spacing: -0.02em; color: var(--red); }
+      #sargStrike .ln { position: absolute; left: 0; right: 0; top: 50%; height: 5px; background: var(--red); transform: scaleX(0); transform-origin: left center; }
+
+      /* E — nur ein Klick */
+      #clickWrap { position: absolute; left: 0; right: 0; top: 760px; text-align: center; }
+      #clickLine { font-weight: 700; font-size: 40px; letter-spacing: -0.01em; }
+
+      /* ===== F — Verantwortung verteilt ===== */
+      #fWrap { position: absolute; inset: 0; }
+      #fWord { position: absolute; left: 0; right: 0; top: 300px; text-align: center; font-weight: 800; font-size: 64px; letter-spacing: -0.02em; }
+      .fNode { position: absolute; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; font-size: 18px; color: var(--muted); }
+      #fAlle { position: absolute; left: 0; right: 0; top: 470px; text-align: center; font-weight: 700; font-size: 30px; color: var(--muted); }
+      #fDanger { position: absolute; left: 0; right: 0; top: 50%; margin-top: -50px; text-align: center; font-weight: 800; font-size: 86px; letter-spacing: -0.03em; }
+
+      /* ===== G — Nicht der Terminator + Pipeline ===== */
+      #termWrap { position: absolute; left: 0; right: 0; top: 250px; text-align: center; }
+      #termEye { width: 150px; height: 150px; margin: 0 auto 24px; border-radius: 50%; background: radial-gradient(circle at 50% 50%, #ff5a3c 0%, #d24b4b 38%, #3a1414 70%, transparent 72%); position: relative; }
+      #termEye::after { content: ""; position: absolute; left: 50%; top: 50%; width: 16px; height: 70px; background: #2a0a0a; transform: translate(-50%,-50%); border-radius: 8px; }
+      #termWords { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 22px; color: var(--muted); position: relative; display: inline-block; }
+      #termWords .ln { position: absolute; left: -10px; right: -10px; top: 52%; height: 4px; background: var(--red); transform: scaleX(0); transform-origin: left center; }
+      #banalLine { position: absolute; left: 0; right: 0; top: 470px; text-align: center; font-weight: 800; font-size: 46px; letter-spacing: -0.02em; }
+
+      #board { position: absolute; left: 50%; top: 408px; width: 1560px; margin-left: -780px; display: flex; gap: 18px; }
+      .col { flex: 1; }
+      .col .ch { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; font-size: 13px; color: var(--muted); padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+      .card { background: rgba(255,255,255,0.05); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; font-size: 15px; }
+      .card .ct { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
+      #boardTitle { position: absolute; left: 0; right: 0; top: 350px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 14px; color: var(--muted); }
+      #schoolCard { position: absolute; z-index: 6; width: 340px; }
+      #schoolCard .card { background: rgba(210,75,75,0.08); border-color: rgba(210,75,75,0.6); }
+
+      /* H — sliders */
+      #sliders { position: absolute; left: 50%; top: 720px; width: 760px; margin-left: -380px; }
+      .sl { position: relative; height: 40px; margin-bottom: 10px; }
+      .sl .sll { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 150px; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; font-size: 14px; color: var(--ink); }
+      .sl .slt { position: absolute; left: 180px; right: 0; top: 50%; transform: translateY(-50%); height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
+      .sl .slf { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--highlight); border-radius: 2px; }
+      .sl .slk { position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%; background: var(--ink); transform: translate(-50%,-50%); }
+
+      /* I — school + verantwortlich */
+      #schoolPhoto { position: absolute; left: 50%; top: 300px; width: 760px; height: 420px; margin-left: -380px; border: 1px solid var(--line); background: url('../assets/schule-teaser.jpg') center/cover; overflow: hidden; }
+      #schoolPhoto .ptint { position: absolute; inset: 0; background: rgba(8,14,28,0.3); mix-blend-mode: multiply; }
+      #schoolTag { position: absolute; left: 50%; top: 250px; transform: translateX(-50%); font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 16px; color: var(--red); border: 1px solid rgba(210,75,75,0.6); padding: 8px 16px; background: rgba(210,75,75,0.06); }
+      #respLine { position: absolute; left: 0; right: 0; top: 760px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; font-size: 20px; color: var(--muted); }
+      #respLine .dash { color: var(--red); font-size: 30px; }
+      #finalQ { position: absolute; left: 0; right: 0; top: 50%; margin-top: -60px; text-align: center; font-weight: 800; font-size: 64px; letter-spacing: -0.02em; z-index: 14; }
+      #finalDim { position: absolute; inset: 0; background: rgba(5,8,15,0.86); z-index: 13; }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="49">
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div class="chrome">
+        <div class="c-tl mono" id="ctl">Die letzte Frage</div>
+        <div class="c-tr mono">KI-Krieg 2.0</div>
+        <div class="c-br mono" id="tc">11:30</div>
+      </div>
+      <div class="baseline" id="baseline"></div>
+
+      <!-- A -->
+      <div class="sub hid" id="sA">
+        <div id="aL1">Und noch eine letzte Frage —</div>
+        <div id="aL2">die <span class="hl">schwierigste</span>.</div>
+      </div>
+
+      <!-- B–E: Waage -->
+      <div class="sub hid" id="sScale">
+        <div id="scaleQ" class="hid">Macht KI Kriege <span class="hl">präziser</span> — oder nur <span class="hl">leichter</span>?</div>
+        <div id="fulcrum"></div>
+        <div id="fbase"></div>
+        <div id="beam">
+          <div id="pivot"></div>
+          <div class="platHang" id="hangL">
+            <div class="str"></div>
+            <div class="plat"></div>
+            <div class="phead">Präziser</div>
+            <div class="wchip bl hid" id="chL" style="top:50px; border-color:rgba(91,143,214,0.5); color:var(--blue);">weniger zivile Opfer</div>
+            <div id="cvL" class="hid">* vielleicht · manchmal<br/>nur unter idealen Bedingungen</div>
+          </div>
+          <div class="platHang" id="hangR">
+            <div class="str"></div>
+            <div class="plat"></div>
+            <div class="phead">Leichter</div>
+            <div class="wchip hid" id="chR1" style="top:50px;">niedrigere Hemmschwelle</div>
+            <div class="wchip hid" id="chR2" style="top:14px;">weniger politische Kosten</div>
+          </div>
+        </div>
+        <div id="clickWrap" class="hid">
+          <div id="clickLine">Nur ein <span class="hl">Klick</span> — und ein Algorithmus, der die Verantwortung verteilt.</div>
+        </div>
+      </div>
+
+      <!-- photo takeovers -->
+      <div id="photoDim" class="hid"></div>
+      <div class="takeover hid" id="toOperator">
+        <div class="ph" style="background-image:url('../assets/drone-station-styled.jpg');"><div class="ptint"></div></div>
+        <div class="cap">Wenige eigene Soldaten in Gefahr.<span class="mn">Nur ein Klick · kein eigenes Risiko</span></div>
+      </div>
+      <div class="takeover hid" id="toSarg">
+        <div class="ph" style="background-image:url('../assets/sarg-styled.jpg');"><div class="ptint"></div></div>
+      </div>
+      <div id="sargStrike" class="hid">KEIN SARG<div class="ln"></div></div>
+
+      <!-- F -->
+      <div class="sub hid" id="sF">
+        <div id="fWord">Verantwortung</div>
+        <div class="fNode hid" id="fn1" style="left:300px; top:300px;">Programmierer</div>
+        <div class="fNode hid" id="fn2" style="left:1380px; top:300px;">Offizier</div>
+        <div class="fNode hid" id="fn3" style="left:360px; top:640px;">CEO</div>
+        <div class="fNode hid" id="fn4" style="left:1340px; top:640px;">Regierung</div>
+        <div id="fAlle" class="hid">auf alle — und auf niemanden.</div>
+        <div id="fDanger" class="hid">Das ist die eigentliche <span class="rd">Gefahr</span>.</div>
+      </div>
+
+      <!-- G -->
+      <div class="sub hid" id="sG">
+        <div id="termWrap">
+          <div id="termEye"></div>
+          <div id="termWords">Kein Terminator · kein Skynet · kein E.T.<div class="ln"></div></div>
+        </div>
+        <div id="banalLine" class="hid">Sondern der ganz normale, <span class="hl">banale</span> Krieg.</div>
+
+        <div id="boardTitle" class="hid">Zielverwaltung · gut organisiert</div>
+        <div id="board" class="hid">
+          <div class="col"><div class="ch">Zuordnung offen</div></div>
+          <div class="col"><div class="ch">Zugeordnet</div></div>
+          <div class="col"><div class="ch">In Ausführung</div></div>
+          <div class="col"><div class="ch">Abgeschlossen</div></div>
+        </div>
+      </div>
+
+      <!-- H sliders -->
+      <div class="sub hid" id="sH">
+        <div id="sliders">
+          <div class="sl" id="sl1"><div class="sll">einfacher</div><div class="slt"><div class="slf"></div><div class="slk"></div></div></div>
+          <div class="sl" id="sl2"><div class="sll">schneller</div><div class="slt"><div class="slf"></div><div class="slk"></div></div></div>
+          <div class="sl" id="sl3"><div class="sll">abstrakter</div><div class="slt"><div class="slf"></div><div class="slk"></div></div></div>
+        </div>
+      </div>
+
+      <!-- I school -->
+      <div class="sub hid" id="sI">
+        <div id="schoolTag" class="hid">Kollateralschaden: einkalkuliert</div>
+        <div id="schoolPhoto" class="hid"><div class="ptint"></div></div>
+        <div id="respLine" class="hid">Verantwortlich: <span class="dash">—</span></div>
+      </div>
+      <div id="finalDim" class="hid"></div>
+      <div id="finalQ" class="hid">…und niemand weiß mehr genau,<br/>wer das <span class="rd">entschieden</span> hat.</div>
+
+      <audio id="vo" src="../audio/voiceover.m4a" data-start="0" data-duration="49" data-media-start="690.6" data-track-index="2"></audio>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+
+        // timecode (11:30 -> 12:19)
+        tl.to({ p: 0 }, { p: 1, duration: 49, ease: "none", onUpdate: function () {
+          const t = 690.6 + 49 * this.targets()[0].p; const m = Math.floor(t/60), s = Math.floor(t%60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.fromTo("#baseline", { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }, 0.2);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+
+        // helper: tip beam to angle a (deg), right-positive
+        function tip(a, t, dur) {
+          dur = dur || 0.8;
+          tl.to("#beam", { rotation: a, duration: dur, ease: "power2.inOut" }, t);
+          tl.to(["#hangL", "#hangR"], { rotation: -a, duration: dur, ease: "power2.inOut" }, t);
+        }
+
+        // ===== A (0.3 – 2.8) =====
+        tl.set("#sA", { opacity: 1 }, 0.3);
+        tl.fromTo("#aL1", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 0.4);
+        tl.fromTo("#aL2", { opacity: 0, y: 18, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "back.out(1.6)" }, 1.2);
+        tl.to("#sA", { opacity: 0, duration: 0.4, ease: "power2.in" }, 2.8);
+
+        // ===== B — question + scale assemble (3.0 – 7.0) =====
+        tl.set("#sScale", { opacity: 1 }, 3.0);
+        tl.fromTo("#scaleQ", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 3.1);
+        tl.fromTo(["#fulcrum", "#fbase"], { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 3.6);
+        tl.fromTo("#beam", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.7, ease: "power2.out", transformOrigin: "440px 4px" }, 4.0);
+        tl.fromTo(["#hangL", "#hangR"], { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 4.5);
+
+        // ===== C — Präziser (7.0 – 13.0) =====
+        tl.fromTo("#chL", { opacity: 0, y: -16, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(2)" }, 7.4);
+        tip(-3.2, 7.6);                       // left dips: präziser has a point
+        tl.fromTo("#cvL", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 10.2);
+        tip(-1.2, 10.6);                      // caveat weakens it, left lifts
+
+        // ===== D1 — Hemmschwelle (13.0 – 18.0) =====
+        tl.fromTo("#chR1", { opacity: 0, y: -16, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(2)" }, 13.4);
+        tip(2.6, 13.6);
+
+        // ===== D2 — operator photo takeover (18.0 – 20.0) =====
+        tl.fromTo("#photoDim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 17.9);
+        tl.set("#toOperator", { opacity: 1 }, 17.9);
+        tl.fromTo("#toOperator", { y: 18 }, { y: 0, duration: 0.5, ease: "power3.out" }, 17.9);
+        tl.fromTo("#toOperator .ph", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 17.9);
+        tl.to(["#toOperator", "#photoDim"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 19.9);
+        tip(4.6, 19.9);
+
+        // ===== weniger politische Kosten (20.0 – 22.0) =====
+        tl.fromTo("#chR2", { opacity: 0, y: -16, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(2)" }, 20.2);
+        tip(6.2, 20.5);
+
+        // ===== D3 — Sarg takeover (22.0 – 24.2) =====
+        tl.fromTo("#photoDim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 21.9);
+        tl.set("#toSarg", { opacity: 1 }, 21.9);
+        tl.fromTo("#toSarg .ph", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 21.9);
+        tl.fromTo("#sargStrike", { opacity: 0, scale: 1.15 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 22.5);
+        tl.fromTo("#sargStrike .ln", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.in" }, 22.9);
+        tl.to(["#toSarg", "#sargStrike", "#photoDim"], { opacity: 0, duration: 0.45, ease: "power2.in" }, 24.0);
+        tip(9.4, 24.0);                       // hard kip: leichter wins
+
+        // ===== E — nur ein Klick (24.2 – 27.0) =====
+        tl.fromTo("#clickWrap", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 24.4);
+        tl.to("#sScale", { opacity: 0, duration: 0.5, ease: "power2.in" }, 26.6);
+
+        // ===== F — Verantwortung verteilt (27.0 – 31.0) =====
+        tl.set("#sF", { opacity: 1 }, 26.9);
+        tl.fromTo("#fWord", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 27.0);
+        tl.to("#fWord", { top: 180, fontSize: 34, duration: 0.5, ease: "power2.inOut" }, 27.9);
+        tl.fromTo(["#fn1", "#fn2", "#fn3", "#fn4"], { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.4, stagger: 0.12, transformOrigin: "center" }, 28.2);
+        tl.fromTo("#fAlle", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 28.8);
+        tl.to(["#fn1", "#fn2", "#fn3", "#fn4", "#fWord"], { opacity: 0, duration: 0.7, ease: "power2.in" }, 29.1);
+        tl.to("#fAlle", { opacity: 0, duration: 0.4 }, 29.6);
+        tl.fromTo("#fDanger", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 29.4);
+        tl.to("#sF", { opacity: 0, duration: 0.5, ease: "power2.in" }, 30.9);
+
+        // ===== G — Nicht der Terminator + Pipeline (31.0 – 39.0) =====
+        tl.set("#sG", { opacity: 1 }, 31.0);
+        tl.fromTo("#termEye", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.8)", transformOrigin: "center" }, 31.1);
+        tl.fromTo("#termWords", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 31.5);
+        tl.to("#termWords .ln", { scaleX: 1, duration: 0.5, ease: "power2.in" }, 32.6);
+        tl.to(["#termEye", "#termWords"], { opacity: 0.18, duration: 0.5 }, 33.2);
+        tl.fromTo("#banalLine", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 33.4);
+        tl.to(["#termEye", "#termWords", "#banalLine"], { opacity: 0, duration: 0.5, ease: "power2.in" }, 35.2);
+        // pipeline board
+        tl.fromTo("#boardTitle", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 35.6);
+        tl.fromTo("#board", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 35.7);
+        // a couple of mundane cards populate + a card advances
+        const mk = (col, top, t, sub, title) => {
+          const c = document.querySelectorAll("#board .col")[col];
+          const card = document.createElement("div"); card.className = "card";
+          card.innerHTML = `<div class="ct">${sub}</div>${title}`;
+          card.style.opacity = "0"; c.appendChild(card);
+          tl.fromTo(card, { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.4 }, t);
+        };
+        mk(0, 0, 36.1, "Ziel 0481", "Funkmast Nord");
+        mk(1, 0, 36.4, "Ziel 0479", "Lagerhalle B");
+        mk(2, 0, 36.7, "Ziel 0463", "Konvoi 12");
+        mk(3, 0, 37.0, "Ziel 0455", "Brücke Süd");
+        mk(3, 0, 37.6, "Ziel 0450", "Depot West");
+
+        // ===== H — schneller, abstrakter (39.0 – 42.0) =====
+        tl.set("#sH", { opacity: 1 }, 39.0);
+        const sls = [["#sl1", 0.86], ["#sl2", 0.78], ["#sl3", 0.7]];
+        sls.forEach((s, i) => {
+          const f = document.querySelector(s[0] + " .slf");
+          const k = document.querySelector(s[0] + " .slk");
+          tl.fromTo(s[0], { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.4 }, 39.1 + i * 0.2);
+          tl.fromTo(f, { width: "0%" }, { width: (s[1] * 100) + "%", duration: 0.7, ease: "power2.out" }, 39.3 + i * 0.2);
+          tl.fromTo(k, { left: "0%" }, { left: (s[1] * 100) + "%", duration: 0.7, ease: "power2.out" }, 39.3 + i * 0.2);
+        });
+        tl.to("#sH", { opacity: 0, duration: 0.4 }, 41.8);
+
+        // ===== I — Schule / Kollateralschaden (42.0 – 49.0) =====
+        tl.set("#sI", { opacity: 1 }, 41.9);
+        // school card slides across the board (col1 -> col4) then becomes the photo
+        const sc = document.createElement("div"); sc.id = "schoolCardInner"; sc.className = "card";
+        sc.innerHTML = `<div class="ct">Ziel — Binab</div>Mädchenschule`;
+        const scWrap = document.createElement("div"); scWrap.id = "schoolCard"; scWrap.appendChild(sc);
+        document.getElementById("sI").appendChild(scWrap);
+        gsap.set(scWrap, { left: 200, top: 642, opacity: 0 });
+        tl.set("#board", { opacity: 0.4 }, 41.9);          // dim board behind
+        tl.set("#boardTitle", { opacity: 0.4 }, 41.9);
+        tl.fromTo(scWrap, { opacity: 0, x: 0 }, { opacity: 1, duration: 0.4 }, 42.0);
+        tl.to(scWrap, { left: 1380, duration: 1.3, ease: "power2.inOut" }, 42.4);   // -> abgeschlossen column
+        tl.fromTo("#schoolTag", { opacity: 0, scale: 1.1 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 44.0);
+        // reveal school photo
+        tl.to(["#board", "#boardTitle"], { opacity: 0, duration: 0.5 }, 44.6);
+        tl.to(scWrap, { opacity: 0, duration: 0.4 }, 44.6);
+        tl.set("#sG", { opacity: 0 }, 45.0);
+        tl.fromTo("#schoolPhoto", { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power2.out" }, 44.7);
+        tl.set("#schoolTag", { clearProps: "scale" }, 44.7);
+        tl.to("#schoolTag", { top: 250, duration: 0.01 }, 44.7);
+        tl.fromTo("#respLine", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 45.6);
+        // final question
+        tl.fromTo("#finalDim", { opacity: 0 }, { opacity: 1, duration: 0.7, ease: "power2.inOut" }, 46.4);
+        tl.fromTo("#finalQ", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out" }, 46.8);
+
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>
