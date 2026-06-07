@@ -37,8 +37,8 @@
       #dNum { position: absolute; left: 0; right: 0; top: 224px; text-align: center; font-weight: 800; font-size: 86px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
       #dNum .hl { color: var(--red); }
       #dSub { position: absolute; left: 0; right: 0; top: 332px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 15px; color: var(--muted); }
-      .gridbox { position: absolute; left: 50%; top: 384px; margin-left: -298px; display: grid; grid-template-columns: repeat(50, 7px); gap: 5px; }
-      .pd2 { width: 7px; height: 7px; border-radius: 2px; background: var(--red); }
+      .gridbox { position: absolute; left: 50%; top: 392px; margin-left: -448px; display: grid; grid-template-columns: repeat(100, 5px); gap: 4px; }
+      .pd2 { width: 5px; height: 5px; border-radius: 1px; background: var(--red); }
       #dKick { position: absolute; left: 0; right: 0; top: 832px; text-align: center; font-weight: 700; font-size: 32px; letter-spacing: -0.01em; }
     </style>
   </head>
@@ -87,7 +87,7 @@
         window.__timelines = window.__timelines || {};
 
         // build the 1.700-dot grids (50 cols x 34 rows = 1700)
-        const N = 1700;
+        const N = 3700;
         const gs = document.getElementById("gridSolid");
         for (let i = 0; i < N; i++) {
           const a = document.createElement("div"); a.className = "pd2"; gs.appendChild(a);
@@ -127,10 +127,10 @@
         // ===== D — 1.700 Menschen grid (10.0 – 17.0) =====
         tl.set("#s41d", { opacity: 1 }, 10.0);
         tl.fromTo("#dNum", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 10.1);
-        tl.to({ v: 0 }, { v: 1700, duration: 1.4, ease: "power2.out", onUpdate: function(){ document.getElementById("dNumV").textContent = Math.round(this.targets()[0].v).toLocaleString("de-DE"); } }, 10.2);
+        tl.to({ v: 0 }, { v: 3700, duration: 1.4, ease: "power2.out", onUpdate: function(){ document.getElementById("dNumV").textContent = Math.round(this.targets()[0].v).toLocaleString("de-DE"); } }, 10.2);
         tl.fromTo("#dSub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 10.6);
-        // reveal 1700 dots
-        tl.fromTo("#gridSolid .pd2", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power1.out", stagger: { amount: 1.5, from: "center", grid: [34, 50] } }, 10.9);
+        // reveal 3700 dots
+        tl.fromTo("#gridSolid .pd2", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power1.out", stagger: { amount: 1.5, from: "center", grid: [37, 100] } }, 10.9);
         // kicker — machine knew (VO ~13.5): dim the marked grid so the line lands
         tl.fromTo("#dKick", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 13.6);
         tl.to("#gridSolid", { opacity: 0.5, duration: 0.8, ease: "power2.inOut" }, 13.6);
