@@ -14,60 +14,135 @@
       .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 30; }
       .chrome > div { position: absolute; }
       .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+      .sub { position: absolute; inset: 0; }
+      .hl { color: var(--highlight); } .rd { color: var(--red); }
 
+      /* A — map intro */
       #mapZoom { position: absolute; inset: 0; overflow: hidden; z-index: 1; }
       #mapStage { position: absolute; left: 0; top: -4px; width: 1920px; height: 1088px; background: url('../assets/minab-map-warm.jpg') center/cover; transform-origin: 1014px 479px; }
-      #vign { position: absolute; inset: 0; z-index: 10; pointer-events: none; box-shadow: inset 0 0 360px 80px rgba(5,8,15,0.8); background: radial-gradient(ellipse at 53% 44%, transparent 30%, rgba(5,8,15,0.35) 78%); }
-
-      /* Minab marker (inside map stage, zooms with it) */
+      #mapVign { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: radial-gradient(ellipse at 53% 44%, transparent 30%, rgba(5,8,15,0.45) 80%); }
       .mk { position: absolute; left: 1014px; top: 479px; transform: translate(-50%,-50%); }
-      #minabRing { width: 92px; height: 92px; border: 2.5px solid var(--red); border-radius: 50%; box-shadow: 0 0 18px rgba(210,75,75,0.6); }
-      #minabPing { width: 92px; height: 92px; border: 2px solid var(--red); border-radius: 50%; }
-      #minabDot { width: 11px; height: 11px; background: var(--red); border-radius: 50%; box-shadow: 0 0 10px rgba(210,75,75,0.9); }
-      #minabLbl { left: 1014px; top: 533px; transform: translateX(-50%); font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 13px; color: var(--red); }
-
-      /* subtitle system */
-      #subscrim { position: absolute; left: 0; right: 0; bottom: 0; height: 360px; background: linear-gradient(to top, rgba(5,8,15,0.9) 5%, rgba(5,8,15,0.4) 50%, transparent 100%); z-index: 15; }
+      #minabRing { width: 96px; height: 96px; border: 2.5px solid var(--red); border-radius: 50%; box-shadow: 0 0 18px rgba(210,75,75,0.6); }
+      #minabPing { width: 96px; height: 96px; border: 2px solid var(--red); border-radius: 50%; }
+      #minabDot { width: 11px; height: 11px; background: var(--red); border-radius: 50%; }
       #titleWrap { position: absolute; left: 0; right: 0; bottom: 150px; text-align: center; z-index: 20; }
+      #titleScrim { position: absolute; left: 0; right: 0; bottom: 0; height: 360px; background: linear-gradient(to top, rgba(5,8,15,0.9), transparent); z-index: 3; }
       #titleKick { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.24em; font-size: 15px; color: var(--red); margin-bottom: 16px; }
-      #titleMain { font-weight: 800; font-size: 76px; letter-spacing: -0.02em; text-shadow: 0 2px 24px rgba(0,0,0,0.8); }
-      .subt { position: absolute; left: 50%; bottom: 132px; transform: translateX(-50%); width: 1400px; text-align: center; font-weight: 600; font-size: 38px; line-height: 1.32; letter-spacing: -0.01em; text-shadow: 0 2px 20px rgba(0,0,0,0.95); z-index: 20; }
-      .subt .mut { color: var(--muted); }
+      #titleMain { font-weight: 800; font-size: 78px; letter-spacing: -0.02em; text-shadow: 0 2px 24px rgba(0,0,0,0.8); }
+
+      /* shared kicker */
+      .gk { position: absolute; left: 0; right: 0; top: 210px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 16px; color: var(--muted); }
+
+      /* B — three causes */
+      .card { position: absolute; top: 360px; width: 380px; height: 260px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,0.03); }
+      #cardA { left: 330px; } #cardB { left: 770px; } #cardC { left: 1210px; }
+      .card .ic { position: absolute; left: 50%; top: 44px; transform: translateX(-50%); width: 72px; height: 72px; }
+      .card .cl { position: absolute; left: 20px; right: 20px; top: 158px; text-align: center; font-weight: 700; font-size: 26px; letter-spacing: -0.01em; line-height: 1.2; }
+      .card .q { position: absolute; top: 16px; right: 18px; font-weight: 800; font-size: 30px; color: var(--muted); }
+      #scanBox { position: absolute; top: 360px; left: 330px; width: 380px; height: 260px; border: 2.5px solid var(--red); border-radius: 10px; box-shadow: 0 0 24px rgba(210,75,75,0.4); z-index: 4; }
+      #causeLbl { position: absolute; left: 0; right: 0; top: 672px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; font-size: 16px; color: var(--red); }
+
+      /* C — institutions + timeline */
+      #instRow { position: absolute; left: 0; right: 0; top: 330px; display: flex; gap: 40px; justify-content: center; }
+      .inst { width: 420px; border: 1px solid var(--line); border-radius: 8px; padding: 22px 20px; text-align: center; background: rgba(255,255,255,0.03); }
+      .inst .it { font-weight: 700; font-size: 28px; letter-spacing: -0.01em; }
+      .inst .is { margin-top: 8px; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; color: var(--muted); }
+      #tlWrap { position: absolute; left: 160px; right: 0; top: 560px; height: 160px; }
+      #tlLine { position: absolute; left: 0; top: 60px; height: 2px; background: var(--line); transform-origin: left center; }
+      #tlArrow { position: absolute; top: 52px; font-size: 22px; color: var(--muted); }
+      #tlStart { position: absolute; left: 0; top: 76px; font-family: "IBM Plex Mono", monospace; letter-spacing: 0.12em; font-size: 15px; color: var(--ink); }
+      .tlTick { position: absolute; top: 50px; width: 2px; height: 22px; background: var(--muted); }
+      #tlEnd { position: absolute; top: 70px; font-family: "IBM Plex Mono", monospace; letter-spacing: 0.12em; font-size: 22px; color: var(--red); }
+      #tlNote { position: absolute; left: 0; right: 0; top: 760px; text-align: center; font-weight: 600; font-size: 30px; }
+
+      /* D — verflüchtigt */
+      #vWord { position: absolute; left: 0; right: 0; top: 430px; text-align: center; font-weight: 800; font-size: 96px; letter-spacing: -0.02em; }
+      #vWord span { display: inline-block; }
+      #vDash { position: absolute; left: 0; right: 0; top: 460px; text-align: center; font-weight: 800; font-size: 120px; color: var(--red); }
+      #vNote { position: absolute; left: 0; right: 0; top: 620px; text-align: center; font-weight: 600; font-size: 34px; color: var(--muted); }
     </style>
   </head>
   <body>
     <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="18">
+      <!-- A: map intro -->
       <div id="mapZoom">
         <div id="mapStage">
           <div class="mk" id="minabPing"></div>
           <div class="mk" id="minabRing"></div>
           <div class="mk" id="minabDot"></div>
-          <div class="mk" id="minabLbl">Minab</div>
         </div>
       </div>
-      <div id="vign"></div>
-      <div id="subscrim"></div>
-      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div id="mapVign" class="hid"></div>
+      <div id="titleScrim" class="hid"></div>
+      <div id="titleWrap" class="hid">
+        <div id="titleKick">Iran · 28. Februar 2026</div>
+        <div id="titleMain">Zurück nach <span class="rd">Minab</span>.</div>
+      </div>
 
+      <!-- B: three causes -->
+      <div class="sub hid" id="sB">
+        <div class="gk" id="bKick">Was geschah in Minab?</div>
+        <div class="card" id="cardA">
+          <svg class="ic" viewBox="0 0 72 72" fill="none"><rect x="18" y="18" width="36" height="36" rx="4" stroke="#f4f7fb" stroke-width="3"/><rect x="29" y="29" width="14" height="14" rx="2" fill="#f4f7fb"/><path d="M26 18v-8M36 18v-8M46 18v-8M26 54v8M36 54v8M46 54v8M18 26h-8M18 36h-8M18 46h-8M54 26h8M54 36h8M54 46h8" stroke="#8492a8" stroke-width="3"/></svg>
+          <div class="cl">Fehler der KI</div><div class="q">?</div>
+        </div>
+        <div class="card" id="cardB">
+          <svg class="ic" viewBox="0 0 72 72"><circle cx="36" cy="22" r="14" fill="#f4f7fb"/><path d="M8 70 C8 44 64 44 64 70 Z" fill="#f4f7fb"/></svg>
+          <div class="cl">Menschliche<br/>Kontrolle</div><div class="q">?</div>
+        </div>
+        <div class="card" id="cardC">
+          <svg class="ic" viewBox="0 0 72 72" fill="none"><circle cx="36" cy="36" r="22" stroke="#d24b4b" stroke-width="3"/><path d="M36 6v20M36 46v20M6 36h20M46 36h20" stroke="#d24b4b" stroke-width="3"/><circle cx="36" cy="36" r="4" fill="#d24b4b"/></svg>
+          <div class="cl">Logik des<br/>Krieges</div><div class="q">?</div>
+        </div>
+        <div id="scanBox" class="hid"></div>
+        <div id="causeLbl" class="hid">Ursache: unbestimmt</div>
+      </div>
+
+      <!-- C: institutions + timeline -->
+      <div class="sub hid" id="sC">
+        <div class="gk" id="cKick">Wird untersucht</div>
+        <div id="instRow">
+          <div class="inst" id="inst1"><div class="it">Gerichte</div><div class="is">Verfahren offen</div></div>
+          <div class="inst" id="inst2"><div class="it">Untersuchungs­kommissionen</div><div class="is">Bericht ausstehend</div></div>
+          <div class="inst" id="inst3"><div class="it">Historiker</div><div class="is">noch lange</div></div>
+        </div>
+        <div id="tlWrap">
+          <div id="tlLine"></div>
+          <div id="tlStart">2026</div>
+          <div class="tlTick" id="tk1"></div>
+          <div class="tlTick" id="tk2"></div>
+          <div class="tlTick" id="tk3"></div>
+          <div id="tlArrow">▶</div>
+          <div id="tlEnd">… ?</div>
+        </div>
+        <div id="tlNote" class="hid">Ein Ende ist nicht in Sicht.</div>
+      </div>
+
+      <!-- D: verflüchtigt -->
+      <div class="sub hid" id="sD">
+        <div id="vWord">VERANTWORTUNG</div>
+        <div id="vDash" class="hid">—</div>
+        <div id="vNote" class="hid">ohne abschließende Antwort.</div>
+      </div>
+
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
       <div class="chrome">
-        <div class="c-tl mono">Minab · Hormozgan</div>
+        <div class="c-tl mono">Minab — ungeklärt</div>
         <div class="c-tr mono">KI-Krieg 2.0</div>
         <div class="c-br mono" id="tc">12:20</div>
       </div>
-
-      <div id="titleWrap" class="hid">
-        <div id="titleKick">Iran · 28. Februar 2026</div>
-        <div id="titleMain">Zurück nach <span style="color:var(--red)">Minab</span>.</div>
-      </div>
-
-      <div class="subt hid" id="su1">War es ein Fehler der <span class="mut">KI</span>? Ein Fehler menschlicher <span class="mut">Kontrolle</span>?<br/>Oder schlicht die grausame Logik des Krieges?</div>
-      <div class="subt hid" id="su2">Gerichte, Untersuchungskommissionen, Historiker —<br/>das wird sie noch lange beschäftigen.</div>
-      <div class="subt hid" id="su3">Wahrscheinlich ohne abschließende Antwort.<br/>Die Verantwortung <span style="color:var(--red)">verflüchtigt</span> sich.</div>
 
       <audio id="vo" src="../audio/voiceover.m4a" data-start="0" data-duration="18" data-media-start="740.6" data-track-index="2"></audio>
 
       <script>
         window.__timelines = window.__timelines || {};
+
+        // split VERANTWORTUNG into letters for the dissolve
+        const vw = document.getElementById("vWord");
+        const letters = vw.textContent.split("");
+        vw.textContent = "";
+        letters.forEach((ch) => { const s = document.createElement("span"); s.textContent = ch; vw.appendChild(s); });
+
         const tl = gsap.timeline({ paused: true });
 
         // timecode (12:20 -> 12:38)
@@ -77,26 +152,64 @@
         } }, 0);
         tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
 
-        // slow dramatic zoom toward Minab (the spine)
-        tl.fromTo("#mapZoom", { opacity: 0 }, { opacity: 1, duration: 1.0 }, 0.0);
-        tl.fromTo("#mapStage", { scale: 1.05 }, { scale: 2.45, duration: 18, ease: "power1.in", transformOrigin: "1014px 479px" }, 0.0);
+        // ===== A — map intro (0 – 2.4) =====
+        tl.set(["#mapVign", "#titleScrim"], { opacity: 1 }, 0.0);
+        tl.fromTo("#mapZoom", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.0);
+        tl.fromTo("#mapStage", { scale: 1.18 }, { scale: 1.6, duration: 2.6, ease: "power1.out", transformOrigin: "1014px 479px" }, 0.0);
+        tl.fromTo(["#minabRing", "#minabDot"], { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)", transformOrigin: "center" }, 0.4);
+        tl.fromTo("#minabPing", { opacity: 0.7, scale: 1 }, { opacity: 0, scale: 2.4, duration: 1.6, ease: "power1.out", repeat: 1, transformOrigin: "center" }, 0.5);
+        tl.fromTo("#titleWrap", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 0.4);
+        // hard-ish cut away from the map
+        tl.to(["#mapZoom", "#mapVign", "#titleScrim", "#titleWrap"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 2.2);
 
-        // Minab marker pulses (opacity) + radar ping
-        tl.fromTo(["#minabRing", "#minabDot", "#minabLbl"], { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(2)", stagger: 0.08, transformOrigin: "center" }, 0.7);
-        tl.to("#minabRing", { opacity: 0.45, duration: 0.9, ease: "sine.inOut", repeat: -1, yoyo: true }, 1.4);
-        tl.fromTo("#minabPing", { opacity: 0.7, scale: 1 }, { opacity: 0, scale: 2.4, duration: 1.8, ease: "power1.out", repeat: -1, transformOrigin: "center" }, 1.0);
+        // ===== B — three causes (2.4 – 8.0) =====
+        tl.set("#sB", { opacity: 1 }, 2.4);
+        tl.fromTo("#bKick", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 2.5);
+        tl.fromTo("#cardA", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 2.8);
+        tl.fromTo("#cardB", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 3.1);
+        tl.fromTo("#cardC", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 3.4);
+        // scanner jumps between the three, never settling
+        tl.set("#scanBox", { opacity: 1 }, 4.0);
+        tl.fromTo("#scanBox", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 4.0);
+        tl.to("#scanBox", { left: 1210, duration: 0.5, ease: "power2.inOut" }, 4.6);
+        tl.to("#scanBox", { left: 770, duration: 0.5, ease: "power2.inOut" }, 5.4);
+        tl.to("#scanBox", { left: 330, duration: 0.5, ease: "power2.inOut" }, 6.2);
+        tl.to("#scanBox", { left: 1210, duration: 0.5, ease: "power2.inOut" }, 6.9);
+        tl.fromTo("#causeLbl", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 5.0);
+        tl.to("#sB", { opacity: 0, duration: 0.45, ease: "power2.in" }, 7.7);
 
-        // title
-        tl.fromTo("#titleWrap", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out" }, 0.5);
-        tl.to("#titleWrap", { opacity: 0, y: -16, duration: 0.5, ease: "power2.in" }, 3.6);
+        // ===== C — institutions + timeline (8.0 – 12.0) =====
+        tl.set("#sC", { opacity: 1 }, 8.0);
+        tl.fromTo("#cKick", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 8.1);
+        tl.fromTo(["#inst1", "#inst2", "#inst3"], { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.18, ease: "power3.out" }, 8.3);
+        // timeline draws to the right edge
+        const tlW = 1760;
+        gsap.set("#tlLine", { width: 0 });
+        tl.to("#tlLine", { width: tlW, duration: 1.6, ease: "power2.inOut" }, 9.0);
+        tl.to("#tlArrow", { left: tlW - 6, duration: 1.6, ease: "power2.inOut" }, 9.0);
+        tl.fromTo("#tlStart", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 9.1);
+        [["#tk1", 360], ["#tk2", 760], ["#tk3", 1160]].forEach((t, i) => {
+          gsap.set(t[0], { left: t[1] });
+          tl.fromTo(t[0], { opacity: 0, scaleY: 0 }, { opacity: 1, scaleY: 1, duration: 0.3, transformOrigin: "center" }, 9.4 + i * 0.25);
+        });
+        tl.fromTo("#tlEnd", { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.5 }, 10.6);
+        gsap.set("#tlEnd", { left: tlW + 12 });
+        tl.fromTo("#tlNote", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 10.8);
+        tl.to("#sC", { opacity: 0, duration: 0.45, ease: "power2.in" }, 11.7);
 
-        // subtitles
-        tl.fromTo("#su1", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 4.0);
-        tl.to("#su1", { opacity: 0, duration: 0.45, ease: "power2.in" }, 7.4);
-        tl.fromTo("#su2", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 7.9);
-        tl.to("#su2", { opacity: 0, duration: 0.45, ease: "power2.in" }, 11.4);
-        tl.fromTo("#su3", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 11.9);
-        tl.to("#su3", { opacity: 0, duration: 0.6, ease: "power2.in" }, 17.3);
+        // ===== D — verflüchtigt (12.0 – 18.0) =====
+        tl.set("#sD", { opacity: 1 }, 12.0);
+        tl.fromTo("#vWord span", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.03, ease: "power3.out" }, 12.1);
+        // dissolve / evaporate upward, staggered & jittered
+        const sp = gsap.utils.toArray("#vWord span");
+        sp.forEach((el) => {
+          const dx = (Math.random() - 0.5) * 80;
+          const dy = -120 - Math.random() * 120;
+          const rot = (Math.random() - 0.5) * 60;
+          tl.to(el, { x: dx, y: dy, rotation: rot, opacity: 0, filter: "blur(6px)", duration: 1.6, ease: "power2.in" }, 14.2 + Math.random() * 0.7);
+        });
+        tl.fromTo("#vDash", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(2)", transformOrigin: "center" }, 16.3);
+        tl.fromTo("#vNote", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 16.6);
 
         window.__timelines["main"] = tl;
       </script>
