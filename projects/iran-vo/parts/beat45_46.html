@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --red: #d24b4b; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #04060b; font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.05; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 30; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+
+      .iml { position: absolute; inset: 0; overflow: hidden; z-index: 1; }
+      .imstage { position: absolute; inset: -2px; background-size: cover; background-position: center; }
+      #im1 .imstage { background-image: url('../assets/minab-rubble-styled.jpg'); }
+      #im2 .imstage { background-image: url('../assets/minab-graves-styled.jpg'); }
+      #im3 .imstage { background-image: url('../assets/minab-flag-styled.jpg'); }
+
+      #vign { position: absolute; inset: 0; z-index: 10; pointer-events: none; background: radial-gradient(ellipse at 50% 46%, transparent 38%, rgba(4,6,11,0.5) 86%); }
+      #subscrim { position: absolute; left: 0; right: 0; bottom: 0; height: 380px; background: linear-gradient(to top, rgba(4,6,11,0.92) 6%, rgba(4,6,11,0.42) 52%, transparent 100%); z-index: 15; }
+      #topscrim { position: absolute; left: 0; right: 0; top: 0; height: 160px; background: linear-gradient(to bottom, rgba(4,6,11,0.7), transparent); z-index: 15; }
+
+      .subt { position: absolute; left: 50%; bottom: 134px; transform: translateX(-50%); width: 1440px; text-align: center; font-weight: 600; font-size: 38px; line-height: 1.32; letter-spacing: -0.01em; text-shadow: 0 2px 20px rgba(0,0,0,0.95); z-index: 20; }
+      .subt .k { display: block; font-family: "IBM Plex Mono", monospace; font-weight: 400; text-transform: uppercase; letter-spacing: 0.2em; font-size: 15px; color: var(--muted); margin-bottom: 14px; }
+      .subt .hl { color: var(--highlight); } .subt .rd { color: var(--red); }
+
+      #finalDim { position: absolute; inset: 0; background: #04060b; z-index: 35; }
+      #finalQ { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 1480px; text-align: center; font-weight: 800; font-size: 62px; line-height: 1.18; letter-spacing: -0.02em; z-index: 36; }
+      #finalQ .rd { color: var(--red); }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="32">
+      <div class="iml hid" id="im1"><div class="imstage"></div></div>
+      <div class="iml hid" id="im2"><div class="imstage"></div></div>
+      <div class="iml hid" id="im3"><div class="imstage"></div></div>
+
+      <div id="vign"></div>
+      <div id="topscrim"></div>
+      <div id="subscrim"></div>
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+
+      <div class="chrome">
+        <div class="c-tl mono">Was wir wissen</div>
+        <div class="c-tr mono">KI-Krieg 2.0</div>
+        <div class="c-br mono" id="tc">12:38</div>
+      </div>
+
+      <div class="subt hid" id="su1"><span class="k">Was wir wissen</span>Die Technologie ist da.</div>
+      <div class="subt hid" id="su2">Die Kriege, in denen sie eingesetzt wird, sind da.</div>
+      <div class="subt hid" id="su3">Das Geld fließt. Die Regeln <span class="rd">fehlen</span>.</div>
+      <div class="subt hid" id="su4">2023 forderten <span class="hl">164 Staaten</span> verbindliche Grenzen.</div>
+      <div class="subt hid" id="su5">Heute schaut die Welt zu —<br/>während die Rüstungsfonds wachsen.</div>
+      <div class="subt hid" id="su6">Das nächste System wird nicht langsamer sein.<br/>Es wird <span class="hl">schneller</span> sein.</div>
+      <div class="subt hid" id="su7">Mehr Ziele. Weniger Zeit pro Entscheidung.</div>
+
+      <div id="finalDim" class="hid"></div>
+      <div id="finalQ" class="hid">Die Frage ist nicht, ob wir diese Debatte führen wollen —<br/>sondern ob wir sie noch <span class="rd">rechtzeitig</span> führen.</div>
+
+      <audio id="vo" src="../audio/voiceover.m4a" data-start="0" data-duration="32" data-media-start="758.6" data-track-index="2"></audio>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+
+        // timecode (12:38 -> 13:10)
+        tl.to({ p: 0 }, { p: 1, duration: 32, ease: "none", onUpdate: function () {
+          const t = 758.6 + 32 * this.targets()[0].p; const m = Math.floor(t/60), s = Math.floor(t%60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+        tl.from(".chrome > div", { opacity: 0, duration: 0.8, stagger: 0.06 }, 0.2);
+
+        // ---- IMG1 rubble/rescuers (0 - 8) ----
+        tl.set("#im1", { opacity: 1 }, 0.0);
+        tl.fromTo("#im1", { opacity: 0 }, { opacity: 1, duration: 1.0 }, 0.0);
+        tl.fromTo("#im1 .imstage", { scale: 1.06 }, { scale: 1.52, duration: 9.5, ease: "none", transformOrigin: "52% 46%" }, 0.0);
+
+        // ---- IMG2 graves (7 - 18.5) ----
+        tl.set("#im2", { opacity: 1 }, 6.9);
+        tl.fromTo("#im2", { opacity: 0 }, { opacity: 1, duration: 1.1 }, 6.9);
+        tl.fromTo("#im2 .imstage", { scale: 1.05 }, { scale: 1.42, duration: 12.5, ease: "none", transformOrigin: "50% 42%" }, 6.9);
+        tl.to("#im1", { opacity: 0, duration: 1.1 }, 6.9);
+
+        // ---- IMG3 flag on rubble (17.5 - 26) ----
+        tl.set("#im3", { opacity: 1 }, 17.4);
+        tl.fromTo("#im3", { opacity: 0 }, { opacity: 1, duration: 1.1 }, 17.4);
+        tl.fromTo("#im3 .imstage", { scale: 1.08 }, { scale: 1.3, duration: 9.0, ease: "none", transformOrigin: "42% 52%" }, 17.4);
+        tl.to("#im2", { opacity: 0, duration: 1.1 }, 17.4);
+
+        // ---- subtitles ----
+        const sub = (id, tin, tout) => {
+          tl.fromTo(id, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.55, ease: "expo.out" }, tin);
+          tl.to(id, { opacity: 0, duration: 0.4, ease: "power2.in" }, tout);
+        };
+        sub("#su1", 0.4, 2.8);     // Technologie ist da
+        sub("#su2", 3.1, 5.8);     // Kriege sind da
+        sub("#su3", 6.1, 8.4);     // Geld fließt, Regeln fehlen
+        sub("#su4", 8.8, 12.6);    // 164 Staaten
+        sub("#su5", 13.0, 18.6);   // Welt schaut zu / Rüstungsfonds
+        sub("#su6", 19.0, 22.6);   // nächstes System schneller
+        sub("#su7", 23.0, 25.6);   // mehr Ziele weniger Zeit
+
+        // ---- final question (26 - 32) ----
+        tl.to("#im3", { opacity: 0.16, duration: 1.2, ease: "power2.inOut" }, 25.6);
+        tl.fromTo("#finalDim", { opacity: 0 }, { opacity: 0.9, duration: 1.2, ease: "power2.inOut" }, 25.6);
+        tl.fromTo("#finalQ", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 1.0, ease: "expo.out" }, 26.4);
+        tl.fromTo("#finalQ .rd", { color: "#f4f7fb" }, { color: "#d24b4b", duration: 0.6 }, 27.6);
+
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>
