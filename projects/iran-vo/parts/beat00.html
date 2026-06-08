@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #070c16; --ink: #f4f7fb; --muted: #8492a8; --highlight: #ffd60a; --line: rgba(255,255,255,0.22); --red: #d24b4b; --sea: #5f7fa8; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+      .hid { opacity: 0; }
+      .grain { position: absolute; inset: 0; opacity: 0.05; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
+      #vign { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, transparent 42%, rgba(3,5,10,0.8) 92%); }
+
+      /* lat/long graticule */
+      #grid { position: absolute; inset: 0; z-index: 1; opacity: 0; background-image:
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 96px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 96px); }
+
+      /* chrome */
+      .chrome { position: absolute; inset: 0; font-size: 14px; z-index: 30; }
+      .chrome > div { position: absolute; }
+      .c-tl { top: 46px; left: 64px; } .c-tr { top: 46px; right: 64px; text-align: right; } .c-br { bottom: 46px; right: 64px; text-align: right; }
+
+      /* status + coordinate readout */
+      #status { position: absolute; left: 0; right: 0; top: 92px; text-align: center; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.28em; font-size: 14px; color: var(--red); z-index: 30; }
+      #coords { position: absolute; left: 0; right: 0; bottom: 92px; text-align: center; font-family: "IBM Plex Mono", monospace; letter-spacing: 0.18em; font-size: 15px; color: var(--muted); z-index: 30; }
+
+      /* reticle corner brackets */
+      .ret { position: absolute; width: 42px; height: 42px; border: 2px solid var(--red); z-index: 25; opacity: 0; }
+      #r1 { left: 470px; top: 150px; border-right: 0; border-bottom: 0; }
+      #r2 { right: 470px; top: 150px; border-left: 0; border-bottom: 0; }
+      #r3 { left: 470px; bottom: 150px; border-right: 0; border-top: 0; }
+      #r4 { right: 470px; bottom: 150px; border-left: 0; border-top: 0; }
+
+      /* map */
+      #mapWrap { position: absolute; inset: 0; z-index: 10; transform-origin: 943px 540px; }
+      #map { position: absolute; left: 530px; top: 110px; width: 860px; height: 860px; overflow: visible; }
+      #borderGhost { fill: none; stroke: rgba(210,75,75,0.16); stroke-width: 3; }
+      #borderPath { fill: none; stroke: var(--red); stroke-width: 3.5; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 0 7px rgba(210,75,75,0.75)); }
+      #iranFill { fill: rgba(210,75,75,0.12); stroke: none; opacity: 0; }
+
+      .nb { position: absolute; z-index: 11; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 14px; color: var(--muted); white-space: nowrap; opacity: 0; }
+      .nb.sea { color: var(--sea); font-style: italic; }
+
+      #iranLbl { position: absolute; left: 0; right: 0; top: 498px; text-align: center; z-index: 12; font-weight: 800; font-size: 76px; letter-spacing: 0.14em; color: var(--ink); text-shadow: 0 2px 30px rgba(0,0,0,0.7); opacity: 0; }
+
+      #minabDot { position: absolute; left: 1110px; top: 827px; width: 12px; height: 12px; margin: -6px 0 0 -6px; background: var(--red); border-radius: 50%; box-shadow: 0 0 12px rgba(210,75,75,0.9); z-index: 14; opacity: 0; }
+      #minabPing { position: absolute; left: 1110px; top: 827px; width: 12px; height: 12px; margin: -6px 0 0 -6px; border: 2px solid var(--red); border-radius: 50%; z-index: 13; opacity: 0; }
+      #minabLbl { position: absolute; left: 1132px; top: 815px; z-index: 14; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 15px; color: var(--ink); opacity: 0; }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="7">
+      <div id="grid"></div>
+      <div id="vign"></div>
+
+      <div id="r1" class="ret"></div><div id="r2" class="ret"></div><div id="r3" class="ret"></div><div id="r4" class="ret"></div>
+
+      <div id="mapWrap">
+        <svg id="map" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet">
+          <path id="iranFill" d="M510.9 213.8 L556.6 201.1 L593.6 163.5 L628.5 165.4 L651.3 153.1 L688.3 159.2 L745.9 192.6 L787.5 199.7 L847.0 257.5 L885.8 259.8 L890.4 314.0 L869.1 393.2 L854.8 438.9 L877.5 448.1 L855.2 482.2 L872.3 531.6 L876.4 570.5 L915.8 580.8 L920.1 619.9 L872.8 674.6 L898.6 706.0 L919.6 742.0 L969.3 768.0 L970.8 819.9 L995.7 829.4 L1000.0 856.3 L924.9 886.3 L905.3 953.4 L807.3 936.0 L750.6 922.8 L691.8 915.3 L669.6 844.0 L644.7 833.7 L604.7 844.1 L552.2 872.3 L488.6 853.0 L436.0 808.0 L385.9 791.3 L351.1 735.1 L312.7 655.4 L284.7 665.2 L251.6 645.2 L232.1 668.7 L203.3 637.0 L202.8 604.8 L186.2 604.8 L194.7 560.6 L167.9 513.9 L104.1 480.0 L68.1 420.7 L80.1 371.4 L106.3 349.5 L102.4 312.2 L68.3 293.0 L34.5 215.6 L6.1 163.0 L16.3 142.5 L0.0 65.8 L35.7 46.6 L43.9 72.0 L70.2 103.0 L105.9 111.9 L124.8 109.9 L186.2 60.4 L205.7 55.4 L221.1 75.2 L203.1 108.4 L235.6 143.2 L248.6 139.9 L265.0 188.6 L314.4 202.3 L350.5 235.0 L424.6 246.2 L505.9 229.0 L510.9 213.8 Z" />
+          <path id="borderGhost" d="M510.9 213.8 L556.6 201.1 L593.6 163.5 L628.5 165.4 L651.3 153.1 L688.3 159.2 L745.9 192.6 L787.5 199.7 L847.0 257.5 L885.8 259.8 L890.4 314.0 L869.1 393.2 L854.8 438.9 L877.5 448.1 L855.2 482.2 L872.3 531.6 L876.4 570.5 L915.8 580.8 L920.1 619.9 L872.8 674.6 L898.6 706.0 L919.6 742.0 L969.3 768.0 L970.8 819.9 L995.7 829.4 L1000.0 856.3 L924.9 886.3 L905.3 953.4 L807.3 936.0 L750.6 922.8 L691.8 915.3 L669.6 844.0 L644.7 833.7 L604.7 844.1 L552.2 872.3 L488.6 853.0 L436.0 808.0 L385.9 791.3 L351.1 735.1 L312.7 655.4 L284.7 665.2 L251.6 645.2 L232.1 668.7 L203.3 637.0 L202.8 604.8 L186.2 604.8 L194.7 560.6 L167.9 513.9 L104.1 480.0 L68.1 420.7 L80.1 371.4 L106.3 349.5 L102.4 312.2 L68.3 293.0 L34.5 215.6 L6.1 163.0 L16.3 142.5 L0.0 65.8 L35.7 46.6 L43.9 72.0 L70.2 103.0 L105.9 111.9 L124.8 109.9 L186.2 60.4 L205.7 55.4 L221.1 75.2 L203.1 108.4 L235.6 143.2 L248.6 139.9 L265.0 188.6 L314.4 202.3 L350.5 235.0 L424.6 246.2 L505.9 229.0 L510.9 213.8 Z" />
+          <path id="borderPath" d="M510.9 213.8 L556.6 201.1 L593.6 163.5 L628.5 165.4 L651.3 153.1 L688.3 159.2 L745.9 192.6 L787.5 199.7 L847.0 257.5 L885.8 259.8 L890.4 314.0 L869.1 393.2 L854.8 438.9 L877.5 448.1 L855.2 482.2 L872.3 531.6 L876.4 570.5 L915.8 580.8 L920.1 619.9 L872.8 674.6 L898.6 706.0 L919.6 742.0 L969.3 768.0 L970.8 819.9 L995.7 829.4 L1000.0 856.3 L924.9 886.3 L905.3 953.4 L807.3 936.0 L750.6 922.8 L691.8 915.3 L669.6 844.0 L644.7 833.7 L604.7 844.1 L552.2 872.3 L488.6 853.0 L436.0 808.0 L385.9 791.3 L351.1 735.1 L312.7 655.4 L284.7 665.2 L251.6 645.2 L232.1 668.7 L203.3 637.0 L202.8 604.8 L186.2 604.8 L194.7 560.6 L167.9 513.9 L104.1 480.0 L68.1 420.7 L80.1 371.4 L106.3 349.5 L102.4 312.2 L68.3 293.0 L34.5 215.6 L6.1 163.0 L16.3 142.5 L0.0 65.8 L35.7 46.6 L43.9 72.0 L70.2 103.0 L105.9 111.9 L124.8 109.9 L186.2 60.4 L205.7 55.4 L221.1 75.2 L203.1 108.4 L235.6 143.2 L248.6 139.9 L265.0 188.6 L314.4 202.3 L350.5 235.0 L424.6 246.2 L505.9 229.0 L510.9 213.8 Z" />
+        </svg>
+
+        <div class="nb sea" style="left:640px; top:163px;">Kaspisches Meer</div>
+        <div class="nb" style="left:430px; top:240px;">Türkei</div>
+        <div class="nb" style="left:402px; top:460px;">Irak</div>
+        <div class="nb" style="left:1140px; top:225px;">Turkmenistan</div>
+        <div class="nb" style="left:1330px; top:455px;">Afghanistan</div>
+        <div class="nb" style="left:1360px; top:742px;">Pakistan</div>
+        <div class="nb sea" style="left:556px; top:922px;">Persischer Golf</div>
+        <div class="nb sea" style="left:1082px; top:930px;">Golf von Oman</div>
+
+        <div id="iranLbl">IRAN</div>
+
+        <div id="minabPing"></div>
+        <div id="minabDot"></div>
+        <div id="minabLbl">Minab</div>
+      </div>
+
+      <div id="status">Geo-Lokalisierung</div>
+      <div id="coords"><span id="lat">00.0° N</span> &nbsp;·&nbsp; <span id="lon">00.0° O</span></div>
+
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      <div class="chrome">
+        <div class="c-tl mono">Standort</div>
+        <div class="c-tr mono">Naher Osten</div>
+        <div class="c-br mono" id="tc">00:00</div>
+      </div>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        const bp = document.getElementById("borderPath");
+        const L = bp.getTotalLength();
+        bp.style.strokeDasharray = L; bp.style.strokeDashoffset = L;
+        const latEl = document.getElementById("lat"), lonEl = document.getElementById("lon");
+
+        const tl = gsap.timeline({ paused: true });
+
+        // timecode 00:00 -> 00:07
+        tl.to({ p: 0 }, { p: 1, duration: 7, ease: "none", onUpdate: function () {
+          const t = 7 * this.targets()[0].p; const m = Math.floor(t/60), s = Math.floor(t%60);
+          document.getElementById("tc").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        } }, 0);
+
+        // ===== approach: grid + chrome + reticle (0 – 1.6) =====
+        tl.from(".chrome > div", { opacity: 0, duration: 0.7, stagger: 0.06 }, 0.1);
+        tl.to("#grid", { opacity: 1, duration: 0.9, ease: "power2.out" }, 0.1);
+        tl.fromTo("#status", { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: 0.6 }, 0.3);
+        tl.fromTo("#coords", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.3);
+        tl.fromTo(".ret", { opacity: 0, scale: 1.5 }, { opacity: 0.9, scale: 1, duration: 0.6, ease: "power2.out", stagger: 0.05, transformOrigin: "center" }, 0.5);
+        // coordinate readout counts in, settling on Iran's centroid
+        tl.to({ a: 18.2, o: 71.5 }, { a: 32.4, o: 53.7, duration: 1.5, ease: "power2.out", onUpdate: function () {
+          const t = this.targets()[0];
+          latEl.textContent = t.a.toFixed(1) + "° N"; lonEl.textContent = t.o.toFixed(1) + "° O";
+        } }, 0.4);
+
+        // ===== border draws on (0.9 – 3.9) =====
+        tl.fromTo("#mapWrap", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, 0.8);
+        tl.fromTo("#borderGhost", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.9);
+        tl.to("#borderPath", { strokeDashoffset: 0, duration: 2.6, ease: "power1.inOut" }, 1.0);
+
+        // neighbour labels fade in while the border traces
+        tl.to(".nb", { opacity: 1, duration: 0.6, stagger: 0.12, ease: "power2.out" }, 1.4);
+
+        // ===== confirm: fill + IRAN + reticle release (3.7 – 5.0) =====
+        tl.to(".ret", { opacity: 0, duration: 0.5 }, 3.6);
+        tl.to("#iranFill", { opacity: 1, duration: 0.9, ease: "power2.out" }, 3.7);
+        tl.to("#status", { opacity: 0, duration: 0.3 }, 3.7);
+        tl.add(() => { document.getElementById("status").textContent = "Zielregion bestätigt"; }, 4.0);
+        tl.to("#status", { opacity: 1, duration: 0.4 }, 4.05);
+        tl.fromTo("#iranLbl", { opacity: 0, scale: 1.18, letterSpacing: "0.5em" }, { opacity: 1, scale: 1, letterSpacing: "0.14em", duration: 0.8, ease: "power3.out", transformOrigin: "center" }, 4.0);
+
+        // ===== Minab marker as a foreshadow (5.0 – 6.3) =====
+        tl.fromTo(["#minabDot"], { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2.5)", transformOrigin: "center" }, 5.1);
+        tl.fromTo("#minabPing", { opacity: 0.8, scale: 1 }, { opacity: 0, scale: 3.2, duration: 1.5, ease: "power1.out", repeat: 1, transformOrigin: "center" }, 5.2);
+        tl.fromTo("#minabLbl", { opacity: 0, x: -6 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 5.4);
+
+        // gentle settle / hold to end
+        tl.to("#mapWrap", { scale: 1.02, duration: 1.6, ease: "sine.inOut" }, 5.4);
+
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>
