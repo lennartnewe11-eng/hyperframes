@@ -6,37 +6,41 @@
     <script src="../gsap.min.js"></script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      :root { --bg-0: #04060b; --ink: #f4f7fb; --muted: #8492a8; --glow1: rgba(255,150,50,0.95); --glow2: rgba(255,120,30,0.7); --glow3: rgba(255,95,20,0.45); }
+      :root { --bg-0: #04060b; --ink: #f4f7fb; --muted: #97a3b6;
+        --gw1: rgba(255,248,235,0.95); --gw2: rgba(255,243,224,0.6); --gw3: rgba(255,238,214,0.4); --gw4: rgba(255,235,206,0.22); }
       html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
       .grain { position: absolute; inset: 0; opacity: 0.05; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
 
-      /* mosaic video-wall */
-      #wallClip { position: absolute; inset: 0; overflow: hidden; z-index: 1; }
-      #wall { position: absolute; left: 960px; top: 540px; width: 2600px; height: 1600px; margin: -800px 0 0 -1300px; transform-origin: center center; }
-      .tile { position: absolute; background-size: cover; background-position: center; background-color: #0a0f18; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04); will-change: transform, opacity; }
-      .tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,6,11,0.1), rgba(4,6,11,0.45)); }
+      /* 3D fly-through */
+      #stage { position: absolute; inset: 0; overflow: hidden; z-index: 1; perspective: 1100px; perspective-origin: 50% 50%; }
+      #world { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; }
+      .card { position: absolute; left: 50%; top: 50%; background-size: cover; background-position: center;
+        background-color: #0a0f18; transform-style: flat; will-change: opacity, transform;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.06); }
+      .card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,6,11,0.05), rgba(4,6,11,0.4)); }
 
-      /* darkening layer so the words read over the wall */
-      #dim { position: absolute; inset: 0; z-index: 2; background: radial-gradient(ellipse at 50% 50%, rgba(4,6,11,0.55) 0%, rgba(4,6,11,0.82) 70%, rgba(4,6,11,0.95) 100%); opacity: 0; }
+      /* darkening so words read over the flow */
+      #dim { position: absolute; inset: 0; z-index: 2; pointer-events: none;
+        background: radial-gradient(ellipse at 50% 50%, rgba(4,6,11,0.45) 0%, rgba(4,6,11,0.72) 62%, rgba(4,6,11,0.92) 100%); opacity: 0.42; }
 
-      /* sequential glowing words */
+      /* warm-white glowing words */
       .word { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; z-index: 3;
-        font-weight: 800; font-size: 168px; letter-spacing: -0.02em; color: #fff;
-        text-shadow: 0 0 22px var(--glow1), 0 0 54px var(--glow2), 0 0 110px var(--glow3); opacity: 0; }
+        font-weight: 800; font-size: 176px; letter-spacing: -0.02em; color: #fff;
+        text-shadow: 0 0 16px var(--gw1), 0 0 42px var(--gw2), 0 0 90px var(--gw3), 0 0 150px var(--gw4); opacity: 0; }
 
       /* final channel lockup */
-      #lockup { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); margin-top: -28px; text-align: center; z-index: 4;
-        font-weight: 800; font-size: 104px; letter-spacing: -0.01em; color: #fff;
-        text-shadow: 0 0 22px var(--glow1), 0 0 54px var(--glow2), 0 0 110px var(--glow3); opacity: 0; }
-      #lockup .dot { color: var(--glow1); }
-      #rule { position: absolute; left: 50%; top: 50%; margin: 66px 0 0 -150px; width: 300px; height: 1px; background: rgba(255,255,255,0.28); transform: scaleX(0); transform-origin: center; z-index: 4; }
-      #tag { position: absolute; left: 0; right: 0; top: 50%; margin-top: 96px; text-align: center; z-index: 4;
+      #lockup { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); margin-top: -26px; text-align: center; z-index: 4;
+        font-weight: 800; font-size: 108px; letter-spacing: -0.01em; color: #fff;
+        text-shadow: 0 0 16px var(--gw1), 0 0 42px var(--gw2), 0 0 90px var(--gw3), 0 0 150px var(--gw4); opacity: 0; }
+      #lockup .dot { color: rgba(255,236,210,1); }
+      #rule { position: absolute; left: 50%; top: 50%; margin: 70px 0 0 -150px; width: 300px; height: 1px; background: rgba(255,246,232,0.32); transform: scaleX(0); transform-origin: center; z-index: 4; }
+      #tag { position: absolute; left: 0; right: 0; top: 50%; margin-top: 100px; text-align: center; z-index: 4;
         font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.42em; font-size: 16px; color: var(--muted); opacity: 0; }
     </style>
   </head>
   <body>
-    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="10">
-      <div id="wallClip"><div id="wall"></div></div>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="11.5">
+      <div id="stage"><div id="world"></div></div>
       <div id="dim"></div>
 
       <div class="word" id="wPast">Past.</div>
@@ -52,68 +56,85 @@
       <script>
         window.__timelines = window.__timelines || {};
 
-        // ---- build the mosaic (20 tiles on a 2600x1600 canvas) ----
-        const POOL = [
-          "drone-station-styled.jpg","maven-drone.jpg","minab-flag-styled.jpg","minab-graves-styled.jpg",
-          "minab-map-warm.jpg","minab-rubble-styled.jpg","sarg-styled.jpg","schule-satellit.jpg",
-          "schule-teaser.jpg","schule-vorher-styled.jpg","thiel-styled.jpg","tomahawk-styled.jpg",
-          "tomahawk.jpg","trump.jpg","un-styled.jpg","helsing-styled.jpg","palantir-white.jpg","laptop.jpg",
-        ];
-        const GAP = 5;
-        const ROWS = [
-          { y: 0,    h: 380, w: [520, 420, 640, 500, 520] },
-          { y: 380,  h: 440, w: [640, 460, 520, 420, 560] },
-          { y: 820,  h: 360, w: [480, 560, 420, 620, 520] },
-          { y: 1180, h: 420, w: [560, 440, 640, 460, 500] },
-        ];
-        const wall = document.getElementById("wall");
-        const tileEls = [];
-        let idx = 0;
-        ROWS.forEach((row) => {
-          let x = 0;
-          row.w.forEach((w) => {
-            const el = document.createElement("div");
-            el.className = "tile";
-            el.style.left = (x + GAP) + "px"; el.style.top = (row.y + GAP) + "px";
-            el.style.width = (w - GAP * 2) + "px"; el.style.height = (row.h - GAP * 2) + "px";
-            el.style.backgroundImage = `url('../assets/${POOL[idx % POOL.length]}')`;
-            wall.appendChild(el); tileEls.push(el); x += w; idx++;
-          });
-        });
+        // ---- image pool (17 photos with their aspect ratios) ----
+        const ASPECT = [1.3504,1.4431,1.5,0.8878,1.9076,0.8011,1.2517,1.5626,1.4908,0.6666,1.7734,1.0,1.3333,2.3908,1.0236,1.503,0.64];
+        const IMG = ASPECT.map((_, i) => `../assets/outro/img${String(i + 1).padStart(2, "0")}.jpg`);
 
+        // deterministic RNG so every render is identical
+        function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+        const rnd = mulberry32(20260608);
+        const rr = (lo, hi) => lo + (hi - lo) * rnd();
+
+        // shuffle image order so neighbours in depth differ
+        const order = [...IMG.keys()];
+        for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+
+        // ---- build cards staggered through a deep 3D tunnel ----
+        const NUM = 44, STEP = 270, WB = 540;
+        const world = document.getElementById("world");
+        const CZ = [];                 // each card's base z in world space
+        for (let i = 0; i < NUM; i++) {
+          const ai = order[i % order.length];
+          const asp = ASPECT[ai];
+          const w = WB, h = WB / asp;
+          const z = -260 - i * STEP + rr(-70, 70);
+          // scatter around centre, biased outward; flatten vertically for 16:9
+          const ang = rr(0, Math.PI * 2), rad = rr(160, 1180);
+          const x = Math.cos(ang) * rad, y = Math.sin(ang) * rad * 0.6;
+          const el = document.createElement("div");
+          el.className = "card";
+          el.style.width = w + "px"; el.style.height = h + "px";
+          el.style.marginLeft = -w / 2 + "px"; el.style.marginTop = -h / 2 + "px";
+          el.style.backgroundImage = `url('${IMG[ai]}')`;
+          el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) rotateY(${rr(-13, 13).toFixed(1)}deg) rotateX(${rr(-7, 7).toFixed(1)}deg) rotateZ(${rr(-5, 5).toFixed(1)}deg)`;
+          el.style.opacity = "0";
+          world.appendChild(el);
+          CZ.push(z);
+        }
+        const cards = Array.from(world.children);
+
+        // opacity vs. distance-to-camera (netz): rise from far, hold, fade as it whooshes past
+        function opac(netz) {
+          if (netz < -5400) return 0;
+          if (netz < -3600) return (netz + 5400) / 1800;
+          if (netz < 360) return 1;
+          if (netz < 880) return 1 - (netz - 360) / 520;
+          return 0;
+        }
+
+        const FLY = 8.2, ZT = 12200;
         const tl = gsap.timeline({ paused: true });
 
-        // ---- intro: tiles assemble + wall slow drift throughout ----
-        gsap.set("#wall", { scale: 1.12, x: -40, y: 0, rotation: -0.6 });
-        tl.fromTo(tileEls, { opacity: 0, scale: 0.86 },
-          { opacity: 1, scale: 1, duration: 0.9, ease: "power3.out", stagger: { each: 0.03, from: "center", grid: [4, 5] } }, 0.0);
-        // continuous parallax drift of the whole wall
-        tl.to("#wall", { scale: 1.06, x: 60, y: -30, rotation: 0.6, duration: 9.4, ease: "sine.inOut" }, 0.4);
-        // subtle per-tile breathing
-        tl.to(tileEls, { scale: 1.04, duration: 3.2, ease: "sine.inOut", yoyo: true, repeat: 3,
-          stagger: { each: 0.08, from: "edges", grid: [4, 5] } }, 0.9);
+        // ---- camera flies forward; one onUpdate drives world depth + every card's opacity ----
+        const cam = { z: 0 };
+        tl.to(cam, { z: ZT, duration: FLY, ease: "none", onUpdate: () => {
+          gsap.set("#world", { z: cam.z });
+          for (let i = 0; i < cards.length; i++) cards[i].style.opacity = opac(CZ[i] + cam.z).toFixed(3);
+        } }, 0);
+        // subtle camera sway + bank for a hand-flown feel
+        gsap.set("#world", { z: 0 });
+        tl.fromTo("#stage", { perspectiveOrigin: "47% 53%" }, { perspectiveOrigin: "53% 47%", duration: 11.5, ease: "sine.inOut" }, 0);
+        tl.fromTo("#world", { rotationZ: -1.2 }, { rotationZ: 1.2, duration: 11.5, ease: "sine.inOut" }, 0);
 
-        // ---- dim in so words read ----
-        tl.to("#dim", { opacity: 1, duration: 0.8, ease: "power2.out" }, 0.9);
-
-        // ---- sequential words ----
+        // ---- warm-white words, one after another ----
         function showWord(id, at) {
-          tl.fromTo(id, { opacity: 0, scale: 1.16, filter: "blur(8px)" },
+          tl.fromTo(id, { opacity: 0, scale: 1.14, filter: "blur(9px)" },
             { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.7, ease: "power3.out", transformOrigin: "center" }, at);
-          tl.to(id, { opacity: 0, scale: 0.96, filter: "blur(6px)", duration: 0.55, ease: "power2.in" }, at + 1.55);
+          tl.to(id, { opacity: 0, scale: 0.97, filter: "blur(6px)", duration: 0.55, ease: "power2.in" }, at + 1.6);
+          tl.to("#dim", { opacity: 0.66, duration: 0.5, ease: "power2.out" }, at - 0.1);
+          tl.to("#dim", { opacity: 0.42, duration: 0.6, ease: "power2.inOut" }, at + 1.7);
         }
-        showWord("#wPast", 1.4);
-        showWord("#wPresent", 3.3);
-        showWord("#wFuture", 5.2);
+        showWord("#wPast", 1.7);
+        showWord("#wPresent", 3.7);
+        showWord("#wFuture", 5.7);
 
-        // ---- finale: wall recedes, channel lockup ----
-        tl.to("#dim", { opacity: 1, background: "radial-gradient(ellipse at 50% 50%, rgba(4,6,11,0.9) 0%, rgba(4,6,11,0.98) 60%, #04060b 100%)", duration: 1.0, ease: "power2.inOut" }, 7.0);
-        tl.to("#wall", { scale: 1.4, opacity: 0.1, duration: 1.6, ease: "power2.in" }, 7.0);
-        tl.to(tileEls, { opacity: 0, duration: 1.2, ease: "power2.in", stagger: { each: 0.02, from: "center", grid: [4, 5] } }, 7.0);
-        tl.fromTo("#lockup", { opacity: 0, scale: 1.1, filter: "blur(10px)" },
-          { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.9, ease: "power3.out", transformOrigin: "center" }, 7.6);
-        tl.to("#rule", { scaleX: 1, duration: 0.7, ease: "power3.inOut" }, 8.3);
-        tl.fromTo("#tag", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, 8.5);
+        // ---- finale: flight dissolves to black, channel lockup ----
+        tl.to("#dim", { opacity: 1, duration: 1.1, ease: "power2.inOut" }, 7.4);
+        tl.to("#world", { opacity: 0, duration: 1.3, ease: "power2.in" }, 7.6);
+        tl.fromTo("#lockup", { opacity: 0, scale: 1.09, filter: "blur(10px)" },
+          { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.9, ease: "power3.out", transformOrigin: "center" }, 8.2);
+        tl.to("#rule", { scaleX: 1, duration: 0.7, ease: "power3.inOut" }, 8.9);
+        tl.fromTo("#tag", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, 9.1);
 
         window.__timelines["main"] = tl;
       </script>
