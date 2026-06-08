@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --bg-0: #04060b; --ink: #f4f7fb; --muted: #8492a8; --glow1: rgba(255,150,50,0.95); --glow2: rgba(255,120,30,0.7); --glow3: rgba(255,95,20,0.45); }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-0); font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+      .grain { position: absolute; inset: 0; opacity: 0.05; mix-blend-mode: overlay; pointer-events: none; z-index: 40; }
+
+      /* mosaic video-wall */
+      #wallClip { position: absolute; inset: 0; overflow: hidden; z-index: 1; }
+      #wall { position: absolute; left: 960px; top: 540px; width: 2600px; height: 1600px; margin: -800px 0 0 -1300px; transform-origin: center center; }
+      .tile { position: absolute; background-size: cover; background-position: center; background-color: #0a0f18; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04); will-change: transform, opacity; }
+      .tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,6,11,0.1), rgba(4,6,11,0.45)); }
+
+      /* darkening layer so the words read over the wall */
+      #dim { position: absolute; inset: 0; z-index: 2; background: radial-gradient(ellipse at 50% 50%, rgba(4,6,11,0.55) 0%, rgba(4,6,11,0.82) 70%, rgba(4,6,11,0.95) 100%); opacity: 0; }
+
+      /* sequential glowing words */
+      .word { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; z-index: 3;
+        font-weight: 800; font-size: 168px; letter-spacing: -0.02em; color: #fff;
+        text-shadow: 0 0 22px var(--glow1), 0 0 54px var(--glow2), 0 0 110px var(--glow3); opacity: 0; }
+
+      /* final channel lockup */
+      #lockup { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); margin-top: -28px; text-align: center; z-index: 4;
+        font-weight: 800; font-size: 104px; letter-spacing: -0.01em; color: #fff;
+        text-shadow: 0 0 22px var(--glow1), 0 0 54px var(--glow2), 0 0 110px var(--glow3); opacity: 0; }
+      #lockup .dot { color: var(--glow1); }
+      #rule { position: absolute; left: 50%; top: 50%; margin: 66px 0 0 -150px; width: 300px; height: 1px; background: rgba(255,255,255,0.28); transform: scaleX(0); transform-origin: center; z-index: 4; }
+      #tag { position: absolute; left: 0; right: 0; top: 50%; margin-top: 96px; text-align: center; z-index: 4;
+        font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.42em; font-size: 16px; color: var(--muted); opacity: 0; }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="10">
+      <div id="wallClip"><div id="wall"></div></div>
+      <div id="dim"></div>
+
+      <div class="word" id="wPast">Past.</div>
+      <div class="word" id="wPresent">Present.</div>
+      <div class="word" id="wFuture">Future.</div>
+
+      <div id="lockup">Past<span class="dot">.</span> Present<span class="dot">.</span> Future<span class="dot">.</span></div>
+      <div id="rule"></div>
+      <div id="tag">Danke fürs Zuschauen</div>
+
+      <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+
+        // ---- build the mosaic (20 tiles on a 2600x1600 canvas) ----
+        const POOL = [
+          "drone-station-styled.jpg","maven-drone.jpg","minab-flag-styled.jpg","minab-graves-styled.jpg",
+          "minab-map-warm.jpg","minab-rubble-styled.jpg","sarg-styled.jpg","schule-satellit.jpg",
+          "schule-teaser.jpg","schule-vorher-styled.jpg","thiel-styled.jpg","tomahawk-styled.jpg",
+          "tomahawk.jpg","trump.jpg","un-styled.jpg","helsing-styled.jpg","palantir-white.jpg","laptop.jpg",
+        ];
+        const GAP = 5;
+        const ROWS = [
+          { y: 0,    h: 380, w: [520, 420, 640, 500, 520] },
+          { y: 380,  h: 440, w: [640, 460, 520, 420, 560] },
+          { y: 820,  h: 360, w: [480, 560, 420, 620, 520] },
+          { y: 1180, h: 420, w: [560, 440, 640, 460, 500] },
+        ];
+        const wall = document.getElementById("wall");
+        const tileEls = [];
+        let idx = 0;
+        ROWS.forEach((row) => {
+          let x = 0;
+          row.w.forEach((w) => {
+            const el = document.createElement("div");
+            el.className = "tile";
+            el.style.left = (x + GAP) + "px"; el.style.top = (row.y + GAP) + "px";
+            el.style.width = (w - GAP * 2) + "px"; el.style.height = (row.h - GAP * 2) + "px";
+            el.style.backgroundImage = `url('../assets/${POOL[idx % POOL.length]}')`;
+            wall.appendChild(el); tileEls.push(el); x += w; idx++;
+          });
+        });
+
+        const tl = gsap.timeline({ paused: true });
+
+        // ---- intro: tiles assemble + wall slow drift throughout ----
+        gsap.set("#wall", { scale: 1.12, x: -40, y: 0, rotation: -0.6 });
+        tl.fromTo(tileEls, { opacity: 0, scale: 0.86 },
+          { opacity: 1, scale: 1, duration: 0.9, ease: "power3.out", stagger: { each: 0.03, from: "center", grid: [4, 5] } }, 0.0);
+        // continuous parallax drift of the whole wall
+        tl.to("#wall", { scale: 1.06, x: 60, y: -30, rotation: 0.6, duration: 9.4, ease: "sine.inOut" }, 0.4);
+        // subtle per-tile breathing
+        tl.to(tileEls, { scale: 1.04, duration: 3.2, ease: "sine.inOut", yoyo: true, repeat: 3,
+          stagger: { each: 0.08, from: "edges", grid: [4, 5] } }, 0.9);
+
+        // ---- dim in so words read ----
+        tl.to("#dim", { opacity: 1, duration: 0.8, ease: "power2.out" }, 0.9);
+
+        // ---- sequential words ----
+        function showWord(id, at) {
+          tl.fromTo(id, { opacity: 0, scale: 1.16, filter: "blur(8px)" },
+            { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.7, ease: "power3.out", transformOrigin: "center" }, at);
+          tl.to(id, { opacity: 0, scale: 0.96, filter: "blur(6px)", duration: 0.55, ease: "power2.in" }, at + 1.55);
+        }
+        showWord("#wPast", 1.4);
+        showWord("#wPresent", 3.3);
+        showWord("#wFuture", 5.2);
+
+        // ---- finale: wall recedes, channel lockup ----
+        tl.to("#dim", { opacity: 1, background: "radial-gradient(ellipse at 50% 50%, rgba(4,6,11,0.9) 0%, rgba(4,6,11,0.98) 60%, #04060b 100%)", duration: 1.0, ease: "power2.inOut" }, 7.0);
+        tl.to("#wall", { scale: 1.4, opacity: 0.1, duration: 1.6, ease: "power2.in" }, 7.0);
+        tl.to(tileEls, { opacity: 0, duration: 1.2, ease: "power2.in", stagger: { each: 0.02, from: "center", grid: [4, 5] } }, 7.0);
+        tl.fromTo("#lockup", { opacity: 0, scale: 1.1, filter: "blur(10px)" },
+          { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.9, ease: "power3.out", transformOrigin: "center" }, 7.6);
+        tl.to("#rule", { scaleX: 1, duration: 0.7, ease: "power3.inOut" }, 8.3);
+        tl.fromTo("#tag", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, 8.5);
+
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>
