@@ -6,80 +6,170 @@
     <script src="../gsap.min.js"></script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      :root { --gold: #ffd60a; }
-      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #03060d; font-family: "Inter", system-ui, sans-serif; }
+      :root { --gold: #ffd60a; --cy: #46d6e6; --bl: #5a96ff; --ink: #dce8f6; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #04080f; font-family: "Inter", system-ui, sans-serif; }
       #frame { position: absolute; inset: 0; }
+      .mono { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.18em; }
 
-      /* ---- textured navy background (same blue family as the video) ---- */
       #bgBase { position: absolute; inset: 0; z-index: 0;
-        background: radial-gradient(ellipse 95% 85% at 50% 40%, #13243f 0%, #0c1a30 34%, #081120 64%, #04080f 100%); }
-      .tex { position: absolute; inset: 0; pointer-events: none; }
-      #texFine { z-index: 1; opacity: 0.5;
-        background-image: linear-gradient(rgba(120,170,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(120,170,255,0.05) 1px, transparent 1px);
-        background-size: 44px 44px; }
-      #texBold { z-index: 1; opacity: 0.6;
-        background-image: linear-gradient(rgba(130,180,255,0.07) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(130,180,255,0.07) 1.5px, transparent 1.5px);
-        background-size: 224px 224px; }
-      #texHatch { z-index: 1; opacity: 0.6;
-        background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.016) 0 2px, transparent 2px 10px); }
-      #texRings { z-index: 1; opacity: 0.8;
-        background-image: repeating-radial-gradient(circle at 50% 44%, rgba(120,170,255,0.045) 0 1.5px, transparent 1.5px 64px); }
-      #glowCenter { position: absolute; inset: 0; z-index: 2; pointer-events: none;
-        background: radial-gradient(circle 460px at 50% 40%, rgba(255,214,10,0.10), transparent 70%); }
-      #vign { position: absolute; inset: 0; z-index: 6; pointer-events: none;
-        background: radial-gradient(ellipse 80% 75% at 50% 46%, transparent 40%, rgba(2,4,9,0.72) 100%); }
-      #bottomScrim { position: absolute; left: 0; right: 0; bottom: 0; height: 320px; z-index: 6; pointer-events: none;
-        background: linear-gradient(to top, rgba(2,4,9,0.85), transparent); }
-      .grain { position: absolute; inset: 0; opacity: 0.13; mix-blend-mode: overlay; pointer-events: none; z-index: 7; }
+        background: radial-gradient(ellipse 80% 70% at 50% 30%, #0f2138 0%, #0a1828 40%, #061020 70%, #03070e 100%); }
 
-      /* ---- figures with warm-yellow rim glow ---- */
+      /* ---- operator console layers (behind the people) ---- */
+      .ops { position: absolute; inset: 0; }
+      #persp { z-index: 1; opacity: 0.55; }
+      #opsFar { z-index: 2; opacity: 0.5; filter: blur(2.5px); }
+      #opsMid { z-index: 3; opacity: 0.92; filter: blur(0.4px); }
+      #focal { position: absolute; inset: 0; z-index: 4; pointer-events: none;
+        background: radial-gradient(circle 520px at 50% 52%, rgba(70,150,230,0.16), rgba(255,214,10,0.05) 30%, transparent 66%); }
+      svg { overflow: visible; }
+      .gline { stroke: var(--cy); }
+      .panel { position: absolute; border: 1px solid rgba(70,150,230,0.35); background: rgba(10,22,38,0.4); border-radius: 4px; }
+      .panel .ph { font-size: 12px; color: rgba(160,200,240,0.9); padding: 6px 10px; border-bottom: 1px solid rgba(70,150,230,0.25); }
+      .pl { position: absolute; font-size: 12px; color: rgba(150,195,235,0.85); }
+
+      /* ---- people: large, filling the lower ~2/3 ---- */
       .fig { position: absolute; bottom: -8px; }
-      #thiel { left: 338px; transform: translateX(-50%); height: 612px; z-index: 3;
-        filter: drop-shadow(0 0 3px rgba(255,214,10,0.95)) drop-shadow(0 0 11px rgba(255,214,10,0.85)) drop-shadow(0 0 26px rgba(255,210,20,0.45)) drop-shadow(0 18px 26px rgba(0,0,0,0.55)); }
-      #trump { left: 1600px; transform: translateX(-50%); height: 640px; z-index: 4;
-        filter: drop-shadow(0 0 3px rgba(255,214,10,0.95)) drop-shadow(0 0 11px rgba(255,214,10,0.85)) drop-shadow(0 0 26px rgba(255,210,20,0.45)) drop-shadow(0 18px 26px rgba(0,0,0,0.55)); }
-      #karp { left: 50%; transform: translateX(-50%); height: 768px; z-index: 5;
-        filter: drop-shadow(0 0 4px rgba(255,221,40,1)) drop-shadow(0 0 14px rgba(255,214,10,0.95)) drop-shadow(0 0 34px rgba(255,210,20,0.6)) drop-shadow(0 22px 30px rgba(0,0,0,0.6)); }
+      #thiel { left: 305px; transform: translateX(-50%); height: 760px; z-index: 5;
+        filter: drop-shadow(0 0 3px rgba(255,221,40,0.95)) drop-shadow(0 0 11px rgba(255,214,10,0.85)) drop-shadow(0 0 26px rgba(255,210,20,0.45)) drop-shadow(0 18px 28px rgba(0,0,0,0.6)); }
+      #trump { left: 1635px; transform: translateX(-50%); height: 800px; z-index: 6;
+        filter: drop-shadow(0 0 3px rgba(255,221,40,0.95)) drop-shadow(0 0 11px rgba(255,214,10,0.85)) drop-shadow(0 0 26px rgba(255,210,20,0.45)) drop-shadow(0 18px 28px rgba(0,0,0,0.6)); }
+      #karp { left: 50%; transform: translateX(-50%); height: 942px; z-index: 7;
+        filter: drop-shadow(0 0 4px rgba(255,221,40,1)) drop-shadow(0 0 14px rgba(255,214,10,0.95)) drop-shadow(0 0 34px rgba(255,210,20,0.6)) drop-shadow(0 22px 34px rgba(0,0,0,0.65)); }
 
-      /* ---- Palantir logo (white-on-black jpg → screen blend drops the black) ---- */
-      /* white-on-black jpg → screen blend drops the black; contrast crush kills the residual box */
-      #logo { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); width: 470px; z-index: 8;
+      /* ---- HUD frame on top, framing the whole console ---- */
+      #topbar { position: absolute; top: 0; left: 0; right: 0; height: 46px; z-index: 9;
+        background: linear-gradient(rgba(8,18,32,0.82), rgba(8,18,32,0.3)); border-bottom: 1px solid rgba(70,200,230,0.45); }
+      #topbar .l { position: absolute; left: 26px; top: 15px; font-size: 13px; color: var(--cy); }
+      #topbar .c { position: absolute; left: 50%; top: 15px; transform: translateX(-50%); font-size: 13px; color: rgba(180,215,245,0.85); }
+      #topbar .r { position: absolute; right: 26px; top: 15px; font-size: 13px; color: rgba(180,215,245,0.85); }
+      #topbar .dot { color: #57e08a; }
+      .corner { position: absolute; width: 38px; height: 38px; border: 2px solid rgba(70,200,230,0.7); z-index: 9; }
+      #cTL { left: 18px; top: 58px; border-right: 0; border-bottom: 0; }
+      #cTR { right: 18px; top: 58px; border-left: 0; border-bottom: 0; }
+      #cBL { left: 18px; bottom: 18px; border-right: 0; border-top: 0; }
+      #cBR { right: 18px; bottom: 18px; border-left: 0; border-top: 0; }
+      #botL { position: absolute; left: 26px; bottom: 24px; z-index: 9; font-size: 12px; color: rgba(120,170,210,0.7); }
+      #botR { position: absolute; right: 26px; bottom: 24px; z-index: 9; font-size: 12px; color: rgba(120,170,210,0.7); text-align: right; }
+
+      #logo { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); width: 360px; z-index: 9;
         mix-blend-mode: screen; filter: brightness(1.05) contrast(2.2) saturate(0); }
-      #logoTag { position: absolute; top: 168px; left: 50%; transform: translateX(-50%); z-index: 8;
-        font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.5em; font-size: 17px; color: rgba(190,205,225,0.8); }
+
+      #scan { position: absolute; inset: 0; z-index: 10; pointer-events: none; opacity: 0.5;
+        background: repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 3px); }
+      #vign { position: absolute; inset: 0; z-index: 10; pointer-events: none;
+        background: radial-gradient(ellipse 78% 80% at 50% 52%, transparent 44%, rgba(2,4,9,0.78) 100%); }
+      .grain { position: absolute; inset: 0; opacity: 0.1; mix-blend-mode: overlay; pointer-events: none; z-index: 11; }
     </style>
   </head>
   <body>
     <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="1.2">
       <div id="frame">
         <div id="bgBase"></div>
-        <div class="tex" id="texRings"></div>
-        <div class="tex" id="texHatch"></div>
-        <div class="tex" id="texFine"></div>
-        <div class="tex" id="texBold"></div>
-        <div id="glowCenter"></div>
+
+        <svg class="ops" id="persp" viewBox="0 0 1920 1080"></svg>
+        <div class="ops" id="opsFar">
+          <svg id="globe" viewBox="0 0 380 380" style="position:absolute; right:60px; top:120px; width:380px; height:380px;"></svg>
+        </div>
+        <div class="ops" id="opsMid"></div>
+        <div id="focal"></div>
 
         <img class="fig" id="thiel" src="../assets/thumb/thiel.png" />
         <img class="fig" id="trump" src="../assets/thumb/trump.png" />
         <img class="fig" id="karp" src="../assets/thumb/karp.png" />
 
-        <div id="vign"></div>
-        <div id="bottomScrim"></div>
-
+        <div id="topbar">
+          <div class="l mono">◧ Palantir · Gotham</div>
+          <div class="c mono">Operator Console</div>
+          <div class="r mono"><span class="dot">●</span> Live &nbsp; 47.6°N 38.2°E</div>
+        </div>
         <img id="logo" src="../assets/palantir-white.jpg" />
+        <div class="corner" id="cTL"></div><div class="corner" id="cTR"></div>
+        <div class="corner" id="cBL"></div><div class="corner" id="cBR"></div>
+        <div class="mono" id="botL">Target Package // Leadership</div>
+        <div class="mono" id="botR">OSINT · Entity Graph · v4.7</div>
 
+        <div id="scan"></div>
+        <div id="vign"></div>
         <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
       </div>
 
       <script>
         window.__timelines = window.__timelines || {};
+        const CY = "#46d6e6", BL = "#5a96ff";
+        function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+        const r = rng(771);
+
+        // ---- one-point perspective grid (depth) ----
+        (function () {
+          const VPX = 960, VPY = 300, S = [];
+          // fan lines to the bottom edge
+          for (let x = -400; x <= 2320; x += 150) S.push(`<line x1="${VPX}" y1="${VPY}" x2="${x}" y2="1140" stroke="${CY}" stroke-width="1" stroke-opacity="0.16"/>`);
+          // a few up to the top edge (ceiling)
+          for (let x = -200; x <= 2120; x += 260) S.push(`<line x1="${VPX}" y1="${VPY}" x2="${x}" y2="-40" stroke="${CY}" stroke-width="1" stroke-opacity="0.07"/>`);
+          // horizontal depth rows below the horizon
+          for (let k = 1; k <= 16; k++) { const y = VPY + (1140 - VPY) * Math.pow(k / 16, 2.1); const op = (0.05 + 0.18 * (k / 16)).toFixed(3); S.push(`<line x1="-200" y1="${y.toFixed(1)}" x2="2120" y2="${y.toFixed(1)}" stroke="${CY}" stroke-width="1" stroke-opacity="${op}"/>`); }
+          document.getElementById("persp").innerHTML = S.join("");
+        })();
+
+        // ---- geo globe widget (right, far depth) ----
+        (function () {
+          const cx = 190, cy = 190, R = 150, S = [`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${BL}" stroke-width="1.4" stroke-opacity="0.6"/>`];
+          for (let i = 1; i <= 3; i++) { const ry = R * (i / 4); S.push(`<ellipse cx="${cx}" cy="${cy}" rx="${R}" ry="${ry}" fill="none" stroke="${BL}" stroke-width="1" stroke-opacity="0.3"/>`); }
+          for (let i = 1; i <= 3; i++) { const rx = R * (i / 4); S.push(`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${R}" fill="none" stroke="${BL}" stroke-width="1" stroke-opacity="0.3"/>`); }
+          // connection arcs + pins
+          const pins = [[120, 110], [255, 150], [180, 250], [240, 250], [110, 210]];
+          pins.forEach((p) => S.push(`<circle cx="${p[0]}" cy="${p[1]}" r="3.4" fill="${CY}"/><circle cx="${p[0]}" cy="${p[1]}" r="8" fill="none" stroke="${CY}" stroke-width="1" stroke-opacity="0.5"/>`));
+          S.push(`<path d="M120 110 Q230 60 255 150" fill="none" stroke="${CY}" stroke-width="1.4" stroke-opacity="0.7"/>`);
+          S.push(`<path d="M255 150 Q210 230 180 250" fill="none" stroke="${CY}" stroke-width="1.4" stroke-opacity="0.6"/>`);
+          S.push(`<path d="M120 110 Q60 190 110 210" fill="none" stroke="${CY}" stroke-width="1.2" stroke-opacity="0.5"/>`);
+          document.getElementById("globe").innerHTML = S.join("");
+        })();
+
+        // ---- entity node-link graph + panels + reticle (mid layer) ----
+        (function () {
+          const mid = document.getElementById("opsMid");
+          // node graph upper-left
+          const NS = 11, nodes = [];
+          for (let i = 0; i < NS; i++) nodes.push([70 + r() * 470, 90 + r() * 360]);
+          let g = `<svg viewBox="0 0 1920 1080" style="position:absolute;inset:0;width:1920px;height:1080px;">`;
+          for (let i = 0; i < NS; i++) for (let j = i + 1; j < NS; j++) if (r() < 0.28) {
+            g += `<line x1="${nodes[i][0].toFixed(0)}" y1="${nodes[i][1].toFixed(0)}" x2="${nodes[j][0].toFixed(0)}" y2="${nodes[j][1].toFixed(0)}" stroke="${CY}" stroke-width="1" stroke-opacity="0.32"/>`;
+          }
+          nodes.forEach((n, i) => { const rad = i % 4 === 0 ? 9 : 5; g += `<circle cx="${n[0].toFixed(0)}" cy="${n[1].toFixed(0)}" r="${rad}" fill="#0b1b2e" stroke="${CY}" stroke-width="1.6" stroke-opacity="0.85"/><circle cx="${n[0].toFixed(0)}" cy="${n[1].toFixed(0)}" r="${rad - 2.5}" fill="${CY}" fill-opacity="0.6"/>`; });
+          // a target reticle upper-right area
+          const rx = 1360, ry = 360;
+          g += `<circle cx="${rx}" cy="${ry}" r="74" fill="none" stroke="${CY}" stroke-width="1.4" stroke-opacity="0.55"/><circle cx="${rx}" cy="${ry}" r="44" fill="none" stroke="${CY}" stroke-width="1" stroke-opacity="0.4"/>`;
+          g += `<line x1="${rx - 96}" y1="${ry}" x2="${rx + 96}" y2="${ry}" stroke="${CY}" stroke-width="1" stroke-opacity="0.5"/><line x1="${rx}" y1="${ry - 96}" x2="${rx}" y2="${ry + 96}" stroke="${CY}" stroke-width="1" stroke-opacity="0.5"/>`;
+          g += `</svg>`;
+          mid.innerHTML = g;
+
+          // labels for the graph
+          const mk = (cls, x, y, t) => { const d = document.createElement("div"); d.className = cls; d.style.left = x + "px"; d.style.top = y + "px"; d.innerHTML = t; mid.appendChild(d); };
+          mk("pl mono", 70, 64, "Entity Network");
+          mk("pl mono", 1300, 452, "TRK-09 · LOCKED");
+
+          // HUD data panels with bar charts / sparklines
+          function panel(x, y, w, h, title, bars) {
+            const p = document.createElement("div"); p.className = "panel"; p.style.cssText += `left:${x}px;top:${y}px;width:${w}px;height:${h}px;`;
+            let inner = `<div class="ph mono">${title}</div><div style="position:absolute;left:0;right:0;bottom:8px;height:${h - 42}px;display:flex;align-items:flex-end;gap:6px;padding:0 12px;">`;
+            for (let i = 0; i < bars; i++) { const bh = 16 + Math.round(r() * (h - 60)); inner += `<div style="flex:1;height:${bh}px;background:linear-gradient(${CY},rgba(70,150,230,0.2));opacity:0.8;border-radius:1px;"></div>`; }
+            inner += `</div>`; p.innerHTML = inner; mid.appendChild(p);
+          }
+          panel(636, 96, 250, 132, "Signal Intake", 11);
+          panel(1480, 660, 300, 120, "Throughput · 24h", 16);
+          // sparkline panel
+          const sp = document.createElement("div"); sp.className = "panel"; sp.style.cssText += "left:60px;top:520px;width:300px;height:120px;";
+          let pts = ""; for (let i = 0; i <= 30; i++) pts += `${(i / 30 * 276 + 12).toFixed(0)},${(96 - r() * 70).toFixed(0)} `;
+          sp.innerHTML = `<div class="ph mono">Anomaly Score</div><svg viewBox="0 0 300 120" style="position:absolute;inset:0;width:300px;height:120px;"><polyline points="${pts}" fill="none" stroke="${CY}" stroke-width="2" stroke-opacity="0.85"/></svg>`;
+          mid.appendChild(sp);
+        })();
+
+        // ---- subtle reveal, spanning the full duration ----
         const tl = gsap.timeline({ paused: true });
-        // span the full composition duration so late frames stay resolved
         tl.to({ p: 0 }, { p: 1, duration: 1.2, ease: "none" }, 0);
         tl.fromTo("#frame", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0);
-        tl.fromTo(["#thiel", "#trump"], { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out", stagger: 0.05 }, 0.1);
-        tl.fromTo("#karp", { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 0.15);
-        tl.fromTo("#logo", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.3);
+        tl.fromTo(["#thiel", "#trump"], { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out", stagger: 0.05 }, 0.1);
+        tl.fromTo("#karp", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 0.15);
         window.__timelines["main"] = tl;
       </script>
     </div>
