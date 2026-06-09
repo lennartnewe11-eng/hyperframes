@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root { --gold: #ffd60a; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #03060d; font-family: "Inter", system-ui, sans-serif; }
+      #frame { position: absolute; inset: 0; }
+
+      /* ---- textured navy background (same blue family as the video) ---- */
+      #bgBase { position: absolute; inset: 0; z-index: 0;
+        background: radial-gradient(ellipse 95% 85% at 50% 40%, #13243f 0%, #0c1a30 34%, #081120 64%, #04080f 100%); }
+      .tex { position: absolute; inset: 0; pointer-events: none; }
+      #texFine { z-index: 1; opacity: 0.5;
+        background-image: linear-gradient(rgba(120,170,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(120,170,255,0.05) 1px, transparent 1px);
+        background-size: 44px 44px; }
+      #texBold { z-index: 1; opacity: 0.6;
+        background-image: linear-gradient(rgba(130,180,255,0.07) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(130,180,255,0.07) 1.5px, transparent 1.5px);
+        background-size: 224px 224px; }
+      #texHatch { z-index: 1; opacity: 0.6;
+        background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.016) 0 2px, transparent 2px 10px); }
+      #texRings { z-index: 1; opacity: 0.8;
+        background-image: repeating-radial-gradient(circle at 50% 44%, rgba(120,170,255,0.045) 0 1.5px, transparent 1.5px 64px); }
+      #glowCenter { position: absolute; inset: 0; z-index: 2; pointer-events: none;
+        background: radial-gradient(circle 460px at 50% 40%, rgba(255,214,10,0.10), transparent 70%); }
+      #vign { position: absolute; inset: 0; z-index: 6; pointer-events: none;
+        background: radial-gradient(ellipse 80% 75% at 50% 46%, transparent 40%, rgba(2,4,9,0.72) 100%); }
+      #bottomScrim { position: absolute; left: 0; right: 0; bottom: 0; height: 320px; z-index: 6; pointer-events: none;
+        background: linear-gradient(to top, rgba(2,4,9,0.85), transparent); }
+      .grain { position: absolute; inset: 0; opacity: 0.13; mix-blend-mode: overlay; pointer-events: none; z-index: 7; }
+
+      /* ---- figures with warm-yellow rim glow ---- */
+      .fig { position: absolute; bottom: -8px; }
+      #thiel { left: 338px; transform: translateX(-50%); height: 612px; z-index: 3;
+        filter: drop-shadow(0 0 3px rgba(255,214,10,0.95)) drop-shadow(0 0 11px rgba(255,214,10,0.85)) drop-shadow(0 0 26px rgba(255,210,20,0.45)) drop-shadow(0 18px 26px rgba(0,0,0,0.55)); }
+      #trump { left: 1600px; transform: translateX(-50%); height: 640px; z-index: 4;
+        filter: drop-shadow(0 0 3px rgba(255,214,10,0.95)) drop-shadow(0 0 11px rgba(255,214,10,0.85)) drop-shadow(0 0 26px rgba(255,210,20,0.45)) drop-shadow(0 18px 26px rgba(0,0,0,0.55)); }
+      #karp { left: 50%; transform: translateX(-50%); height: 768px; z-index: 5;
+        filter: drop-shadow(0 0 4px rgba(255,221,40,1)) drop-shadow(0 0 14px rgba(255,214,10,0.95)) drop-shadow(0 0 34px rgba(255,210,20,0.6)) drop-shadow(0 22px 30px rgba(0,0,0,0.6)); }
+
+      /* ---- Palantir logo (white-on-black jpg → screen blend drops the black) ---- */
+      /* white-on-black jpg → screen blend drops the black; contrast crush kills the residual box */
+      #logo { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); width: 470px; z-index: 8;
+        mix-blend-mode: screen; filter: brightness(1.05) contrast(2.2) saturate(0); }
+      #logoTag { position: absolute; top: 168px; left: 50%; transform: translateX(-50%); z-index: 8;
+        font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.5em; font-size: 17px; color: rgba(190,205,225,0.8); }
+    </style>
+  </head>
+  <body>
+    <div data-composition-id="main" data-width="1920" data-height="1080" data-start="0" data-duration="1.2">
+      <div id="frame">
+        <div id="bgBase"></div>
+        <div class="tex" id="texRings"></div>
+        <div class="tex" id="texHatch"></div>
+        <div class="tex" id="texFine"></div>
+        <div class="tex" id="texBold"></div>
+        <div id="glowCenter"></div>
+
+        <img class="fig" id="thiel" src="../assets/thumb/thiel.png" />
+        <img class="fig" id="trump" src="../assets/thumb/trump.png" />
+        <img class="fig" id="karp" src="../assets/thumb/karp.png" />
+
+        <div id="vign"></div>
+        <div id="bottomScrim"></div>
+
+        <img id="logo" src="../assets/palantir-white.jpg" />
+
+        <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+      </div>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+        // span the full composition duration so late frames stay resolved
+        tl.to({ p: 0 }, { p: 1, duration: 1.2, ease: "none" }, 0);
+        tl.fromTo("#frame", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0);
+        tl.fromTo(["#thiel", "#trump"], { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out", stagger: 0.05 }, 0.1);
+        tl.fromTo("#karp", { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 0.15);
+        tl.fromTo("#logo", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.3);
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>
