@@ -30,11 +30,11 @@
       /* ---- people: large, filling the lower ~2/3 ---- */
       .fig { position: absolute; bottom: -8px; }
       #thiel { left: 305px; transform: translateX(-50%); height: 760px; z-index: 5;
-        filter: drop-shadow(0 0 3px rgba(255,221,40,0.95)) drop-shadow(0 0 11px rgba(255,214,10,0.85)) drop-shadow(0 0 26px rgba(255,210,20,0.45)) drop-shadow(0 18px 28px rgba(0,0,0,0.6)); }
+        filter: drop-shadow(0 0 2px rgba(255,221,40,0.8)) drop-shadow(0 0 8px rgba(255,214,10,0.6)) drop-shadow(0 0 18px rgba(255,210,20,0.32)) drop-shadow(0 18px 28px rgba(0,0,0,0.6)); }
       #trump { left: 1635px; transform: translateX(-50%); height: 800px; z-index: 6;
-        filter: drop-shadow(0 0 3px rgba(255,221,40,0.95)) drop-shadow(0 0 11px rgba(255,214,10,0.85)) drop-shadow(0 0 26px rgba(255,210,20,0.45)) drop-shadow(0 18px 28px rgba(0,0,0,0.6)); }
+        filter: drop-shadow(0 0 2px rgba(255,221,40,0.8)) drop-shadow(0 0 8px rgba(255,214,10,0.6)) drop-shadow(0 0 18px rgba(255,210,20,0.32)) drop-shadow(0 18px 28px rgba(0,0,0,0.6)); }
       #karp { left: 50%; transform: translateX(-50%); height: 942px; z-index: 7;
-        filter: drop-shadow(0 0 4px rgba(255,221,40,1)) drop-shadow(0 0 14px rgba(255,214,10,0.95)) drop-shadow(0 0 34px rgba(255,210,20,0.6)) drop-shadow(0 22px 34px rgba(0,0,0,0.65)); }
+        filter: drop-shadow(0 0 3px rgba(255,221,40,0.85)) drop-shadow(0 0 10px rgba(255,214,10,0.7)) drop-shadow(0 0 24px rgba(255,210,20,0.4)) drop-shadow(0 22px 34px rgba(0,0,0,0.65)); }
 
       /* ---- HUD frame on top, framing the whole console ---- */
       #topbar { position: absolute; top: 0; left: 0; right: 0; height: 46px; z-index: 9;
@@ -51,7 +51,7 @@
       #botL { position: absolute; left: 26px; bottom: 24px; z-index: 9; font-size: 12px; color: rgba(120,170,210,0.7); }
       #botR { position: absolute; right: 26px; bottom: 24px; z-index: 9; font-size: 12px; color: rgba(120,170,210,0.7); text-align: right; }
 
-      #logo { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); width: 360px; z-index: 9;
+      #logo { position: absolute; top: 78px; left: 64px; width: 500px; z-index: 2; opacity: 0.66;
         mix-blend-mode: screen; filter: brightness(1.05) contrast(2.2) saturate(0); }
 
       #scan { position: absolute; inset: 0; z-index: 10; pointer-events: none; opacity: 0.5;
@@ -168,8 +168,8 @@
         const tl = gsap.timeline({ paused: true });
         tl.to({ p: 0 }, { p: 1, duration: 1.2, ease: "none" }, 0);
         tl.fromTo("#frame", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0);
-        tl.fromTo(["#thiel", "#trump"], { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out", stagger: 0.05 }, 0.1);
-        tl.fromTo("#karp", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 0.15);
+        tl.fromTo(["#thiel", "#trump"], { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out", stagger: 0.05 }, 0.1);
+        tl.fromTo("#karp", { opacity: 0 }, { opacity: 1, duration: 0.55, ease: "power2.out" }, 0.15);
         window.__timelines["main"] = tl;
       </script>
     </div>
