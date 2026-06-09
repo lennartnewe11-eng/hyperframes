@@ -33,18 +33,13 @@
         background: radial-gradient(ellipse 76% 78% at 50% 50%, transparent 50%, rgba(8,6,3,0.62) 100%); }
       .grain { position: absolute; inset: 0; z-index: 6; opacity: 0.08; mix-blend-mode: overlay; pointer-events: none; }
 
-      /* torn newspaper piece carrying the three words */
-      #news { position: absolute; left: 50%; top: 50%; width: 1500px; height: 430px; transform: translate(-50%, -50%) rotate(-1.6deg); z-index: 10;
-        background: #f7f4ec; padding: 40px 70px; filter: url(#tornBig) drop-shadow(0 30px 50px rgba(0,0,0,0.6)) drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
-      #newsInner { position: absolute; inset: 0; }
-      #cols { position: absolute; inset: 30px 46px; display: flex; gap: 40px; opacity: 0.5; }
-      #cols .col { flex: 1; }
-      #cols .ln { height: 4px; background: #b3aa97; margin-bottom: 9px; border-radius: 1px; }
-      #headline { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center;
-        font-family: "Blackletter", "Liberation Serif", serif; color: #181309; font-size: 126px; line-height: 1; letter-spacing: 0.01em;
-        text-shadow: 0 2px 0 rgba(255,253,247,0.65); }
-      #headBand { position: absolute; left: 30px; right: 30px; top: 50%; transform: translateY(-50%); height: 150px; z-index: -1;
-        background: linear-gradient(180deg, rgba(247,244,236,0) 0%, rgba(247,244,236,0.92) 22%, rgba(247,244,236,0.92) 78%, rgba(247,244,236,0) 100%); }
+      /* glowing Helvetica words, scattered in the foreground */
+      .word { position: absolute; z-index: 10; font-family: "Helvetica Neue", Helvetica, "Liberation Sans", Arial, sans-serif;
+        font-weight: 800; color: #fff; letter-spacing: -0.015em; line-height: 1;
+        text-shadow: 0 6px 28px rgba(0,0,0,0.72), 0 0 11px rgba(255,255,255,0.95), 0 0 30px rgba(206,230,255,0.85), 0 0 66px rgba(150,205,255,0.6), 0 0 120px rgba(120,185,255,0.4); }
+      #wPast { left: 520px; top: 520px; font-size: 184px; transform: rotate(-6deg); }
+      #wPresent { left: 720px; top: 700px; font-size: 150px; transform: rotate(3deg); }
+      #wFuture { left: 1356px; top: 576px; font-size: 198px; transform: rotate(-3deg); }
     </style>
   </head>
   <body>
@@ -64,13 +59,9 @@
         <div id="vign"></div>
         <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
 
-        <div id="news">
-          <div id="newsInner">
-            <div id="cols"></div>
-            <div id="headBand"></div>
-            <div id="headline">Past. Present. Future.</div>
-          </div>
-        </div>
+        <div class="word" id="wPast">PAST.</div>
+        <div class="word" id="wPresent">PRESENT</div>
+        <div class="word" id="wFuture">FUTURE</div>
       </div>
 
       <script>
@@ -114,14 +105,6 @@
           if (cls.startsWith("plain")) el.style.backgroundImage = `url('${IMG[ai]}')`;
           else el.innerHTML = `<div class="im" style="background-image:url('${IMG[ai]}')"></div>`;
           pile.appendChild(el);
-        }
-
-        // ---- faint newspaper body text inside the torn piece ----
-        const cols = document.getElementById("cols");
-        for (let c = 0; c < 3; c++) {
-          const col = document.createElement("div"); col.className = "col";
-          for (let l = 0; l < 30; l++) { const ln = document.createElement("div"); ln.className = "ln"; ln.style.width = (62 + rnd() * 36).toFixed(0) + "%"; col.appendChild(ln); }
-          cols.appendChild(col);
         }
 
         const tl = gsap.timeline({ paused: true });
