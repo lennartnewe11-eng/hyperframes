@@ -7,69 +7,69 @@
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       @font-face { font-family: "Blackletter"; src: url('../assets/fonts/UnifrakturCook-Bold.ttf'); font-weight: 700; font-display: block; }
-      html, body { width: 2560px; height: 1440px; overflow: hidden; background: #0c0a07; }
+      html, body { width: 2560px; height: 1440px; overflow: hidden; background: #14110c; }
       #frame { position: absolute; inset: 0; }
 
-      /* photo collage */
-      #collage { position: absolute; inset: 0; z-index: 1;
-        filter: grayscale(0.72) sepia(0.34) contrast(1.08) brightness(0.95); }
+      /* base coverage layer (natural colour) */
+      #base { position: absolute; inset: 0; z-index: 1; filter: contrast(1.03) saturate(1.04); }
       .tile { position: absolute; background-size: cover; background-position: center; }
-      .tile::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(20,14,6,0.5); }
+      .tile::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(10,8,4,0.45); }
 
-      /* newsprint halftone + grain + ink wash */
-      #dots { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0.16; mix-blend-mode: multiply;
-        background-image: radial-gradient(circle, #100c06 0 1px, transparent 1.6px); background-size: 5px 5px; }
-      #wash { position: absolute; inset: 0; z-index: 2; pointer-events: none; mix-blend-mode: multiply;
-        background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(60,48,28,0.0) 30%, rgba(40,30,16,0.55) 100%); }
-      #tone { position: absolute; inset: 0; z-index: 2; pointer-events: none; mix-blend-mode: overlay; opacity: 0.4;
-        background: linear-gradient(180deg, rgba(214,196,150,0.5), rgba(120,96,60,0.2)); }
-      .grain { position: absolute; inset: 0; z-index: 3; opacity: 0.16; mix-blend-mode: overlay; pointer-events: none; }
+      /* overlapping collage pieces */
+      #pile { position: absolute; inset: 0; z-index: 2; }
+      .pc { position: absolute; background-size: cover; background-position: center; }
+      .print { padding: 16px 16px 46px; background: #fbfaf6; box-shadow: 0 22px 46px rgba(0,0,0,0.55), 0 4px 10px rgba(0,0,0,0.4); }
+      .print > .im { width: 100%; height: 100%; background-size: cover; background-position: center; }
+      .torn { background: #f7f4ec; padding: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+      .torn.t1 { filter: url(#torn1) drop-shadow(0 16px 22px rgba(0,0,0,0.5)); }
+      .torn.t2 { filter: url(#torn2) drop-shadow(0 16px 22px rgba(0,0,0,0.5)); }
+      .torn.t3 { filter: url(#torn3) drop-shadow(0 16px 22px rgba(0,0,0,0.5)); }
+      .torn > .im { width: 100%; height: 100%; background-size: cover; background-position: center; }
+      .plain { box-shadow: 0 18px 38px rgba(0,0,0,0.55); }
+      .plain::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.08); }
 
-      /* pasted newspaper clipping */
-      #clip { position: absolute; left: 50%; top: 50%; width: 1500px; height: 408px; transform: translate(-50%, -50%) rotate(-1.1deg); z-index: 6;
-        background:
-          repeating-linear-gradient(0deg, rgba(120,100,60,0.05) 0 2px, transparent 2px 4px),
-          radial-gradient(ellipse 120% 120% at 30% 20%, #efe6cd 0%, #e7dabc 55%, #d8c8a2 100%);
-        box-shadow: 0 26px 60px rgba(0,0,0,0.6), 0 4px 14px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(60,46,24,0.5), inset 0 0 70px rgba(120,96,52,0.25);
-        padding: 26px 56px; }
-      #clip::before { content: ""; position: absolute; inset: 10px; border: 1px solid rgba(54,40,20,0.55); pointer-events: none; }
-      #clip::after { content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: 0.5;
-        background: radial-gradient(ellipse 130% 130% at 70% 90%, rgba(90,64,28,0) 50%, rgba(70,48,20,0.6) 100%); }
+      /* atmosphere */
+      #vign { position: absolute; inset: 0; z-index: 5; pointer-events: none;
+        background: radial-gradient(ellipse 76% 78% at 50% 50%, transparent 50%, rgba(8,6,3,0.62) 100%); }
+      .grain { position: absolute; inset: 0; z-index: 6; opacity: 0.08; mix-blend-mode: overlay; pointer-events: none; }
 
-      .row { position: relative; display: flex; align-items: center; justify-content: space-between; color: #2a2114;
-        font-family: "Liberation Serif", Georgia, serif; }
-      .dateline { font-size: 25px; font-style: italic; letter-spacing: 0.04em; padding: 4px 6px 0; }
-      .dateline .sc { font-variant: small-caps; font-style: normal; letter-spacing: 0.14em; }
-      .rule { position: relative; height: 0; border-top: 3px solid #2a2114; margin: 9px 4px; }
-      .rule.thin { border-top-width: 1px; margin-top: -5px; }
-      .masthead { font-family: "Blackletter", "Liberation Serif", serif; color: #1c1610; text-align: center;
-        font-size: 132px; line-height: 1.02; letter-spacing: 0.01em; padding: 6px 0 10px;
-        text-shadow: 0 1px 0 rgba(255,250,235,0.4); }
-      .kicker { text-align: center; font-family: "Liberation Serif", Georgia, serif; font-style: italic; font-size: 26px; color: #3a2c18; letter-spacing: 0.05em; padding-top: 4px; }
-      .kicker .sc { font-variant: small-caps; font-style: normal; letter-spacing: 0.22em; }
+      /* torn newspaper piece carrying the three words */
+      #news { position: absolute; left: 50%; top: 50%; width: 1500px; height: 430px; transform: translate(-50%, -50%) rotate(-1.6deg); z-index: 10;
+        background: #f7f4ec; padding: 40px 70px; filter: url(#tornBig) drop-shadow(0 30px 50px rgba(0,0,0,0.6)) drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
+      #newsInner { position: absolute; inset: 0; }
+      #cols { position: absolute; inset: 30px 46px; display: flex; gap: 40px; opacity: 0.5; }
+      #cols .col { flex: 1; }
+      #cols .ln { height: 4px; background: #b3aa97; margin-bottom: 9px; border-radius: 1px; }
+      #headline { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center;
+        font-family: "Blackletter", "Liberation Serif", serif; color: #181309; font-size: 126px; line-height: 1; letter-spacing: 0.01em;
+        text-shadow: 0 2px 0 rgba(255,253,247,0.65); }
+      #headBand { position: absolute; left: 30px; right: 30px; top: 50%; transform: translateY(-50%); height: 150px; z-index: -1;
+        background: linear-gradient(180deg, rgba(247,244,236,0) 0%, rgba(247,244,236,0.92) 22%, rgba(247,244,236,0.92) 78%, rgba(247,244,236,0) 100%); }
     </style>
   </head>
   <body>
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <filter id="torn1"><feTurbulence type="fractalNoise" baseFrequency="0.016 0.03" numOctaves="3" seed="11" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"/></filter>
+        <filter id="torn2"><feTurbulence type="fractalNoise" baseFrequency="0.02 0.028" numOctaves="3" seed="29" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="24" xChannelSelector="R" yChannelSelector="G"/></filter>
+        <filter id="torn3"><feTurbulence type="fractalNoise" baseFrequency="0.018 0.034" numOctaves="3" seed="47" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="28" xChannelSelector="R" yChannelSelector="G"/></filter>
+        <filter id="tornBig"><feTurbulence type="fractalNoise" baseFrequency="0.011 0.022" numOctaves="4" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="30" xChannelSelector="R" yChannelSelector="G"/></filter>
+      </defs>
+    </svg>
+
     <div data-composition-id="main" data-width="2560" data-height="1440" data-start="0" data-duration="1">
       <div id="frame">
-        <div id="collage"></div>
-        <div id="dots"></div>
-        <div id="tone"></div>
-        <div id="wash"></div>
+        <div id="base"></div>
+        <div id="pile"></div>
+        <div id="vign"></div>
         <div class="grain"><svg width="100%" height="100%"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
 
-        <div id="clip">
-          <div class="row dateline">
-            <span>Vol. MMXXVI · <span class="sc">No. 01</span></span>
-            <span class="sc">Late City Edition</span>
-            <span>Preis 5 ₰</span>
+        <div id="news">
+          <div id="newsInner">
+            <div id="cols"></div>
+            <div id="headBand"></div>
+            <div id="headline">Past. Present. Future.</div>
           </div>
-          <div class="rule"></div>
-          <div class="rule thin"></div>
-          <div class="masthead">Past. Present. Future.</div>
-          <div class="rule"></div>
-          <div class="rule thin"></div>
-          <div class="kicker"><span class="sc">Established MMXXVI</span> — Vergangenheit · Gegenwart · Zukunft</div>
         </div>
       </div>
 
@@ -78,28 +78,51 @@
         const ASPECT = [1.3504,1.4431,1.5,0.8878,1.9076,0.8011,1.2517,1.5626,1.4908,0.6666,1.7734,1.0,1.3333,2.3908,1.0236,1.503,0.64];
         const IMG = ASPECT.map((_, i) => `../assets/outro/img${String(i + 1).padStart(2, "0")}.jpg`);
         function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-        const rnd = mulberry32(424242);
-        const order = [...IMG.keys()];
-        for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+        const rnd = mulberry32(90909);
+        const rr = (lo, hi) => lo + (hi - lo) * rnd();
+        const shuffle = (arr) => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
+        // ---- base coverage masonry (full bleed, natural colour) ----
         const ROWS = [
-          { y: 0,    h: 370, w: [520, 420, 640, 480, 500] },
-          { y: 370,  h: 360, w: [640, 460, 500, 420, 540] },
-          { y: 730,  h: 350, w: [480, 560, 440, 600, 480] },
-          { y: 1080, h: 360, w: [560, 440, 620, 460, 480] },
+          { y: -10, h: 380, w: [560, 440, 640, 480, 520] },
+          { y: 360, h: 380, w: [620, 480, 520, 460, 540] },
+          { y: 730, h: 360, w: [500, 560, 460, 600, 500] },
+          { y: 1080, h: 380, w: [560, 460, 620, 480, 500] },
         ];
-        const col = document.getElementById("collage");
-        let i = 0;
-        ROWS.forEach((row) => {
-          let x = 0;
-          row.w.forEach((w) => {
-            const el = document.createElement("div");
-            el.className = "tile";
-            el.style.left = x + "px"; el.style.top = row.y + "px"; el.style.width = w + "px"; el.style.height = row.h + "px";
-            el.style.backgroundImage = `url('${IMG[order[i % order.length]]}')`;
-            col.appendChild(el); x += w; i++;
-          });
-        });
+        const base = document.getElementById("base");
+        let bi = 0; const bo = shuffle(IMG.keys ? [...IMG.keys()] : IMG.map((_, k) => k));
+        ROWS.forEach((row) => { let x = -10; row.w.forEach((w) => {
+          const el = document.createElement("div"); el.className = "tile";
+          el.style.cssText = `left:${x}px;top:${row.y}px;width:${w}px;height:${row.h}px;background-image:url('${IMG[bo[bi % bo.length]]}')`;
+          base.appendChild(el); x += w; bi++;
+        }); });
+
+        // ---- overlapping collage pieces (prints, torn cut-outs, plain) ----
+        const pile = document.getElementById("pile");
+        const styles = ["print", "torn t1", "print", "torn t2", "plain", "torn t3", "print", "plain", "torn t1", "print", "torn t2", "plain", "print", "torn t3"];
+        const po = shuffle([...Array(IMG.length).keys()].concat([...Array(IMG.length).keys()]));
+        const N = 14;
+        for (let i = 0; i < N; i++) {
+          const ai = po[i % po.length], asp = ASPECT[ai];
+          const w = rr(360, 600), h = w / asp;
+          const x = rr(-90, 2560 - w + 60), y = rr(-70, 1440 - h + 50);
+          const rot = rr(-9, 9);
+          const cls = styles[i % styles.length];
+          const el = document.createElement("div");
+          el.className = "pc " + cls;
+          el.style.cssText = `left:${x.toFixed(0)}px;top:${y.toFixed(0)}px;width:${w.toFixed(0)}px;height:${h.toFixed(0)}px;transform:rotate(${rot.toFixed(1)}deg);z-index:${2 + i};`;
+          if (cls.startsWith("plain")) el.style.backgroundImage = `url('${IMG[ai]}')`;
+          else el.innerHTML = `<div class="im" style="background-image:url('${IMG[ai]}')"></div>`;
+          pile.appendChild(el);
+        }
+
+        // ---- faint newspaper body text inside the torn piece ----
+        const cols = document.getElementById("cols");
+        for (let c = 0; c < 3; c++) {
+          const col = document.createElement("div"); col.className = "col";
+          for (let l = 0; l < 30; l++) { const ln = document.createElement("div"); ln.className = "ln"; ln.style.width = (62 + rnd() * 36).toFixed(0) + "%"; col.appendChild(ln); }
+          cols.appendChild(col);
+        }
 
         const tl = gsap.timeline({ paused: true });
         tl.fromTo("#frame", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 0);
