@@ -1,0 +1,716 @@
+1
+00:00:05,800 --> 00:00:35,700
+Im Iran beginnt die Schulwoche an.
+
+2
+00:00:35,700 --> 00:00:48,100
+Am Samstag und an einem solchen ganz normalen Samstag, dem 28. Februar 2026, kamen in der Stadt Binab im Südosten des Landes rund 170 Menschen in einer Mädchenschule zusammen.
+
+3
+00:00:48,100 --> 00:00:56,400
+Schülerinnen, Lehrerinnen, Verwaltungsangestellte. Eine Schule wie viele, ein Morgen wie viele.
+
+4
+00:00:56,400 --> 00:01:01,100
+Dann kam der erste Schlag.
+
+5
+00:01:01,100 --> 00:01:08,800
+Nach Berichten der Nachrichtenagentur Reuters folgten etwa 40 Minuten später weitere Einschläge.
+
+6
+00:01:08,800 --> 00:01:19,200
+Ein sogenannter Double Tap Angriff. Erst das Gebäude, dann die Ersthelfer. Der iranische rote Halbmond zählte 168 Tote.
+
+7
+00:01:19,200 --> 00:01:22,000
+Darunter über 100 Kinder.
+
+8
+00:01:22,000 --> 00:01:29,600
+Die Frage, wer für diesen Angriff verantwortlich ist, war von Anfang an umstritten. Die USA bestritten die Verantwortung.
+
+9
+00:01:29,600 --> 00:01:38,600
+Donald Trump erklärte Amerika greife keine Zivilisten an. Ein gezielter Angriff auf eine Schule geht nach internationalem Recht als Kriegsverbrechen.
+
+10
+00:01:38,600 --> 00:01:43,900
+Weil dann veröffentlichte Amnesty International eine detaillierte forensische Analyse.
+
+11
+00:01:43,900 --> 00:01:50,300
+Satellitenbilder zeigten das Gelände der Schule und ein benachbartes Compound der iranischen Revolutionsgarden.
+
+12
+00:01:50,400 --> 00:01:56,700
+Nahe Infrarot auf nahen belegten Brandspuren. Zerstörungsmuster, die präzise Einschlagsgeometrie.
+
+13
+00:01:56,700 --> 00:02:04,000
+Die Schlussfolgerung von Amnesty. Es ist sehr wahrscheinlich, dass eine US Tomahawk Rakete die Schule traf.
+
+14
+00:02:04,000 --> 00:02:15,900
+Vermutlich ürtümlich. Das primäre Ziel war das Militärgelände nebenan. Die Schule war Kollateralschaden. 168 Menschen Kollateralschaden.
+
+15
+00:02:16,800 --> 00:02:24,500
+Hier könnte man sagen, das passiert im Krieg. Fehler passieren. Und das stimmt. Fehler passieren im Krieg seit Jahrtausenden.
+
+16
+00:02:24,500 --> 00:02:29,100
+Aber dieser Angriff fand nicht in einer Zeit statt, in der man auf Karten tippt und hofft.
+
+17
+00:02:29,100 --> 00:02:33,800
+Dieser Angriff fand in einem der technologisch fortschrittlichsten Kriege der Geschichte statt.
+
+18
+00:02:33,800 --> 00:02:38,000
+Einem Krieg, der ausdrücklich als erster echter KI-Krieg bezeichnet wird.
+
+19
+00:02:38,000 --> 00:02:45,100
+Das hilft eine unbequeme Frage auf, wenn künstliche Intelligenz die Präzision revolutioniert haben soll.
+
+20
+00:02:45,600 --> 00:02:48,400
+Wie konnte dann eine Schule getroffen werden?
+
+21
+00:02:48,400 --> 00:02:51,300
+Um das zu verstehen, müssen wir einen Schritt zurücktreten.
+
+22
+00:02:51,300 --> 00:02:57,500
+Weit zurück. Denn was im Irankrieg 2026 passierte, ist nicht über Nacht entstanden.
+
+23
+00:02:57,500 --> 00:03:01,300
+Project Maven. Das klingt nach einem Codenamen aus einem Thriller.
+
+24
+00:03:01,300 --> 00:03:03,900
+Ist es auch. Aber es ist Realität.
+
+25
+00:03:03,900 --> 00:03:10,700
+Maven ist ein KI-System des US-Militärs, das im Jahr 2017 unter dem Pentagon gestartet wurde.
+
+26
+00:03:10,900 --> 00:03:15,500
+Ursprünglich zum Analysieren von Drohnenvideos gedacht, ist es heute das System,
+
+27
+00:03:15,500 --> 00:03:20,000
+das im Irankrieg zum zentralen Rückgrat der amerikanischen Angriffsplanung wurde.
+
+28
+00:03:20,000 --> 00:03:23,300
+Und Maven läuft auf Software eines einzigen Unternehmens.
+
+29
+00:03:23,300 --> 00:03:25,300
+Palantir.
+
+30
+00:03:25,300 --> 00:03:32,800
+Palantir, gegründet 2003, mitfinanziert von Peter Thiel, CIA-Risiko-Kapital-Inklusive.
+
+31
+00:03:32,800 --> 00:03:36,700
+Benannt nach den allsinnigen Kristallkugeln aus Tolkien's Herr der Ringe.
+
+32
+00:03:36,700 --> 00:03:40,000
+Der Name ist kein Zufall, es ist ein Selbstverständnis.
+
+33
+00:03:40,000 --> 00:03:44,400
+Palantir-CEO Alex Kaab ist nicht gerade ein Mann der leisen Worte.
+
+34
+00:03:44,400 --> 00:03:50,200
+Im November 2025, kurz vor Ausbruch der offenen Kampfhandlung, sagte er in einem Podcast,
+
+35
+00:04:01,700 --> 00:04:06,400
+Was Maven kann, erklärte kurz darauf ein Pentagon-Beamter auf einer Palantir-Konferenz.
+
+36
+00:04:06,400 --> 00:04:10,800
+Er demonstrierte live, wie das System Ziele verwaltet wie ein Projektmanagement-Tool.
+
+37
+00:04:10,800 --> 00:04:14,900
+Markierte Ziele wandern mit drei Mausklicks durch eine digitale Pipeline.
+
+38
+00:04:14,900 --> 00:04:19,900
+Zuordnung ausstehend, zugeordnet, in Ausführung, abgeschlossen.
+
+39
+00:04:19,900 --> 00:04:22,800
+Am Ende explodiert auf dem Bildschirm ein Gebäude.
+
+40
+00:04:22,800 --> 00:04:26,500
+Linksklick, Rechtsklick, Linksklick.
+
+41
+00:04:26,500 --> 00:04:29,100
+Das war ein fiktives Demonstrationsszenario,
+
+42
+00:04:29,100 --> 00:04:34,400
+aber die Software dahinter wird in echten Kriegen gegen echte Menschen eingesetzt.
+
+43
+00:04:34,400 --> 00:04:39,900
+Am ersten Tag der US-Angriffe auf den Iran schlug das KI-System, angereichert mit Sprachmodellen,
+
+44
+00:04:39,900 --> 00:04:45,000
+die Geheimdienstdaten in Echtzeit analysierten rund 1000 priorisierte Ziele vor.
+
+45
+00:04:45,000 --> 00:04:51,700
+Was früher Wochen an Planungsarbeit für Analysten bedeutet hätte, komprimierte die Maschine auf Minuten.
+
+46
+00:04:51,700 --> 00:04:57,400
+Eine Georgetown-Studie belegt, eine einzelne Artillerieeinheit mit 20 Soldaten
+
+47
+00:04:57,400 --> 00:05:02,800
+konnte dank Maven die Arbeit leisten, die früher 2000 Menschen erfordert hätte.
+
+48
+00:05:02,800 --> 00:05:04,800
+Speed and Scale.
+
+49
+00:05:04,800 --> 00:05:07,600
+Geschwindigkeit und Skalierung.
+
+50
+00:05:07,600 --> 00:05:12,300
+Das sind die Schlagworte des Neuen Krieges, aber Geschwindigkeit hat einen Preis.
+
+51
+00:05:12,300 --> 00:05:14,600
+Hier liegt der Kern des Problems.
+
+52
+00:05:14,600 --> 00:05:17,400
+Und es ist kein technisches, sondern ein menschliches.
+
+53
+00:05:17,400 --> 00:05:24,400
+Wenn eine KI in Minuten 1000 Ziele vorschlägt, wie lange kann ein Mensch noch wirklich jedes einzelne davon überprüfen?
+
+54
+00:05:24,400 --> 00:05:29,000
+Die israelische Armee hatte im Gaza-Krieg ein System namens Lavender eingesetzt.
+
+55
+00:05:29,200 --> 00:05:36,100
+Es vergab jedem Bewohner Gazas einen Score von 1 bis 100, wie wahrscheinlich es ist, dass diese Person ein Kämpfer ist.
+
+56
+00:05:36,100 --> 00:05:41,400
+Laut investigativen Berichten verbrachten Offiziere im Schnitt etwa 20 Sekunden damit,
+
+57
+00:05:41,400 --> 00:05:48,100
+jede maschinell generierte Zieleinstufung zu überprüfen und lehnten die Empfehlungen der KI so gut wie nie ab.
+
+58
+00:05:48,100 --> 00:05:50,600
+20 Sekunden pro Mensch.
+
+59
+00:05:50,600 --> 00:05:52,600
+Das ist kein menschliches Urteil mehr.
+
+60
+00:05:52,600 --> 00:05:55,900
+Das ist eine Unterschrift unter einem maschinellen Beschluss.
+
+61
+00:05:55,900 --> 00:05:57,600
+Und jetzt zurück nach Minab.
+
+62
+00:05:57,600 --> 00:06:00,900
+War die Mädchenschule in der Datenbank falsch klassifiziert?
+
+63
+00:06:00,900 --> 00:06:03,400
+War das Gelände der Revolutionsgraden zu nah?
+
+64
+00:06:03,400 --> 00:06:06,400
+Und die KI hatte die Sprengwirkungsradien unterschätzt?
+
+65
+00:06:06,400 --> 00:06:11,900
+Haben menschliche Entscheidere die Pipeline zu schnell durchlaufen lassen, weil sie die mit dem System vertraut haben?
+
+66
+00:06:11,900 --> 00:06:13,100
+Wir wissen es nicht.
+
+67
+00:06:13,100 --> 00:06:15,800
+Wahrscheinlich werden wir es nie vollständig wissen.
+
+68
+00:06:15,800 --> 00:06:17,800
+Das ist Teil des Problems.
+
+69
+00:06:20,300 --> 00:06:26,100
+KI-Expertin Verena Jackson von der Universität der Bundeswehr nannte den Ukraine-Krieg KI-Krieg 1.0.
+
+70
+00:06:26,200 --> 00:06:28,900
+Und den Iran-Krieg bereits KI-Krieg 2.0.
+
+71
+00:06:28,900 --> 00:06:30,900
+Die Ukraine war das Testfeld.
+
+72
+00:06:30,900 --> 00:06:34,000
+Iran war der erste echte Einsatz im großen Maßstab.
+
+73
+00:06:34,000 --> 00:06:36,000
+Und was hat das für Konsequenzen?
+
+74
+00:06:36,000 --> 00:06:38,000
+Erstens Entkopplung.
+
+75
+00:06:38,000 --> 00:06:43,200
+Wenn Entscheidungen aus der Distanz getroffen werden, vor Bildschirmen, durch Software-Interfaces,
+
+76
+00:06:43,200 --> 00:06:45,500
+dann wird Töten zunehmend abstrakt.
+
+77
+00:06:45,500 --> 00:06:50,400
+Es ist ein bekanntes Phänomen aus der Drohnkriegsführung, aber KI beschleunigt es.
+
+78
+00:06:50,400 --> 00:06:54,000
+Piloten, die Drohnen steuern, berichten von psychischen Belastungen,
+
+79
+00:06:54,200 --> 00:06:57,900
+weil sie ihre Ziele manchmal stundenlang beobachten, bevor sie abdrücken.
+
+80
+00:06:57,900 --> 00:07:03,200
+Bei einem KI-System, das 1000 Ziele pro Tag generiert, gibt es diese Verbindung nicht mehr.
+
+81
+00:07:03,200 --> 00:07:05,700
+Kein Gesicht, kein Kontext.
+
+82
+00:07:05,700 --> 00:07:07,700
+Ein Score, ein Klick.
+
+83
+00:07:07,700 --> 00:07:11,100
+Zweitens Verantwortung wird diffus.
+
+84
+00:07:11,100 --> 00:07:16,500
+Wer haftet, wenn eine Maschine ein falsches Ziel vorschlägt und ein Mensch es in 20 Sekunden genehmigt?
+
+85
+00:07:16,500 --> 00:07:21,700
+Ist es der Programmierer, der Offizier, der CEO von Palantir,
+
+86
+00:07:21,800 --> 00:07:24,000
+die Regierung, die das System beschafft hat?
+
+87
+00:07:24,000 --> 00:07:26,000
+Diese Frage ist nicht rhetorisch.
+
+88
+00:07:26,000 --> 00:07:29,600
+Sie ist die offene Rechtsfrage des 21. Jahrhunderts.
+
+89
+00:07:29,600 --> 00:07:33,200
+Und die internationale Gemeinschaft hat bisher keine Antwort darauf.
+
+90
+00:07:33,200 --> 00:07:36,800
+Drittens, privates Kapital wird zur Kriegsmacht.
+
+91
+00:07:36,800 --> 00:07:39,400
+Palantir ist ein börsennotiertes Unternehmen.
+
+92
+00:07:39,400 --> 00:07:46,700
+Die Aktie stieg zwischen Mai 2022 und November 2025 um fast 3000 Prozent.
+
+93
+00:07:46,700 --> 00:07:48,900
+Der Irankrieg ließ sie weiter steigen.
+
+94
+00:07:48,900 --> 00:07:51,200
+Kriege sind für Palantir kein Schaden.
+
+95
+00:07:51,200 --> 00:07:52,800
+Sie sind das Geschäftsmodell.
+
+96
+00:07:52,800 --> 00:08:00,900
+Palantir's CTO erklärte öffentlich, der Irankonflikt werde als der erste bedeutende KI-geführte Krieg der Geschichte in Erinnerung bleiben.
+
+97
+00:08:00,900 --> 00:08:05,400
+Das sagt der Technologieschef des Unternehmens, das die Software verkauft.
+
+98
+00:08:05,400 --> 00:08:07,400
+Das ist kein neutrales Urteil.
+
+99
+00:08:07,400 --> 00:08:09,400
+Das ist Marketing.
+
+100
+00:08:11,400 --> 00:08:13,400
+Es gab einmal einen Konsens in Europa.
+
+101
+00:08:13,400 --> 00:08:16,600
+Er war nicht laut, er war nicht berühmt, aber er war real.
+
+102
+00:08:16,800 --> 00:08:28,000
+Als die Europäische Union 2024 den AI-Act verabschiedete, jenes historische Regelwerk zur Regulierung künstlicher Intelligenz, enthielt es eine bemerkenswerte Selbstbeschränkung.
+
+103
+00:08:28,000 --> 00:08:31,300
+Militärische Anwendungen wurden bewusst ausgeklammert.
+
+104
+00:08:31,300 --> 00:08:33,300
+Getrennte Verhandlungen hieß es.
+
+105
+00:08:33,300 --> 00:08:34,500
+Eigene Prozesse.
+
+106
+00:08:34,500 --> 00:08:36,900
+Man wollte keine überstürzten Entscheidungen.
+
+107
+00:08:36,900 --> 00:08:38,900
+Das klang nach Vorsicht.
+
+108
+00:08:38,900 --> 00:08:46,000
+Parallel dazu bemühte sich die internationale Gemeinschaft um verbindliche Regeln für letale autonome Waffensysteme.
+
+109
+00:08:46,000 --> 00:08:48,000
+Im Volksmund Killer Robots.
+
+110
+00:08:48,000 --> 00:09:00,000
+Der UN-Generalsekretär und das internationale Komitee vom Roten Kreuz riefen 2023 gemeinsam dazu auf, bis 2026 ein rechtlich bindendes Abkommen zu beschließen.
+
+111
+00:09:00,000 --> 00:09:04,400
+164 Staaten stimmten in der Generalversammlung dafür.
+
+112
+00:09:04,400 --> 00:09:06,400
+Lediglich 5 dagegen.
+
+113
+00:09:06,400 --> 00:09:08,400
+Das war eine überwältigende Mehrheit.
+
+114
+00:09:08,400 --> 00:09:10,400
+Es passierte nichts.
+
+115
+00:09:10,400 --> 00:09:12,400
+Stattdessen fanden Konferenzen statt.
+
+116
+00:09:12,400 --> 00:09:14,400
+Die Re-Aim-Gipfel.
+
+117
+00:09:14,400 --> 00:09:16,400
+Den Haag 2023.
+
+118
+00:09:16,400 --> 00:09:18,400
+Seoul 2024.
+
+119
+00:09:18,400 --> 00:09:20,400
+Madrid im Februar 2026.
+
+120
+00:09:20,400 --> 00:09:22,400
+Politische Erklärungen.
+
+121
+00:09:22,400 --> 00:09:24,400
+Freiwillige Prinzipien.
+
+122
+00:09:24,400 --> 00:09:26,400
+Unverbindliche Zusagen.
+
+123
+00:09:26,400 --> 00:09:29,600
+Das Völkerrecht ist auf Menschen ausgerichtet, nicht auf Maschinen.
+
+124
+00:09:29,600 --> 00:09:32,400
+Und bisher hat niemand das ernsthaft geändert.
+
+125
+00:09:32,400 --> 00:09:34,400
+Dann kam der Ukraine-Krieg.
+
+126
+00:09:34,400 --> 00:09:36,400
+Dann der Gaza-Krieg.
+
+127
+00:09:36,400 --> 00:09:38,400
+Dann der Iran-Krieg.
+
+128
+00:09:38,400 --> 00:09:42,400
+Und mit jedem Konflikt wurde die Debatte leiser und die Rufe nach Rüstungsinvestitionen lauter.
+
+129
+00:09:42,400 --> 00:09:44,400
+Die EU mobilisiert unter dem Stichwort Re-Aim-Europe
+
+130
+00:09:44,400 --> 00:09:48,400
+Potenzial bis zu 800 Milliarden Euro für Verteidigung bis 2030.
+
+131
+00:09:48,400 --> 00:09:50,400
+Der Europäische Verteidigungsfonds
+
+132
+00:09:50,400 --> 00:09:54,400
+Fördert mit 7,3 Milliarden Euro Rüstungstechnologie.
+
+133
+00:09:54,400 --> 00:10:00,400
+Ausdrücklich in den Bereichen KI, Dronen, Cyberkapazitäten und autonome Systeme.
+
+134
+00:10:00,400 --> 00:10:08,400
+Allein 2026 mobilisierte die Kommission 1 Milliarde Euro für Forschung und Entwicklung spezifischer Rüstungsgüter.
+
+135
+00:10:08,400 --> 00:10:18,400
+Die Rüstungsausgaben der EU-Mitgliedstaaten für Forschung und Entwicklung stiegen zwischen 2023 und 2024 von 6 auf 20 Prozent.
+
+136
+00:10:18,400 --> 00:10:22,400
+In absoluten Zahlen von rund 3 Milliarden auf 5 Milliarden Euro.
+
+137
+00:10:22,400 --> 00:10:24,400
+In einem einzigen Jahr.
+
+138
+00:10:24,400 --> 00:10:28,400
+Hier entsteht ein Widerspruch, der kaum jemandem aufzuregen scheint.
+
+139
+00:10:28,400 --> 00:10:32,400
+Auf der einen Seite steht ein breiter internationaler Konsens.
+
+140
+00:10:32,400 --> 00:10:36,400
+164 Staaten wollen Regeln für autonome Waffen.
+
+141
+00:10:36,400 --> 00:10:42,400
+Auf der anderen Seite fließen hunderte Milliarden in genau jene Systeme, für die es keine Regeln gibt.
+
+142
+00:10:42,400 --> 00:10:46,400
+Die Debatte ist nicht verstummt, weil sich die Fragen erledigt hätten.
+
+143
+00:10:46,400 --> 00:10:49,400
+Sie ist verstummt, weil die Welt gefährlicher geworden ist.
+
+144
+00:10:49,400 --> 00:10:55,400
+Und weil in Zeiten von Gefahr die Frage, wie schnell können wir bauen, lauter ist als die Frage, was dürfen wir bauen.
+
+145
+00:10:55,400 --> 00:10:58,400
+Das ist verständlich, aber es ist gefährlich.
+
+146
+00:10:58,400 --> 00:11:03,400
+Denn die Fragen, die vor zehn Jahren akademisch klang, sind jetzt operativ.
+
+147
+00:11:03,400 --> 00:11:09,400
+Was bedeutet es, wenn eine Drohne autonom entscheidet, ohne Menschen in der Schleifhobbe ein Zielkomponent ist?
+
+148
+00:11:09,400 --> 00:11:14,400
+Was bedeutet es für das Kriegsvölkerrecht, das auf dem Prinzip der Unterscheidung basiert?
+
+149
+00:11:14,400 --> 00:11:16,400
+Zivilisten hier, Kämpfer dort.
+
+150
+00:11:16,400 --> 00:11:19,400
+Wer haftet, wenn die Maschine falsch liegt?
+
+151
+00:11:19,400 --> 00:11:22,400
+Lavender hatte eine Fehlerrate von 10 Prozent.
+
+152
+00:11:22,400 --> 00:11:25,400
+Das war laut israelischen Betreibern akzeptabel.
+
+153
+00:11:25,400 --> 00:11:29,400
+10 Prozent von 37.000 identifizierten Zielen.
+
+154
+00:11:29,400 --> 00:11:36,400
+1.700 Menschen, die als mutmaßliche Terroristen markiert wurden, obwohl die Maschine selbst wusste, dass sie es wahrscheinlich gar nicht sind.
+
+155
+00:11:36,400 --> 00:11:39,400
+Und noch eine letzte Frage, die schwierigste.
+
+156
+00:11:39,400 --> 00:11:43,400
+Macht KI-Kriege präziser oder macht sie sie nur leichter?
+
+157
+00:11:43,400 --> 00:11:49,400
+Präziser im Sinne von weniger zivile Opfer, vielleicht manchmal unter idealen Bedingungen.
+
+158
+00:11:49,400 --> 00:11:54,400
+Aber leichter im Sinne von niedrigere Hemmschwelle, einen Krieg überhaupt zu beginnen.
+
+159
+00:11:54,400 --> 00:11:56,400
+Wenige eigene Soldaten in Gefahr.
+
+160
+00:11:56,400 --> 00:11:58,400
+Weniger politische Kosten.
+
+161
+00:11:58,400 --> 00:12:00,400
+Kein Sarg, der nach Hause fliegt.
+
+162
+00:12:00,400 --> 00:12:03,400
+Nur ein Klick und ein Algorithmus, der die Verantwortung verteilt.
+
+163
+00:12:03,400 --> 00:12:05,400
+Auf alle und auf niemanden.
+
+164
+00:12:05,400 --> 00:12:07,400
+Das ist die eigentliche Gefahr.
+
+165
+00:12:07,400 --> 00:12:15,400
+Nicht der Terminator, nichts, kein Et, sondern der ganz normale, banale, gut organisierte Krieg, der ein bisschen einfacher wird.
+
+166
+00:12:15,400 --> 00:12:18,400
+Ein bisschen schneller, ein bisschen abstrakter.
+
+167
+00:12:18,400 --> 00:12:25,400
+Bis eine KI eine Schule als Kollateralschaden einkalkuliert und niemand mehr genau weiß, wer das entschieden hat.
+
+168
+00:12:26,400 --> 00:12:28,400
+Zurück nach Minab.
+
+169
+00:12:28,400 --> 00:12:34,400
+Ob es ein Fehler der KI war, ein Fehler menschlicher Kontrolle oder schlicht die grausame Logik moderner Kriegsführung.
+
+170
+00:12:34,400 --> 00:12:38,400
+Das wird Gerichte, Untersuchungskommissionen und Historiker noch lange beschäftigen.
+
+171
+00:12:38,400 --> 00:12:44,400
+Wahrscheinlich ohne abschließende Antwort, weil die Verantwortung so verteilt ist, dass sie sich verflüchtigt.
+
+172
+00:12:44,400 --> 00:12:47,400
+Was wir wissen, die Technologie ist da.
+
+173
+00:12:47,400 --> 00:12:50,400
+Die Kriege, in denen sie eingesetzt wird, sind da.
+
+174
+00:12:50,400 --> 00:12:52,400
+Das Geld fließt, die Regeln fehlen.
+
+175
+00:12:52,400 --> 00:13:03,400
+Und die internationale Gemeinschaft, die sich 2023 noch zu 164 gegen 0 mehrheitlich viel verbändliche Grenzen ausgesprochen hat, schaut zu, während Rüstungsfonds wachsen.
+
+176
+00:13:03,400 --> 00:13:07,400
+Das nächste System wird nicht langsamer sein, es wird schneller sein.
+
+177
+00:13:07,400 --> 00:13:10,400
+Mehr Ziele, weniger Zeit pro Entscheidung.
+
+178
+00:13:10,400 --> 00:13:13,400
+Die Frage ist nicht, ob wir diese Debatte führen wollen.
+
+179
+00:13:13,400 --> 00:13:16,400
+Die Frage ist, ob wir sie noch rechtzeitig führen.
+
